@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.390516011801255,
+        "y": 5.590258103593131
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.352960269513065,
+        "y": 5.55032295115826
+      },
+      "isLocked": false,
+      "linkedName": "DriveThruR2End"
+    },
+    {
+      "anchor": {
+        "x": 1.390838803377426,
+        "y": 5.54
+      },
+      "prevControl": {
+        "x": 2.1236463449418763,
+        "y": 5.540352780524728
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "MiddleScoreScorpion"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

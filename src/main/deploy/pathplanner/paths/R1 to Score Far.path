@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.1284908121417674,
+        "y": 7.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.612184705984843,
+        "y": 6.642056635529786
+      },
+      "isLocked": false,
+      "linkedName": "Drive Thru R1 End"
+    },
+    {
+      "anchor": {
+        "x": 2.0837656624077567,
+        "y": 6.318026089940065
+      },
+      "prevControl": {
+        "x": 2.532423340916604,
+        "y": 6.726803085914791
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "R1ScoreEndFar"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -150.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}

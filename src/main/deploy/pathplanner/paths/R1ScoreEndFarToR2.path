@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.0837656624077567,
+        "y": 6.318026089940065
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.2931392457118855,
+        "y": 6.34295151652389
+      },
+      "isLocked": false,
+      "linkedName": "R1ScoreEndFar"
+    },
+    {
+      "anchor": {
+        "x": 2.8763942277733867,
+        "y": 6.422712881592128
+      },
+      "prevControl": {
+        "x": 2.602214535351313,
+        "y": 6.417727796275363
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "PreDriveThruR2From90"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0.5,
+    "rotation": -90.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": -150.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

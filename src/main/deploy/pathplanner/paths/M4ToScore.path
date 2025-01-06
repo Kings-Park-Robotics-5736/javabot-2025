@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.357900274514542,
+        "y": 2.463762744844589
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.702407521066525,
+        "y": 0.15581108267791854
+      },
+      "isLocked": false,
+      "linkedName": "DriveThruM4End"
+    },
+    {
+      "anchor": {
+        "x": 1.9501694993900078,
+        "y": 3.7394659842700477
+      },
+      "prevControl": {
+        "x": 1.7261910680405,
+        "y": 2.366380818170891
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 150.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 90.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

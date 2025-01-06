@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.8494666525198027,
+        "y": 7.015938034287159
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.9781603326736668,
+        "y": 7.015938034287159
+      },
+      "isLocked": false,
+      "linkedName": "BeginDriveThruR1"
+    },
+    {
+      "anchor": {
+        "x": 3.1284908121417674,
+        "y": 7.0
+      },
+      "prevControl": {
+        "x": 2.689243785491615,
+        "y": 7.000270608747703
+      },
+      "nextControl": null,
+      "isLocked": true,
+      "linkedName": "Drive Thru R1 End"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 2.0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}

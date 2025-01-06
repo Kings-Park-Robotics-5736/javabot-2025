@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.8763942277733867,
+        "y": 6.422712881592128
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.8664240571398563,
+        "y": 6.0986823360024065
+      },
+      "isLocked": false,
+      "linkedName": "PreDriveThruR2From90"
+    },
+    {
+      "anchor": {
+        "x": 2.8763942277733867,
+        "y": 5.515427353940903
+      },
+      "prevControl": {
+        "x": 2.8714091424566215,
+        "y": 5.889308752698278
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "DriveThruR290End"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -90.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": -90.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.57732968148275,
+        "y": 0.7447007057968305
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.5823147667995165,
+        "y": 0.749685791113594
+      },
+      "isLocked": false,
+      "linkedName": "M5Start"
+    },
+    {
+      "anchor": {
+        "x": 8.328685696517299,
+        "y": 0.749840835387484
+      },
+      "prevControl": {
+        "x": 7.328685696517299,
+        "y": 0.749840835387484
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "EndDriveThruM5"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

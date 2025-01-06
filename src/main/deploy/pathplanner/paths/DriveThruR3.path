@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.7946307140353883,
+        "y": 4.1445288918305385
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.8945669994701433,
+        "y": 4.140959738779297
+      },
+      "isLocked": false,
+      "linkedName": "R3PreDriveThru"
+    },
+    {
+      "anchor": {
+        "x": 2.7181962056231805,
+        "y": 4.16609679373205
+      },
+      "prevControl": {
+        "x": 2.7109669603954596,
+        "y": 4.137179812821165
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "DriveThruR3End"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 0.75,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

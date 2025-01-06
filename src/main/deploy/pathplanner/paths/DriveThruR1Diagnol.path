@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.417766378631009,
+        "y": 6.24324981018859
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.657050473835728,
+        "y": 6.572265441095078
+      },
+      "isLocked": false,
+      "linkedName": "ToR1DiagnolEnd"
+    },
+    {
+      "anchor": {
+        "x": 2.9063047396739763,
+        "y": 7.020923119603924
+      },
+      "prevControl": {
+        "x": 2.622154876618373,
+        "y": 6.691907488697436
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "DriveThruR1DiagnolEnd"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 60.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "FastShot",
+  "previewStartingState": {
+    "rotation": 60.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

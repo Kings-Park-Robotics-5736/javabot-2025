@@ -1,0 +1,65 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.1284908121417674,
+        "y": 7.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.082022625583713,
+        "y": 6.754166585256248
+      },
+      "isLocked": false,
+      "linkedName": "Drive Thru R1 End"
+    },
+    {
+      "anchor": {
+        "x": 1.76,
+        "y": 5.54
+      },
+      "prevControl": {
+        "x": 2.2039678463266923,
+        "y": 5.549156953991717
+      },
+      "nextControl": {
+        "x": 1.5354062775661028,
+        "y": 5.535367695205472
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.390838803377426,
+        "y": 5.54
+      },
+      "prevControl": {
+        "x": 1.7801685050187013,
+        "y": 5.54
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "MiddleScoreScorpion"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}

@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.313120159694208,
+        "y": 2.4196893722298585
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.313120159694208,
+        "y": 2.419689372229858
+      },
+      "isLocked": false,
+      "linkedName": "EdgeToM4End"
+    },
+    {
+      "anchor": {
+        "x": 8.295181967096907,
+        "y": 2.4296595428633894
+      },
+      "prevControl": {
+        "x": 7.951211080240123,
+        "y": 2.4246744575466246
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "DriveThruM4FromEdgeEnd"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
