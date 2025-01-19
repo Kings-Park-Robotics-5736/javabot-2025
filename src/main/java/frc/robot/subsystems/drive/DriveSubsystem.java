@@ -99,6 +99,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_transYLockoutValue;
   private long m_lastPoseUpdate;
 
+  private boolean pathPlannerInitSuccess;
   private boolean visionEnabled;
 
   private Limelight m_limelight;
@@ -189,6 +190,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyro.setYaw(180);
 
     RobotConfig config;
+    pathPlannerInitSuccess = true;
     try{
       config = RobotConfig.fromGUISettings();
       AutoBuilder.configure(
@@ -214,6 +216,7 @@ public class DriveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
+      pathPlannerInitSuccess = false;
     }
 
    
@@ -260,6 +263,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Robot Pose Y", getPose().getY());
 
   }
+
 
   private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
@@ -356,6 +360,11 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.getBoolean("LimelightVisionEnabled", visionEnabled);
   }
 
+
+  public boolean getPathPlannerInitSuccess(){
+    return pathPlannerInitSuccess;
+  }
+  
   /**
    * Returns the currently-estimated pose of the robot.
    *
