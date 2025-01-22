@@ -27,28 +27,19 @@ import frc.robot.utils.TalonUtils; // Adjust the package name as necessary
 
 public class SwerveModule {
 
-  private final TalonFX m_driveMotor;
   private final int m_id;
+
+  private final TalonFX m_driveMotor;
   private final TalonFX m_turningMotor;
 
   private final CANcoder m_turningEncoder;
   private final PIDController m_drivePIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
   private final PIDController m_turnPIDController = new PIDController(ModuleConstants.kPModuleTurningNoController, 0, 0);
-  // Using a TrapezoidProfile PIDController to allow for smooth turning
-  private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
-      ModuleConstants.kPModuleTurningController,
-      0,
-      0,
-      new TrapezoidProfile.Constraints(
-          ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-          ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+  
 
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(DriveConstants.ksVoltsDrive,
       DriveConstants.kvVoltsDrive, DriveConstants.kaVoltsDrive);
 
-  private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(DriveConstants.ksVoltsTurning,
-      DriveConstants.kvVoltSecondsPerMeterTurning,
-      DriveConstants.kaVoltSecondsSquaredPerMeterTurning);
 
   /**
    * Constructs a SwerveModule.
@@ -106,14 +97,10 @@ public class SwerveModule {
     }
    
 
-      
-
-
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turnPIDController.enableContinuousInput(-Math.PI, Math.PI);
-    m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   public TalonFX getTurningMotor(){
@@ -192,16 +179,10 @@ public class SwerveModule {
     //// SmartDashboard.putNumber("drive vo " +m_id,driveOutput );
     //// SmartDashboard.putNumber("drive vf " +m_id,driveFeedforward);
 
-    double turnFeedforward = 0;// m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
     m_driveMotor.setVoltage(driveOutput + driveFeedforward);
-    /*
-     * if(turnOutput + turnFeedforward < .05){
-     * turnOutput = 0;
-     * turnFeedforward = 0;
-     * }
-     */
-    m_turningMotor.setVoltage(turnOutput + turnFeedforward);
+  
+    m_turningMotor.setVoltage(turnOutput);
   }
 
   public void lockTurningAtZero(){
