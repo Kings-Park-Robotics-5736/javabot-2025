@@ -147,12 +147,12 @@ public final class Constants {
 
     public static final double kMaxVelocity = (double) 2 *  Math.PI; //max velocity is 90 deg / sec
     public static final double kMaxAcceleration = (double) 2.5*  Math.PI; //max accel is 45 deg/sec^2
-    public static final PidConstants kPidValues = new PidConstants(41/*5.3718*/, 0, 6.605);
+    public static final PidConstants kPidValues = new PidConstants(1/*5.3718*/, 0, 0);
     //public static final PidConstants kPidValues = new PidConstants(30/*5.3718*/, 80, .1);
     //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(1.2, .52879, 1.0435, 3.991);
     //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.42502, 2.8721, 0.92093, -1.5);
     //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.87319, 1.8992, 0.55601, -3.153);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.1318, 13.2, 0.11, 0.019257);
+    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0, .42499, 0.11, .3);
 
     //kg 1.56
     //kv .62

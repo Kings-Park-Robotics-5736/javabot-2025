@@ -65,9 +65,9 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                                // = 0.12
                                // volts / Rotation per second
         configs.Slot0.kA = 0.0;
-        configs.Voltage.PeakForwardVoltage = 12;
-        configs.Voltage.PeakReverseVoltage = -12;
-        configs.Feedback.SensorToMechanismRatio = 125 * 2 * Math.PI; //convert to arm radians
+        configs.Voltage.PeakForwardVoltage = 6;
+        configs.Voltage.PeakReverseVoltage = -6;
+        configs.Feedback.SensorToMechanismRatio = 25 /  (2 * Math.PI); //convert to arm radians
 
         if (!TalonUtils.ApplyTalonConfig(m_motor, configs)) {
             System.out.println("!!!!!ERROR!!!! Could not initialize the + Arm. Restart robot!");
@@ -82,13 +82,13 @@ public class ArmSubsystemFalcon extends SubsystemBase {
        
         m_sysIdRoutine = new SysIdRoutine(
                 // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-                new SysIdRoutine.Config(null, Volts.of(7), null, state->SignalLogger.writeString("arm-state", state.toString())),
+                new SysIdRoutine.Config(null, Volts.of(2), null, state->SignalLogger.writeString("arm-state", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Voltage volts) -> {
                             m_motor.setControl(m_sysidControl.withOutput(volts));
                         },
                      null,
-                        this));
+                        this)); 
 
         InitMotionProfile(getArmAngleRadians(),ArmConstants.kMaxAcceleration );
 
@@ -212,7 +212,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     }
 
     public double getFalconAngleRadians() {
-        return (m_motor.getPosition().refresh().getValueAsDouble()  %2*Math.PI);
+        return (m_motor.getPosition().refresh().getValueAsDouble());
     }
 
 
