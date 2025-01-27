@@ -152,7 +152,7 @@ public final class Constants {
     //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(1.2, .52879, 1.0435, 3.991);
     //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.42502, 2.8721, 0.92093, -1.5);
     //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.87319, 1.8992, 0.55601, -3.153);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0, .42499, 0.11, .3);
+    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
 
     //kg 1.56
     //kv .62
@@ -172,7 +172,7 @@ public final class Constants {
     public static final double falconOffsetAngleDegrees = 35;
     public static final double armEncoderOffsetAngleDegrees = 35;//-203;
 
-    public static final Limits kLimits = new Limits(Math.toRadians(38), Math.toRadians(-120));
+    public static final Limits kLimits = new Limits(Math.toRadians(180), Math.toRadians(-120));
 
     public static final double falconErrorThresh = Math.toRadians(.5);
     public static final double falconErrorCount = 5;

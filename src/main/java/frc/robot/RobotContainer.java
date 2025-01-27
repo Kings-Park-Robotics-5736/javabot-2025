@@ -312,7 +312,7 @@ public class RobotContainer {
                                 .whileTrue(m_arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
                 new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(m_arm.RunArmToPositionCommand(0));
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(120)));
 
                 new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
                                 .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(-25)));
