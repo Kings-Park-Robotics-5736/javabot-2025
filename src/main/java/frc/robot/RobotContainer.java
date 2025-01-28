@@ -30,7 +30,7 @@ import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
-import frc.robot.subsystems.ArmSubsystemFalcon;
+import frc.robot.subsystems.ElevateAssembly.ArmSubsystemFalcon;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.Types.GoalType;
 import frc.robot.utils.Types.PositionType;
@@ -118,7 +118,7 @@ public class RobotContainer {
                 if (rot != 0){
                         SmartDashboard.putBoolean("Square to Target?", false);
                 }
-                if(m_driverController.getLeftBumper()){
+                if(m_driverController.getLeftBumperButton()){
                         fieldRelative = false;
                           xSpeed = -xSpeed;
                         ySpeed = -ySpeed;
