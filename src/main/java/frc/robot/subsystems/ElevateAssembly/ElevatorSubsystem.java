@@ -202,11 +202,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.quasistatic(direction); // Todo: Replace this line with a proper command done
+        return m_sysIdRoutine.quasistatic(direction); 
     }
 
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.dynamic(direction); // Todo: Replace this line with a proper command done i think
+        return m_sysIdRoutine.dynamic(direction); 
     }
 
 

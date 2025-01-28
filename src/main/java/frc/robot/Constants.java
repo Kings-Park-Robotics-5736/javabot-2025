@@ -96,7 +96,6 @@ public final class Constants {
 
 
   public static final class ClimbConstants {
-    // TODO tune these values
     public static final int kForwardSpeed = 4000;
     public static final int kReverseSpeed = -3000;
   }
