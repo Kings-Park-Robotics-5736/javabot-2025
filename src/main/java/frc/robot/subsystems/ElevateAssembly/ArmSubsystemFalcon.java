@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.ElevateAssembly;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
@@ -33,8 +33,6 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     private boolean manualControl = true;
     private double armManualOffset = 0;
 
-    private ArmFeedforward m_feedforward;
-    private TrapezoidProfile profile;
     private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     /********************************************************
@@ -43,7 +41,6 @@ public class ArmSubsystemFalcon extends SubsystemBase {
    
     private final SysIdRoutine m_sysIdRoutine;
     private double m_globalSetpoint;
-    private final PositionVoltage m_poositionVoltage = new PositionVoltage(0);
     private final VoltageOut m_sysidControl = new VoltageOut(0);
     
     private double usedP;
@@ -51,22 +48,18 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     private double usedD;
     private double usedV;
     private double usedG;
-    private TrapezoidProfile.State m_prior_iteration_setpoint;
     private TalonFXConfiguration configs;
 
 
     public ArmSubsystemFalcon() {
 
-        m_motor = new TalonFX(ArmConstants.kLeaderDeviceId, ArmConstants.kCanName);
+        m_motor = new TalonFX(ArmConstants.kMotorID, ArmConstants.kCanName);
 
         configs = new TalonFXConfiguration();
         configs.Slot0.kP = ArmConstants.kPidValues.p; // An error of 1 rotation per second results in 2V output
         configs.Slot0.kI = ArmConstants.kPidValues.i; // An error of 1 rotation per second increases output by 0.5V every second
         configs.Slot0.kD = ArmConstants.kPidValues.d; // A change of 1 rotation per second squared results in 0.01 volts output
-        //configs.Slot0.kV = 0.0;// 0.12; // Falcon 500 is a 500kV motor, 500rpm per V = 8.333 rps per V, 1/8.33
-                               // = 0.12
-                               // volts / Rotation per second
-        configs.Slot0.kA = 0.0;
+        configs.Slot0.kA = ArmConstants.kFFValues.ka;
         configs.Slot0.kG = ArmConstants.kFFValues.kg;
         configs.Slot0.kV = ArmConstants.kFFValues.kv;
         configs.Slot0.kS = ArmConstants.kFFValues.ks;
@@ -74,17 +67,17 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         configs.Voltage.PeakForwardVoltage = 12;
         configs.Voltage.PeakReverseVoltage = -12;
         configs.Feedback.SensorToMechanismRatio = 72.73 /  (2 * Math.PI); //convert to arm radians
-        configs.MotionMagic.MotionMagicCruiseVelocity = 2* Math.PI;
-        configs.MotionMagic.MotionMagicAcceleration = 4* Math.PI; // Target acceleration of 160 rps/s (0.5 seconds)
-        configs.MotionMagic.MotionMagicJerk = 20*Math.PI; // Target jerk of 1600 rps/s/s (0.1 seconds)        if (!TalonUtils.ApplyTalonConfig(m_motor, configs)) {
+
+        configs.MotionMagic.MotionMagicCruiseVelocity = ArmConstants.kMaxVelocity;// 2* Math.PI;
+        configs.MotionMagic.MotionMagicAcceleration = ArmConstants.kMaxAcceleration; //4* Math.PI; 
+        configs.MotionMagic.MotionMagicJerk = ArmConstants.kMaxJerk; //20*Math.PI; 
+
         if (!TalonUtils.ApplyTalonConfig(m_motor, configs)) { 
             System.out.println("!!!!!ERROR!!!! Could not initialize the + Arm. Restart robot!");
         }
 
         m_motor.setPosition(Math.toRadians(-90)); //this is the arm offset value
         
-        m_feedforward = new ArmFeedforward(ArmConstants.kFFValues.ks, ArmConstants.kFFValues.kg,
-                ArmConstants.kFFValues.kv, ArmConstants.kFFValues.ka);
 
         m_motor.setNeutralMode(NeutralModeValue.Brake);
        
@@ -98,7 +91,6 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                      null,
                         this)); 
 
-        InitMotionProfile(getArmAngleRadians(),ArmConstants.kMaxAcceleration );
 
         BaseStatusSignal.setUpdateFrequencyForAll(250,m_motor.getPosition(), m_motor.getVelocity(), m_motor.getMotorVoltage());
         m_motor.optimizeBusUtilization();
@@ -162,13 +154,15 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         if (newV != usedV && newV != 0) {
             usedV = newV;
             System.out.println("Using V of " + usedV);
-            m_feedforward = new ArmFeedforward(ArmConstants.kFFValues.ks, usedG, usedV, ArmConstants.kFFValues.ka);
+            configs.Slot0.kV=(usedV);
+            TalonUtils.ApplyTalonConfig(m_motor, configs);
         }
 
         if (newG != usedG && newG != 0) {
             usedG = newG;
+            configs.Slot0.kG =(usedG);
+            TalonUtils.ApplyTalonConfig(m_motor, configs);
             System.out.println("Using G of " + usedG);
-            m_feedforward = new ArmFeedforward(ArmConstants.kFFValues.ks, usedG, usedV, ArmConstants.kFFValues.ka);
         }
 
         if(!manualControl){
@@ -178,18 +172,11 @@ public class ArmSubsystemFalcon extends SubsystemBase {
 
      public void RunArmToPos() {
 
-        m_prior_iteration_setpoint = profile.calculate(0.02, m_prior_iteration_setpoint,new TrapezoidProfile.State(m_globalSetpoint, 0));
-        double ff =  m_feedforward.calculate(m_prior_iteration_setpoint.position, m_prior_iteration_setpoint.velocity);
+        m_motor.setControl(m_request.withPosition(m_globalSetpoint + armManualOffset));
 
-        //m_motor.setControl(m_poositionVoltage.withFeedForward(ff).withPosition(m_prior_iteration_setpoint.position));
-        m_motor.setControl(m_request.withPosition(m_globalSetpoint));
-
-        SmartDashboard.putNumber("Arm FF Output", ff);
-        SmartDashboard.putNumber("Arm Position Eror", Math.toDegrees(m_prior_iteration_setpoint.position - getArmAngleRadians()));
+       
+        SmartDashboard.putNumber("Arm Position Eror", Math.toDegrees(m_globalSetpoint - getArmAngleRadians()));
         SmartDashboard.putNumber("Arm Offset Manual", Math.toDegrees(armManualOffset));
-
-        SmartDashboard.putNumber("Arm SetpointVelocity", m_prior_iteration_setpoint.velocity);
-        SmartDashboard.putNumber("Arm SetpointPosition", Math.toDegrees(m_prior_iteration_setpoint.position));
         SmartDashboard.putNumber("Arm Global Setpoint ", Math.toDegrees(m_globalSetpoint));
         
     }
@@ -228,15 +215,6 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     public double getFalconAngularVelocityRadiansPerSec() {
         return m_motor.getVelocity().refresh().getValueAsDouble();
     }
-
-    private void InitMotionProfile(double setpoint, double maxAcceleration) {
-
-        profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(ArmConstants.kMaxVelocity, maxAcceleration));
-
-        m_globalSetpoint = setpoint;
-        m_prior_iteration_setpoint = new TrapezoidProfile.State(getArmAngleRadians(), 0);
-    }
-
 
     /**
      * @brief Checks if the arm has reached its target
@@ -277,17 +255,15 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         return isFinished;
     }
 
-    private Boolean isWithinLimits(double direction) {
-        return getArmAngleRadians() > ArmConstants.kLimits.high || ( direction > 0);
-    }
+
 
 
     private double sanitizePositionSetpoint(double setpoint){
-        if (setpoint > ArmConstants.kLimits.low){
-            setpoint = ArmConstants.kLimits.low;
-        }
-        if(setpoint < ArmConstants.kLimits.high){
+        if (setpoint > ArmConstants.kLimits.high){
             setpoint = ArmConstants.kLimits.high;
+        }
+        if(setpoint < ArmConstants.kLimits.low){
+            setpoint = ArmConstants.kLimits.low;
         }
         return setpoint;
     }
@@ -297,7 +273,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         double sanitizedSetpoint = sanitizePositionSetpoint(setpoint);
         System.out.println("-----------------Starting Arm to position " + sanitizedSetpoint + " --------------");
       
-        InitMotionProfile(sanitizedSetpoint, ArmConstants.kMaxAcceleration);
+        m_globalSetpoint = sanitizedSetpoint;
         manualControl = false;
     }
     /**
@@ -323,8 +299,6 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     }
 
     public void UpdateAngleManually(double diff){
-        m_globalSetpoint += diff;
-        InitMotionProfile(m_globalSetpoint,ArmConstants.kMaxAcceleration );
         armManualOffset +=diff;
     }
 
@@ -341,7 +315,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                     StopArm();
                 },
                 () -> {
-                    return !isWithinLimits(getSpeed.getAsDouble());
+                    return false;
                 }, this);
     }
 
@@ -358,7 +332,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                     StopArm();
                 },
                 () -> {
-                    return !isWithinLimits(getSpeed.getAsDouble());
+                    return false;
                 }, this);
     }
 

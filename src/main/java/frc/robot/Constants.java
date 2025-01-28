@@ -93,11 +93,7 @@ public final class Constants {
     public static final double kMaxAccelerationMetersPerSecondSquared = 4;
   }
 
-  public static final class IntakeConstants {
 
-    public static final int kForwardSpeed = 4000;
-    public static final int kReverseSpeed = -3000;
-  }
 
   public static final class ClimbConstants {
     // TODO tune these values
@@ -105,123 +101,63 @@ public final class Constants {
     public static final int kReverseSpeed = -3000;
   }
 
-  public static final class LeftClimbConstants {
 
-    public static final byte kDeviceId = 2;
-    // TODO tune these values
-    public static final PidConstants kPidValues = new PidConstants(0.00001, 0, 0);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06368, 0.12005, 0.0034381);
-  }
+  public static final class ElevatorConstants{
+    public static final byte kLeaderDeviceId = 9;
+    public static final byte kFollowerDeviceId = 10;
 
-  public static final class RightClimbConstants {
+    public static final PidConstants kPidValues = new PidConstants(0.5, 0, 0.007);
+    public static final Limits kLimits = new Limits(0, 60);
+    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
 
-    public static final byte kDeviceId = 17;
-    // TODO tune these values
-    public static final PidConstants kPidValues = new PidConstants(3.7415E-05, 0, 0);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.19204, 0.12201, 0.0082481);
-  }
+    public static final int kMaxVelocity = 100;
+    public static final int kMaxAcceleration = 100;
 
-  public static final class LowerIntakeConstants {
+    public static final double kStaleTolerance = .5;
+    public static final double kDiffThreshold = 0.15;
+    public static final int kStaleThreshold = 10;
+    public static final double kPositionTolerance = 1.0;
 
-    public static final byte kDeviceId = 1;
 
-    public static final PidConstants kPidValues = new PidConstants(5.1248E-06, 0, 0);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.2672, 0.12568, 0.0065158);
-  }
-
-  public static final class UpperIntakeConstants {
-
-    public static final byte kDeviceId = 3;
-
-    public static final PidConstants kPidValues = new PidConstants(5.1248E-06, 0, 0);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.2672, 0.12568, 0.0065158);
+    public static final double kL1Position = 0.0;
+    public static final double kL2Position = 59.5;
+    public static final double kL3Position = 59.5;
+    public static final double kL4Position = 59.5;
+    public static final double kIntakePosition = 59.5;
   }
 
   public static final class ArmConstants {
 
-    public static final byte kLeaderDeviceId = 14;
-    public static final byte kFollowerDeviceId = 10;
+    public static final byte kMotorID = 14;
 
-    public static final byte kNoteSensorDIO = 1;
     public static final String kCanName = "rio";
 
     public static final double kMaxVelocity = (double) 2 *  Math.PI; //max velocity is 90 deg / sec
-    public static final double kMaxAcceleration = (double) 2.5*  Math.PI; //max accel is 45 deg/sec^2
-    public static final PidConstants kPidValues = new PidConstants(15/*5.3718*/, 0, 0);
-    //public static final PidConstants kPidValues = new PidConstants(30/*5.3718*/, 80, .1);
-    //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(1.2, .52879, 1.0435, 3.991);
-    //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.42502, 2.8721, 0.92093, -1.5);
-    //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.87319, 1.8992, 0.55601, -3.153);
+    public static final double kMaxAcceleration = (double) 4* Math.PI; 
+    public static final double kMaxJerk = (double) 20 * Math.PI;
+    public static final PidConstants kPidValues = new PidConstants(15, 0, 0);
+    
     public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
 
-    //kg 1.56
-    //kv .62
-    //ka .08
-
-    //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0, .62, 0.08, 1.56);
-
-
-
-    //public static final FeedForwardConstants kFFValues = new FeedForwardConstants(.20035, 3.2988, 0.52066, 0.48143);
    
     public static final double kPositionTolerance = Math.toRadians(1.0);
     public static final double kStaleTolerance = Math.toRadians(3);
     public static final double kDiffThreshold = Math.toRadians(.9);
     public static final int kStaleThreshold = 20;
 
-    public static final double falconOffsetAngleDegrees = 35;
-    public static final double armEncoderOffsetAngleDegrees = 35;//-203;
 
-    public static final Limits kLimits = new Limits(Math.toRadians(180), Math.toRadians(-120));
+    public static final Limits kLimits = new Limits(Math.toRadians(-100),Math.toRadians(180));
 
-    public static final double falconErrorThresh = Math.toRadians(.5);
-    public static final double falconErrorCount = 5;
-
-    public static final double intakeAngle = Math.toRadians(35);
-    public static final double ampAngle = Math.toRadians(-104);
-    public static final double scorpionAngle = Math.toRadians(-111);
-    public static final double TrapAngle = Math.toRadians(-115);
-    public static final double FixedAngle = Math.toRadians(0);
+    public static final double L1Angle = Math.toRadians(0);
+    public static final double L2Angle = Math.toRadians(25);
+    public static final double L3Angle = Math.toRadians(25);
+    public static final double L4Angle = Math.toRadians(120);
+    public static final double intakeAngle = Math.toRadians(0);
 
 
   }
 
-  public static final class ShooterConstants {
 
-    public static final int kDesiredSpeed = 4000; //RPM
-    public static final int kAmpSpeed = 500;
-    public static final int scorpionSpeed = 1500;
-    public static final int kReverseSpeed = -1500; //RPM
-    public static final int kIdleSpeed = 2000; //RPM
-    public static final int kTolerance = 150; //RPM
-  }
-
-  public static final class LeftShooterConstants {
-    public static final byte kDeviceId = 1;
-
-    public static final PidConstants kPidValues = new PidConstants(0.046382, 0, 0);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.17665, 0.11767, 0.0067599);
-  }
-
-  public static final class RightShooterConstants {
-    public static final byte kDeviceId = 0;
-
-    public static final PidConstants kPidValues = new PidConstants(0.046382, 0, 0);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.17665, 0.11767, 0.0067599);
-  }
-
-  public static final class kickupConstants {
-
-    public static final int kForwardSpeed = -2000;
-    public static final int kReverseSpeed = 1000;
-  }
-
-  public static final class RightKickupConstants {
-    public static final byte kDeviceId = 2;
-
-    public static final PidConstants kPidValues = new PidConstants(0.001873, 0, 0);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.058711, 0.11659, 0.0016706);
-  }
 
   public static final class ModuleConstants {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 15 * 2 * Math.PI;
