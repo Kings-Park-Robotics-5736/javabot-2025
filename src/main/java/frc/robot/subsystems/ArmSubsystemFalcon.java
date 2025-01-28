@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -34,6 +35,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
 
     private ArmFeedforward m_feedforward;
     private TrapezoidProfile profile;
+    private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     /********************************************************
      * SysId variables
@@ -61,15 +63,21 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         configs.Slot0.kP = ArmConstants.kPidValues.p; // An error of 1 rotation per second results in 2V output
         configs.Slot0.kI = ArmConstants.kPidValues.i; // An error of 1 rotation per second increases output by 0.5V every second
         configs.Slot0.kD = ArmConstants.kPidValues.d; // A change of 1 rotation per second squared results in 0.01 volts output
-        configs.Slot0.kV = 0.0;// 0.12; // Falcon 500 is a 500kV motor, 500rpm per V = 8.333 rps per V, 1/8.33
+        //configs.Slot0.kV = 0.0;// 0.12; // Falcon 500 is a 500kV motor, 500rpm per V = 8.333 rps per V, 1/8.33
                                // = 0.12
                                // volts / Rotation per second
         configs.Slot0.kA = 0.0;
+        configs.Slot0.kG = ArmConstants.kFFValues.kg;
+        configs.Slot0.kV = ArmConstants.kFFValues.kv;
+        configs.Slot0.kS = ArmConstants.kFFValues.ks;
+
         configs.Voltage.PeakForwardVoltage = 12;
         configs.Voltage.PeakReverseVoltage = -12;
         configs.Feedback.SensorToMechanismRatio = 72.73 /  (2 * Math.PI); //convert to arm radians
-
-        if (!TalonUtils.ApplyTalonConfig(m_motor, configs)) {
+        configs.MotionMagic.MotionMagicCruiseVelocity = 2* Math.PI;
+        configs.MotionMagic.MotionMagicAcceleration = 4* Math.PI; // Target acceleration of 160 rps/s (0.5 seconds)
+        configs.MotionMagic.MotionMagicJerk = 20*Math.PI; // Target jerk of 1600 rps/s/s (0.1 seconds)        if (!TalonUtils.ApplyTalonConfig(m_motor, configs)) {
+        if (!TalonUtils.ApplyTalonConfig(m_motor, configs)) { 
             System.out.println("!!!!!ERROR!!!! Could not initialize the + Arm. Restart robot!");
         }
 
@@ -173,7 +181,8 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         m_prior_iteration_setpoint = profile.calculate(0.02, m_prior_iteration_setpoint,new TrapezoidProfile.State(m_globalSetpoint, 0));
         double ff =  m_feedforward.calculate(m_prior_iteration_setpoint.position, m_prior_iteration_setpoint.velocity);
 
-        m_motor.setControl(m_poositionVoltage.withFeedForward(ff).withPosition(m_prior_iteration_setpoint.position));
+        //m_motor.setControl(m_poositionVoltage.withFeedForward(ff).withPosition(m_prior_iteration_setpoint.position));
+        m_motor.setControl(m_request.withPosition(m_globalSetpoint));
 
         SmartDashboard.putNumber("Arm FF Output", ff);
         SmartDashboard.putNumber("Arm Position Eror", Math.toDegrees(m_prior_iteration_setpoint.position - getArmAngleRadians()));

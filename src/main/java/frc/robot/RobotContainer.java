@@ -302,7 +302,7 @@ public class RobotContainer {
         }
 */
         private void configButtonBindingsArmSysID() {
-                new JoystickButton(m_driverController, XboxController.Button.kA.value)
+                /*new JoystickButton(m_driverController, XboxController.Button.kA.value)
                                 .whileTrue(m_arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
                 new JoystickButton(m_driverController, XboxController.Button.kB.value)
                                 .whileTrue(m_arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
@@ -310,12 +310,21 @@ public class RobotContainer {
                                 .whileTrue(m_arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
                 new JoystickButton(m_driverController, XboxController.Button.kY.value)
                                 .whileTrue(m_arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
+*/
                 new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
                                 .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(120)));
 
                 new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
                                 .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(-25)));
+
+                new JoystickButton(m_driverController, XboxController.Button.kA.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(-90)));
+                new JoystickButton(m_driverController, XboxController.Button.kB.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(0)));
+                new JoystickButton(m_driverController, XboxController.Button.kX.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(180)));
+                new JoystickButton(m_driverController, XboxController.Button.kY.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(90)));
 
 
                  new Trigger(() -> {
