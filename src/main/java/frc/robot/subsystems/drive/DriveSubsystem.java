@@ -80,7 +80,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightAngleOffset);
 
   // The gyro sensor
-  private final Pigeon2 m_gyro = new Pigeon2(0, "Canivore");
+  private final Pigeon2 m_gyro = new Pigeon2(DriveConstants.kGyroPort, "Canivore");
 
   /**
    * @brief This is a flag to lockout the joystick control of the robot.

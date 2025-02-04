@@ -30,21 +30,22 @@ public final class Constants {
   public static final double kDt = 0.02;
 
   public static final class DriveConstants {
+    public static final int kGyroPort = 13;
 
     public static final int kFrontLeftDriveMotorPort = 2;
-    public static final int kRearLeftDriveMotorPort = 4;
+    public static final int kRearLeftDriveMotorPort = 6;
     public static final int kFrontRightDriveMotorPort = 0;
-    public static final int kRearRightDriveMotorPort = 6;
+    public static final int kRearRightDriveMotorPort = 20;
 
     public static final int kFrontLeftTurningMotorPort = 3;
-    public static final int kRearLeftTurningMotorPort = 5;
+    public static final int kRearLeftTurningMotorPort = 7;
     public static final int kFrontRightTurningMotorPort = 1;
-    public static final int kRearRightTurningMotorPort = 7;
+    public static final int kRearRightTurningMotorPort = 5;
 
     public static final int kFrontLeftTurningEncoderPort = 1;
-    public static final int kRearLeftTurningEncoderPort = 2;
+    public static final int kRearLeftTurningEncoderPort = 3;
     public static final int kFrontRightTurningEncoderPort = 0;
-    public static final int kRearRightTurningEncoderPort = 3;
+    public static final int kRearRightTurningEncoderPort = 2;
 
     public static final boolean kFrontLeftTurningEncoderReversed = true;
     public static final boolean kRearLeftTurningEncoderReversed = true;
@@ -52,20 +53,20 @@ public final class Constants {
     public static final boolean kRearRightTurningEncoderReversed = true;
 
     public static final boolean kFrontLeftDriveReversed = true;
-    public static final boolean kRearLeftDriveReversed = false;
-    public static final boolean kFrontRightDriveReversed = true;
-    public static final boolean kRearRightDriveReversed = true;
+    public static final boolean kRearLeftDriveReversed = true;
+    public static final boolean kFrontRightDriveReversed = false;
+    public static final boolean kRearRightDriveReversed = false;
 
-    public static final double kFrontLeftAngleOffset = -0.189941;// 0.358643; //unit is from -1 to 1, normalized
-    public static final double kFrontRightAngleOffset = -0.920654;
-    public static final double kBackLeftAngleOffset = -0.733887;
-    public static final double kBackRightAngleOffset = 0.487793;
+    public static final double kFrontLeftAngleOffset = 0.319580078125;// 0.358643; //unit is from -1 to 1, normalized
+    public static final double kFrontRightAngleOffset = 0.083740234375;
+    public static final double kBackLeftAngleOffset = -0.231201171875;
+    public static final double kBackRightAngleOffset = 0.01171875;
 
     // Distance between centers of right and left wheels on robot
-    public static final double kTrackWidth = 0.60325;
+    public static final double kTrackWidth = 0.62865;
 
     // Distance between front and back wheels on robot
-    public static final double kWheelBase = 0.55245;
+    public static final double kWheelBase = 0.62865;
 
     
 
