@@ -104,6 +104,7 @@ public final class Constants {
   public static final class ElevatorConstants{
     public static final byte kLeaderDeviceId = 9;
     public static final byte kFollowerDeviceId = 10;
+    public static final String kCanName = "rio";
 
     public static final PidConstants kPidValues = new PidConstants(0.5, 0, 0.007);
     public static final Limits kLimits = new Limits(0, 60);

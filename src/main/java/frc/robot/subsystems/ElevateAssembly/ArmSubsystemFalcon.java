@@ -94,7 +94,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
 
         BaseStatusSignal.setUpdateFrequencyForAll(250,m_motor.getPosition(), m_motor.getVelocity(), m_motor.getMotorVoltage());
         m_motor.optimizeBusUtilization();
-        SignalLogger.start();
+        
 
         SmartDashboard.putNumber("ARM P", ArmConstants.kPidValues.p);
         SmartDashboard.putNumber("ARM I", ArmConstants.kPidValues.i);

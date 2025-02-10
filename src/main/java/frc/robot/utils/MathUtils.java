@@ -1,56 +1,68 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.field.ScoringPositions;
+import frc.robot.field.ScoringPositions.ScorePositions;
 
 public class MathUtils {
 
 
     
 
-    public static double distanceToScoringTarget(Pose2d robotPose){
+    public static ScorePositions getClosestScoringTarget(Pose2d robotPose){
         var alliance = DriverStation.getAlliance();
-        Pose2d scoringPos;
+       
+        double minDistance = 10000;
+
+        Pose2d[] scoringPositions = {};
+        int poseIndex = 0;
         if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
-            scoringPos = ScoringPositions.kBlueScoringPosition;
+            scoringPositions = ScoringPositions.BlueScoringLocations;
         } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-            scoringPos = ScoringPositions.kRedScoringPosition;
-        } else {
-            return 0;
+            scoringPositions = ScoringPositions.RedScoringLocations;
         }
 
-        return scoringPos.getTranslation().getDistance(robotPose.getTranslation());
-    }
-
-    public static double angleRadiansToScoringTarget(Pose2d robotPose){
-        //0.4064 is robot rotation height
-        double distance = distanceToScoringTarget(robotPose);
-        if(distance < 5.0 && distance > 0){
-            System.out.println("Distance to Scoring Target " + distance );
-            double newAngle = - Math.toRadians(3.41 * distance * distance -26.5* distance + 76);
-            double modelAngle =  - Math.atan((ScoringPositions.speakerOpeningFromFloorMeters - 0.438)/(distance));
-            System.out.println( " New angle "  + Math.toDegrees(newAngle) + ", Old Angle: " + Math.toDegrees(modelAngle));
-            return newAngle - Math.toRadians(4);
-        }else{
-            return 0;
+        for (int i = 0; i < scoringPositions.length; i++){
+            Pose2d position = scoringPositions[i];
+            double distance = position.getTranslation().getDistance(robotPose.getTranslation());
+            if (distance < minDistance){
+                minDistance = distance;
+                poseIndex = i;
+            }
         }
 
-        //return - Math.atan((ScoringPositions.speakerOpeningFromFloorMeters - 0.438)/(distance)) + Math.toRadians(-1.6* distance + 5.9);
+
+        return ScoringPositions.scorePositionsList[poseIndex];
     }
 
-    public static int distanceToShootingSpeed(Pose2d robotPose){
-        double distance = distanceToScoringTarget(robotPose);
-        if(distance < 2.0){
-            return 1500;
-        }else if (distance < 2.75){
-            return 2000;
-        }else if (distance < 3){
-            return 2500;
-        }else if (distance < 3.5){
-            return 3000;
-        }else{
-            return 4500;
-        }
+    
+
+    public static Pose2d getRobotPoseAtScoringTarget(ScoringPositions.ScorePositions clockScorePosition, ScoringPositions.ScoreLocation side){
+
+        final double ROBOT_WIDTH_WITH_BUMPERS = .50; //meters
+        final double ROBOT_LEFT_SCORE_OFFSET  = .25; //meters
+        final double ROBOT_RIGHT_SCORE_OFFSET = -.25; //meters
+
+        double offset = side == ScoringPositions.ScoreLocation.LEFT ? ROBOT_LEFT_SCORE_OFFSET : ROBOT_RIGHT_SCORE_OFFSET;
+
+        var alliance = DriverStation.getAlliance();
+
+        Pose2d AprilTagCoord = ScoringPositions.ScorePositionToPose(clockScorePosition, alliance.get());
+
+        double robotAngle = AprilTagCoord.getRotation().getRadians() - Math.toRadians(180);
+        double robotX;
+        double robotY;
+        
+        robotX = AprilTagCoord.getX() + Math.cos(AprilTagCoord.getRotation().getRadians())*(ROBOT_WIDTH_WITH_BUMPERS * .5 + offset);
+
+        robotY = AprilTagCoord.getX() + Math.sin(AprilTagCoord.getRotation().getRadians())*(ROBOT_WIDTH_WITH_BUMPERS * .5 + offset);
+        
+
+        return new Pose2d( new Translation2d(robotX,robotY), Rotation2d.fromRadians(robotAngle));
     }
+
+   
 }
