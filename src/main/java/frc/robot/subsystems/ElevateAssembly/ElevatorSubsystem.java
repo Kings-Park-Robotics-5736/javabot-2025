@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.MathUtils;
 import frc.robot.utils.SparkMaxUtils;
 import frc.robot.utils.Types.FeedForwardConstants;
 import frc.robot.utils.Types.Limits;
@@ -127,8 +129,11 @@ public class ElevatorSubsystem extends SubsystemBase {
        
     }
 
+
     @Override
     public void periodic() {
+        
+        SmartDashboard.putNumber("Elevator Position", getElevatorPosition());
 
         //optional code to tune pids from smart dashboard
        /* double p = SmartDashboard.getNumber("P Gain", 0);
@@ -280,5 +285,41 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
    
+
+
+    public void StopArm() {
+        setSpeed(0);
+    }
+
+
+
+    public Command RunArmDownManualSpeedCommand(DoubleSupplier getSpeed) {
+        return new FunctionalCommand(
+                () -> {
+                    System.out.println("-----------------Manual Speed Arm Down Starting--------------");
+                    manualControl = true;
+                },
+                () -> {
+                    setSpeed(getSpeed.getAsDouble());
+                },
+                (interrupted) -> {
+                    StopArm();
+                },
+                () -> {
+                    return !isWithinLimits(getSpeed.getAsDouble());
+                }, this);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

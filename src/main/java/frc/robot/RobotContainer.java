@@ -31,6 +31,8 @@ import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.subsystems.ElevateAssembly.ArmSubsystemFalcon;
+import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
+import frc.robot.subsystems.ElevateAssembly.ElevatorSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.Types.GoalType;
 import frc.robot.utils.Types.PositionType;
@@ -56,6 +58,10 @@ public class RobotContainer {
         public Limelight m_limelight = new Limelight("limelight");
         public Limelight m_limelight_side = new Limelight("limelight-side");
         public ArmSubsystemFalcon m_arm = new ArmSubsystemFalcon();
+        //public EndeffectorSubsystem m_endeffector = new EndeffectorSubsystem();
+        public ElevateSubsystem m_elevate = new ElevateSubsystem();
+        public ElevatorSubsystem m_elevator = new ElevatorSubsystem("elevtor");
+
         private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side);// use only 1 limelight for
                                                                                           // driving now since we dont
                                                                                           // have great measurements
@@ -199,6 +205,9 @@ public class RobotContainer {
                         autoChooser = null;
                 }
 
+        
+        
+        
         }
 
         public void resetArm(){
@@ -348,17 +357,19 @@ public class RobotContainer {
          * {@link JoystickButton}.
          */
         private void configureButtonBindings() {
-
+                
                 //Center to the goal
                  new JoystickButton(m_driverController, XboxController.Button.kA.value)
                  //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
                  .whileTrue(new CenterToGoalCommand(m_robotDrive, true));
 
+
                 
+
+
              
                  //Auto drive to trap
-                  new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                 .whileTrue( TrajectoryCommandsFactory.DriveToAmp(m_robotDrive));
+                 
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
                 

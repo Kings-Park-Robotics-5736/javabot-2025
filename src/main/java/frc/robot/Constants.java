@@ -103,8 +103,11 @@ public final class Constants {
 
 
   public static final class ElevatorConstants{
-    public static final byte kLeaderDeviceId = 9;
-    public static final byte kFollowerDeviceId = 10;
+    public static final String kCanName = "Canivore";
+    public static final double kMaxJerk = 0;
+    public static final byte kLeaderDeviceId = 1;
+    public static final byte kFollowerDeviceId = 2
+    ;
 
     public static final PidConstants kPidValues = new PidConstants(0.5, 0, 0.007);
     public static final Limits kLimits = new Limits(0, 60);
@@ -128,7 +131,7 @@ public final class Constants {
 
   public static final class ArmConstants {
 
-    public static final byte kMotorID = 14;
+    public static final byte kMotorID = 3;
 
     public static final String kCanName = "rio";
 
@@ -156,6 +159,17 @@ public final class Constants {
 
 
   }
+  public static final class EndeffectorConstants {
+
+    public static final byte kMotorID = 4;
+    public static final PidConstants kPidValues = new PidConstants(15, 0, 0);
+    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
+
+
+
+  }
+
+  
 
 
 
