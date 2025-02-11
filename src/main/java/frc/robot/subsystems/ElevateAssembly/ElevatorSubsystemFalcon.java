@@ -7,14 +7,22 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -46,7 +54,11 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
     private double m_setpoint;
     private boolean manualControl;
     private final VoltageOut m_sysidControl = new VoltageOut(0);
+    private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
+ private final MutVoltage m_appliedVoltage = (Volts.mutable(0));
+    private final MutAngle m_distance = (Rotations.mutable(0));
+    private final MutAngularVelocity m_velocity = (RotationsPerSecond.mutable(0));
 
      /********************************************************
      * SysId variables
@@ -61,11 +73,22 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         m_follower = new TalonFX(ElevatorConstants.kFollowerDeviceId, ElevatorConstants.kCanName);
        
         configs = new TalonFXConfiguration();
-        configs.Slot0.kP = ArmConstants.kPidValues.p; // An error of 1 rotation per second results in 2V output
-        configs.Slot0.kI = ArmConstants.kPidValues.i; // An error of 1 rotation per second increases output by 0.5V every second
-        configs.Slot0.kD = ArmConstants.kPidValues.d; // A change of 1 rotation per second squared results in 0.01 volts output
-        configs.Voltage.PeakForwardVoltage = 12;
-        configs.Voltage.PeakReverseVoltage = -12;
+        configs.Slot0.kP = ElevatorConstants.kPidValues.p; // An error of 1 rotation per second results in 2V output
+        configs.Slot0.kI = ElevatorConstants.kPidValues.i; // An error of 1 rotation per second increases output by 0.5V every second
+        configs.Slot0.kD = ElevatorConstants.kPidValues.d; // A change of 1 rotation per second squared results in 0.01 volts output
+         configs.Slot0.kA = ElevatorConstants.kFFValues.ka;
+        configs.Slot0.kG = ElevatorConstants.kFFValues.kg;
+        configs.Slot0.kV = ElevatorConstants.kFFValues.kv;
+        configs.Slot0.kS = ElevatorConstants.kFFValues.ks;
+        configs.Voltage.PeakForwardVoltage = 6;
+        configs.Voltage.PeakReverseVoltage = -6;
+        configs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        configs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+        configs.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.kMaxVelocity;// 2* Math.PI;
+
+        configs.MotionMagic.MotionMagicAcceleration = ElevatorConstants.kMaxAcceleration; //4* Math.PI; 
+        configs.MotionMagic.MotionMagicJerk = ElevatorConstants.kMaxJerk; //20*Math.PI; 
 
         if (!TalonUtils.ApplyTalonConfig(m_leader, configs)) { 
             System.out.println("!!!!!ERROR!!!! Could not initialize the Elevator LEADER. Restart robot!");
@@ -76,8 +99,8 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         }
 
         m_follower.setControl(new Follower(m_leader.getDeviceID(), false));
-        m_leader.setNeutralMode(NeutralModeValue.Brake);
-        m_follower.setNeutralMode(NeutralModeValue.Brake);
+        //m_leader.setNeutralMode(NeutralModeValue.Brake);
+        //m_follower.setNeutralMode(NeutralModeValue.Brake);
         
 
 
@@ -87,18 +110,33 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
 
         m_feedforward = new ElevatorFeedforward(ElevatorConstants.kFFValues.ks, ElevatorConstants.kFFValues.kg, ElevatorConstants.kFFValues.kv, ElevatorConstants.kFFValues.ka);
 
-        m_sysIdRoutine = new SysIdRoutine(
-            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-            new SysIdRoutine.Config(null, Volts.of(2), null, state->SignalLogger.writeString("arm-state", state.toString())),
-            new SysIdRoutine.Mechanism(
-                    (Voltage volts) -> {
-                        m_leader.setControl(m_sysidControl.withOutput(volts));
-                    },
-                 null,
-                    this)); 
+     
 
-        BaseStatusSignal.setUpdateFrequencyForAll(250,m_leader.getPosition(), m_leader.getVelocity(), m_leader.getMotorVoltage());
-        m_leader.optimizeBusUtilization();
+          m_sysIdRoutine = new SysIdRoutine(
+                // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+                new SysIdRoutine.Config(null, Volts.of(2), null),
+                new SysIdRoutine.Mechanism(
+                        (Voltage volts) -> {
+                            // CANNOT use set voltage, it does not work. This normalizes the voltage between
+                            // -1 and 0 and 1
+                            m_leader.set(volts.in(Volts) / RobotController.getBatteryVoltage());
+                        },
+                        log -> {
+                            log.motor(("ElevatorD"))
+                                    .voltage(m_appliedVoltage.mut_replace(
+                                            m_leader.get() * RobotController.getBatteryVoltage(), Volts))
+                                    .angularPosition(m_distance.mut_replace(m_leader.getPosition().refresh().getValueAsDouble(),
+                                            Rotations))
+                                    .angularVelocity(
+                                            m_velocity.mut_replace(m_leader.getVelocity().refresh().getValueAsDouble(),
+                                                    RotationsPerSecond));
+
+                        },
+                        this));
+
+        //BaseStatusSignal.setUpdateFrequencyForAll(250,m_leader.getPosition(), m_leader.getVelocity(), m_leader.getMotorVoltage());
+        //m_leader.optimizeBusUtilization();
+        //SignalLogger.start();
        
     }
 
@@ -117,6 +155,9 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         if(!manualControl){
             RunElevator();
         }
+
+        SmartDashboard.putNumber("Elevtor Enc Pos", getElevatorPosition());
+
     }
 
     public void stopElevator() {
@@ -154,7 +195,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         return new FunctionalCommand(
                 () -> {manualControl = false; InitMotionProfile(position);},
                 () -> {},
-                (interrupted) -> stopElevator(),
+                (interrupted) -> {},
                 () -> isFinished(), this);
     }
 
@@ -173,7 +214,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
     }
 
     public double getRotationsPerSecond(){
-        return m_leader.getVelocity().refresh().getValueAsDouble() / 60;
+        return m_leader.getVelocity().refresh().getValueAsDouble();
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
@@ -194,6 +235,9 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
     private void setSpeed(double speed) {
         m_leader.set(speed);
         SmartDashboard.putNumber("Elevator Position" + m_name, getElevatorPosition());
+        SmartDashboard.putNumber("Elevator Speed" + m_name, speed);
+        System.out.println("Elevator Speed: " + speed);
+
     }
 
     /**
@@ -248,8 +292,10 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         m_prior_iteration_setpoint = m_profile.calculate(0.02, m_prior_iteration_setpoint,new TrapezoidProfile.State(m_setpoint, 0));
 
         double ff = m_feedforward.calculate(m_prior_iteration_setpoint.position, m_prior_iteration_setpoint.velocity);
+        SmartDashboard.putNumber("Elevator m_setpoint" + m_name, m_setpoint);
 
-        m_leader.setControl(m_poositionVoltage.withFeedForward(ff).withPosition(m_prior_iteration_setpoint.position));
+       // m_leader.setControl(m_poositionVoltage.withFeedForward(ff).withPosition(m_prior_iteration_setpoint.position));
+       m_leader.setControl(m_request.withPosition(m_setpoint));
 
     }
 

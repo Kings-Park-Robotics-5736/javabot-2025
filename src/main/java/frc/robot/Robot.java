@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     PathfindingCommand.warmupCommand().schedule();
     SmartDashboard.putData(CommandScheduler.getInstance());
-    SignalLogger.start();
+   
     
    
   }

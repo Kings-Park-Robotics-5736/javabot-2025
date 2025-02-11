@@ -72,7 +72,8 @@ public final class Types {
     SHOOTER_LEFT,
     SHOOTER_RIGHT,
     KICKUP_RIGHT,
-    ARM
+    ARM,
+    ELEVATOR
   }
 
   public enum GoalType{

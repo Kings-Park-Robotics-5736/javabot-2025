@@ -76,7 +76,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
             System.out.println("!!!!!ERROR!!!! Could not initialize the + Arm. Restart robot!");
         }
 
-        m_motor.setPosition(Math.toRadians(-90)); //this is the arm offset value
+        m_motor.setPosition(Math.toRadians(90)); //this is the arm offset value
         
 
         m_motor.setNeutralMode(NeutralModeValue.Brake);
@@ -92,9 +92,12 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                         this)); 
 
 
+
+
         BaseStatusSignal.setUpdateFrequencyForAll(250,m_motor.getPosition(), m_motor.getVelocity(), m_motor.getMotorVoltage());
         m_motor.optimizeBusUtilization();
-        
+        SignalLogger.start();
+ 
 
         SmartDashboard.putNumber("ARM P", ArmConstants.kPidValues.p);
         SmartDashboard.putNumber("ARM I", ArmConstants.kPidValues.i);

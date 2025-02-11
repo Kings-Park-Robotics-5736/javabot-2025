@@ -31,6 +31,7 @@ import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.subsystems.ElevateAssembly.ArmSubsystemFalcon;
+import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.Types.GoalType;
 import frc.robot.utils.Types.PositionType;
@@ -50,12 +51,14 @@ public class RobotContainer {
 
         // The robot's subsystems
 
-        private final SysidMechanism enabledSysid = SysidMechanism.ARM;
+        private final SysidMechanism enabledSysid = SysidMechanism.NONE;
 
         private final PiCamera m_picam = new PiCamera();
         public Limelight m_limelight = new Limelight("limelight");
         public Limelight m_limelight_side = new Limelight("limelight-side");
-        public ArmSubsystemFalcon m_arm = new ArmSubsystemFalcon();
+        //public EndeffectorSubsystem m_endeffector = new EndeffectorSubsystem();
+        public ElevateSubsystem m_elevate = new ElevateSubsystem();
+
         private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side);// use only 1 limelight for
                                                                                           // driving now since we dont
                                                                                           // have great measurements
@@ -165,8 +168,8 @@ public class RobotContainer {
                         case SHOOTER_RIGHT:
                                 //configureButtonBindingsShooterRightSysID();
                                 break;
-                        case KICKUP_RIGHT:
-                                //configButtonBindingsKickupRightSysID();
+                        case ELEVATOR:
+                                configButtonBindingsElevatorSysID();
                                 break;
                         case ARM:
                                 configButtonBindingsArmSysID();
@@ -199,6 +202,9 @@ public class RobotContainer {
                         autoChooser = null;
                 }
 
+        
+        
+        
         }
 
         public void resetArm(){
@@ -303,19 +309,19 @@ public class RobotContainer {
 */
         private void configButtonBindingsArmSysID() {
                 new JoystickButton(m_driverController, XboxController.Button.kA.value)
-                                .whileTrue(m_arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+                                .whileTrue(m_elevate.sysIdArmQuasistatic(SysIdRoutine.Direction.kForward));
                 new JoystickButton(m_driverController, XboxController.Button.kB.value)
-                                .whileTrue(m_arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+                                .whileTrue(m_elevate.sysIdArmQuasistatic(SysIdRoutine.Direction.kReverse));
                 new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                                .whileTrue(m_arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
+                                .whileTrue(m_elevate.sysIdArmDynamic(SysIdRoutine.Direction.kForward));
                 new JoystickButton(m_driverController, XboxController.Button.kY.value)
-                                .whileTrue(m_arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+                                .whileTrue(m_elevate.sysIdArmDynamic(SysIdRoutine.Direction.kReverse));
 
                 new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(120)));
+                                .whileTrue(m_elevate.RunArmToPositionCommand(Math.toRadians(120)));
 
                 new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(-25)));
+                                .whileTrue(m_elevate.RunArmToPositionCommand(Math.toRadians(-25)));
 /*
                 new JoystickButton(m_driverController, XboxController.Button.kA.value)
                                 .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(-90)));
@@ -329,12 +335,48 @@ public class RobotContainer {
 */
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
-                }).whileTrue(m_arm.RunArmUpManualSpeedCommand(() -> m_driverController.getRightTriggerAxis()));
+                }).whileTrue(m_elevate.RunArmUpManualSpeedCommand(() -> m_driverController.getRightTriggerAxis()));
 
 
                 new Trigger(() -> {
                         return m_driverController.getLeftTriggerAxis() > 0;
-                }).whileTrue(m_arm.RunArmDownManualSpeedCommand(() -> -m_driverController.getLeftTriggerAxis()));
+                }).whileTrue(m_elevate.RunArmDownManualSpeedCommand(() -> -m_driverController.getLeftTriggerAxis()));
+        }
+
+        private void configButtonBindingsElevatorSysID() {
+                new JoystickButton(m_driverController, XboxController.Button.kA.value)
+                                .whileTrue(m_elevate.sysIdElevatorQuasistatic(SysIdRoutine.Direction.kForward));
+                new JoystickButton(m_driverController, XboxController.Button.kB.value)
+                                .whileTrue(m_elevate.sysIdElevatorQuasistatic(SysIdRoutine.Direction.kReverse));
+                new JoystickButton(m_driverController, XboxController.Button.kX.value)
+                                .whileTrue(m_elevate.sysIdElevatorDynamic(SysIdRoutine.Direction.kForward));
+                new JoystickButton(m_driverController, XboxController.Button.kY.value)
+                                .whileTrue(m_elevate.sysIdElevatorDynamic(SysIdRoutine.Direction.kReverse));
+
+                new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+                                .whileTrue(m_elevate.RunElevatorToPositionCommand(10));
+
+                new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+                                .whileTrue(m_elevate.RunElevatorToPositionCommand(24.5));
+/*
+                new JoystickButton(m_driverController, XboxController.Button.kA.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(-90)));
+                new JoystickButton(m_driverController, XboxController.Button.kB.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(0)));
+                new JoystickButton(m_driverController, XboxController.Button.kX.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(180)));
+                new JoystickButton(m_driverController, XboxController.Button.kY.value)
+                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(90)));
+
+*/
+                 new Trigger(() -> {
+                        return m_driverController.getRightTriggerAxis() > 0;
+                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> m_driverController.getRightTriggerAxis()));
+
+
+                new Trigger(() -> {
+                        return m_driverController.getLeftTriggerAxis() > 0;
+                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> -m_driverController.getLeftTriggerAxis()));
         }
         
 
@@ -348,17 +390,34 @@ public class RobotContainer {
          * {@link JoystickButton}.
          */
         private void configureButtonBindings() {
-
+                
                 //Center to the goal
                  new JoystickButton(m_driverController, XboxController.Button.kA.value)
                  //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
                  .whileTrue(new CenterToGoalCommand(m_robotDrive, true));
 
+
                 
+                 new JoystickButton(m_driverController, XboxController.Button.kY.value)
+                 //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
+                 .whileTrue(m_elevate.GoToIntake());
+
+                 new JoystickButton(m_driverController, XboxController.Button.kB.value)
+                 //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
+                 .whileTrue(m_elevate.ScoreL4());
+
+                 new Trigger(() -> {
+                        return m_driverController.getRightTriggerAxis() > 0;
+                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> m_driverController.getRightTriggerAxis()));
+
+
+                new Trigger(() -> {
+                        return m_driverController.getLeftTriggerAxis() > 0;
+                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> -m_driverController.getLeftTriggerAxis()));
+
              
                  //Auto drive to trap
-                  new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                 .whileTrue( TrajectoryCommandsFactory.DriveToAmp(m_robotDrive));
+                 
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
                 

@@ -30,21 +30,22 @@ public final class Constants {
   public static final double kDt = 0.02;
 
   public static final class DriveConstants {
+    public static final int kGyroPort = 13;
 
     public static final int kFrontLeftDriveMotorPort = 2;
-    public static final int kRearLeftDriveMotorPort = 4;
+    public static final int kRearLeftDriveMotorPort = 6;
     public static final int kFrontRightDriveMotorPort = 0;
-    public static final int kRearRightDriveMotorPort = 6;
+    public static final int kRearRightDriveMotorPort = 20;
 
     public static final int kFrontLeftTurningMotorPort = 3;
-    public static final int kRearLeftTurningMotorPort = 5;
+    public static final int kRearLeftTurningMotorPort = 7;
     public static final int kFrontRightTurningMotorPort = 1;
-    public static final int kRearRightTurningMotorPort = 7;
+    public static final int kRearRightTurningMotorPort = 5;
 
     public static final int kFrontLeftTurningEncoderPort = 1;
-    public static final int kRearLeftTurningEncoderPort = 2;
+    public static final int kRearLeftTurningEncoderPort = 3;
     public static final int kFrontRightTurningEncoderPort = 0;
-    public static final int kRearRightTurningEncoderPort = 3;
+    public static final int kRearRightTurningEncoderPort = 2;
 
     public static final boolean kFrontLeftTurningEncoderReversed = true;
     public static final boolean kRearLeftTurningEncoderReversed = true;
@@ -52,20 +53,20 @@ public final class Constants {
     public static final boolean kRearRightTurningEncoderReversed = true;
 
     public static final boolean kFrontLeftDriveReversed = true;
-    public static final boolean kRearLeftDriveReversed = false;
-    public static final boolean kFrontRightDriveReversed = true;
-    public static final boolean kRearRightDriveReversed = true;
+    public static final boolean kRearLeftDriveReversed = true;
+    public static final boolean kFrontRightDriveReversed = false;
+    public static final boolean kRearRightDriveReversed = false;
 
-    public static final double kFrontLeftAngleOffset = -0.189941;// 0.358643; //unit is from -1 to 1, normalized
-    public static final double kFrontRightAngleOffset = -0.920654;
-    public static final double kBackLeftAngleOffset = -0.733887;
-    public static final double kBackRightAngleOffset = 0.487793;
+    public static final double kFrontLeftAngleOffset = 0.319580078125;// 0.358643; //unit is from -1 to 1, normalized
+    public static final double kFrontRightAngleOffset = 0.083740234375;
+    public static final double kBackLeftAngleOffset = -0.231201171875;
+    public static final double kBackRightAngleOffset = 0.01171875;
 
     // Distance between centers of right and left wheels on robot
-    public static final double kTrackWidth = 0.60325;
+    public static final double kTrackWidth = 0.62865;
 
     // Distance between front and back wheels on robot
-    public static final double kWheelBase = 0.55245;
+    public static final double kWheelBase = 0.62865;
 
     
 
@@ -98,17 +99,20 @@ public final class Constants {
   public static final class ClimbConstants {
     public static final int kForwardSpeed = 4000;
     public static final int kReverseSpeed = -3000;
+    public static final byte kMotorID = 5; // or 2
   }
 
 
   public static final class ElevatorConstants{
-    public static final byte kLeaderDeviceId = 9;
-    public static final byte kFollowerDeviceId = 10;
-    public static final String kCanName = "rio";
+    public static final String kCanName = "Canivore";
+    public static final double kMaxJerk = 0;
+    public static final byte kLeaderDeviceId = 22;
+    public static final byte kFollowerDeviceId = 23;
+    ;
 
-    public static final PidConstants kPidValues = new PidConstants(0.5, 0, 0.007);
-    public static final Limits kLimits = new Limits(0, 60);
-    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
+    public static final PidConstants kPidValues = new PidConstants(5, 0, 0.0);
+    public static final Limits kLimits = new Limits(0, 25);
+    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(.015, .12391, 0, .24024);
 
     public static final int kMaxVelocity = 100;
     public static final int kMaxAcceleration = 100;
@@ -122,13 +126,14 @@ public final class Constants {
     public static final double kL1Position = 0.0;
     public static final double kL2Position = 59.5;
     public static final double kL3Position = 59.5;
-    public static final double kL4Position = 59.5;
-    public static final double kIntakePosition = 59.5;
+    public static final double kL4Position = 24.5;
+    public static final double kIntakePosition = 8;
+    public static final double kOutofthewayPosition = 12;
   }
 
   public static final class ArmConstants {
 
-    public static final byte kMotorID = 14;
+    public static final byte kMotorID = 21;
 
     public static final String kCanName = "rio";
 
@@ -146,16 +151,27 @@ public final class Constants {
     public static final int kStaleThreshold = 20;
 
 
-    public static final Limits kLimits = new Limits(Math.toRadians(-100),Math.toRadians(180));
+    public static final Limits kLimits = new Limits(Math.toRadians(0),Math.toRadians(230));
 
     public static final double L1Angle = Math.toRadians(0);
     public static final double L2Angle = Math.toRadians(25);
     public static final double L3Angle = Math.toRadians(25);
-    public static final double L4Angle = Math.toRadians(120);
-    public static final double intakeAngle = Math.toRadians(0);
+    public static final double L4Angle = Math.toRadians(51);
+    public static final double intakeAngle = Math.toRadians(220);
 
 
   }
+  public static final class EndeffectorConstants {
+
+    public static final byte kMotorID = 4;
+    public static final PidConstants kPidValues = new PidConstants(15, 0, 0);
+    public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
+
+
+
+  }
+
+  
 
 
 
