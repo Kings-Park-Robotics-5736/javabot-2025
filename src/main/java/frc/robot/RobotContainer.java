@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DriveConstants;
@@ -30,6 +31,7 @@ import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ArmSubsystemFalcon;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -58,6 +60,7 @@ public class RobotContainer {
         public Limelight m_limelight_side = new Limelight("limelight-side");
         //public EndeffectorSubsystem m_endeffector = new EndeffectorSubsystem();
         public ElevateSubsystem m_elevate = new ElevateSubsystem();
+        public ClimbSubsystem m_climb = new ClimbSubsystem();
 
         private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side);// use only 1 limelight for
                                                                                           // driving now since we dont
@@ -209,7 +212,8 @@ public class RobotContainer {
         
         }
 
-        public void resetArm(){
+        public void resetArmElevator(){
+                m_elevate.resetArmElevatorAfterDisable();
         }
         private void configureButtonBindingsDriveSysID() {
                 new JoystickButton(m_driverController, XboxController.Button.kA.value)
@@ -393,7 +397,20 @@ public class RobotContainer {
          */
         private void configureButtonBindings() {
                 
-                //Center to the goal
+
+                //A -> Go to score L2, but dont score
+                //B -> Go to score L3, but dont score
+                //Y -> Go to and Score L4
+                //X -> Go to Prep spot to score L4
+                //Right Bumper -> Score for L2 and L3
+                //Left Bumper -> Go to intake position and intake
+                //Start -> Reset Elevator Encoder
+                //Right Trigger -> Elevator Up
+                //Left Trigger -> Elevator Down
+
+                //POV Up -> Run Climber Forward
+                //POV Down -> Run Climber Reverse
+
                  new JoystickButton(m_driverController, XboxController.Button.kA.value)
                  .whileTrue(m_elevate.GotoScoreL2PositionCommand());
 
@@ -414,6 +431,9 @@ public class RobotContainer {
 
                  new JoystickButton(m_driverController, XboxController.Button.kStart.value)
                  .whileTrue(m_elevate.ResetElevatorEncoder());
+
+                 new POVButton(m_driverController, 0).whileTrue(m_climb.runClimberForward());
+                 new POVButton(m_driverController, 180).whileTrue(m_climb.runClimberReverse());
 
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;

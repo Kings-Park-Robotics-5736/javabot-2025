@@ -97,20 +97,7 @@ public double getArmEncoder(){
 }
 
 
-public Command endeffector_Flimit_Enable() {
-    // implicitly require `this`
-    return this.runOnce(() -> m_motor.configureAsync(m_FLimitEnable, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
-  }
 
-  public Command endeffector_Rlimit_Enable() {
-    // implicitly require `this`
-    return this.runOnce(() -> m_motor.configureAsync(m_RLimitEnable, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
-  }
-
-  public Command endeffector_Nolimit_Enable() {
-    // implicitly require `this`
-    return this.runOnce(() -> m_motor.configureAsync(m_NoLimitEnable, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
-  }
 
   public Command ReGrip(){
     return new FunctionalCommand(

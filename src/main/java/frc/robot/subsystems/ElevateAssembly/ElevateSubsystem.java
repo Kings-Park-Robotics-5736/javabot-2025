@@ -17,7 +17,7 @@ public class ElevateSubsystem extends SubsystemBase {
     private final ElevatorSubsystemFalcon m_elevator;
 
     public ElevateSubsystem(){
-        m_arm = new ArmSubsystemFalcon();
+        m_arm = new ArmSubsystemFalcon(()->getArmEncoderPosition());
         m_endeffector = new EndeffectorSubsystem();
         m_elevator = new ElevatorSubsystemFalcon("Elevator");
     }
@@ -146,6 +146,12 @@ public class ElevateSubsystem extends SubsystemBase {
 
     public Command Regrip(){
         return m_endeffector.ReGrip();
+    }
+
+
+    public void resetArmElevatorAfterDisable() {
+        m_arm.resetAfterDisable();
+        m_elevator.resetAfterDisable();
     }
 
     

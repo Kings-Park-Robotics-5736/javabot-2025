@@ -50,11 +50,13 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     private double usedV;
     private double usedG;
     private TalonFXConfiguration configs;
+    private final DoubleSupplier m_armEncoderPositionSupplier;
 
 
-    public ArmSubsystemFalcon() {
+    public ArmSubsystemFalcon(DoubleSupplier _encoderPosition) {
 
         m_motor = new TalonFX(ArmConstants.kMotorID, ArmConstants.kCanName);
+        m_armEncoderPositionSupplier = _encoderPosition;
 
         configs = new TalonFXConfiguration();
         configs.Slot0.kP = ArmConstants.kPidValues.p; // An error of 1 rotation per second results in 2V output
@@ -115,13 +117,11 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     }
 
     public void setInitialPosition(double position){
-
-        System.out.println("Setting position to " + position  + " or " + Units.rotationsToDegrees(position) + " degrees");
         m_motor.setPosition(Units.rotationsToRadians(position)); //this is the arm offset value
     }
 
     public void resetAfterDisable(){
-        System.out.println("Reset After Disable!!!");
+        System.out.println("Reset ARM After Disable!!!");
         manualControl = true;
         setSpeed(0);
     }
@@ -177,6 +177,9 @@ public class ArmSubsystemFalcon extends SubsystemBase {
 
         if(!manualControl){
             RunArmToPos();
+            if(getFalconAngularVelocityRadiansPerSec()<0.1){
+                setInitialPosition(m_armEncoderPositionSupplier.getAsDouble());
+            }
         }
     }
 
