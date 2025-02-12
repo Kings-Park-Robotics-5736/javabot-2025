@@ -31,7 +31,7 @@ public class ClimbSubsystem extends SubsystemBase{
 public Command runClimberForward(){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(.5),
+         ()->setSpeed(1),
          (interrupted) -> m_motor.set(0),
          () -> false, this);
 }
@@ -39,7 +39,7 @@ public Command runClimberReverse(){
     return new FunctionalCommand(
         ()->{},
          ()->setSpeed(-.5),
-         (interrupted) -> m_motor.set(0),
+         (interrupted) -> m_motor.set(-1),
          () -> false, this);
 }
 
