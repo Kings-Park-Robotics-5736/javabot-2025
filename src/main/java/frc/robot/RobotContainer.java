@@ -202,6 +202,8 @@ public class RobotContainer {
                         autoChooser = null;
                 }
 
+                m_elevate.setArmInitialPosition();
+
         
         
         
@@ -393,31 +395,33 @@ public class RobotContainer {
                 
                 //Center to the goal
                  new JoystickButton(m_driverController, XboxController.Button.kA.value)
-                 //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
-                 .whileTrue(new CenterToGoalCommand(m_robotDrive, true));
-
-
-                
-                 new JoystickButton(m_driverController, XboxController.Button.kY.value)
-                 //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
-                 .whileTrue(m_elevate.GoToIntake());
+                 .whileTrue(m_elevate.GotoScoreL2PositionCommand());
 
                  new JoystickButton(m_driverController, XboxController.Button.kB.value)
-                 //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
-                 .whileTrue(m_elevate.ScoreL4());
+                 .whileTrue(m_elevate.GotoScoreL3PositionCommand());
+
+                 new JoystickButton(m_driverController, XboxController.Button.kY.value)
+                 .whileTrue(m_elevate.ScoreL4Command());
+
+                 new JoystickButton(m_driverController, XboxController.Button.kX.value)
+                 .whileTrue(m_elevate.PrepScoreL4());
+
+                 new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+                 .whileTrue(m_elevate.OnlyScore());
+
+                 new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+                 .whileTrue(m_elevate.GoToIntakeAndIntake());
+
+                 new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+                 .whileTrue(m_elevate.ResetElevatorEncoder());
 
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
                 }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> m_driverController.getRightTriggerAxis()));
 
-
                 new Trigger(() -> {
                         return m_driverController.getLeftTriggerAxis() > 0;
-                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> -m_driverController.getLeftTriggerAxis()));
-
-             
-                 //Auto drive to trap
-                 
+                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> -m_driverController.getLeftTriggerAxis()));    
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
                 

@@ -209,6 +209,10 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         m_leader.setPosition(0);
     }
 
+    public Boolean elevatorInSafeSpot(){
+        return getElevatorPosition() > ElevatorConstants.kOutofthewayPosition;
+    }
+
     public double getElevatorPosition(){
         return m_leader.getPosition().refresh().getValueAsDouble();
     }
@@ -225,7 +229,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         return m_sysIdRoutine.dynamic(direction); 
     }
 
-
+  
     /**
      * 
      * Set the speed of the intake motor (-1 to 1)

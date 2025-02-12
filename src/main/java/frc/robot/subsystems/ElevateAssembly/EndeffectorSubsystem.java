@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.EndeffectorConstants;
 
 
@@ -12,6 +13,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.LimitSwitchConfig;
+import com.revrobotics.AbsoluteEncoder;
 
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.config.LimitSwitchConfig.Type;
@@ -35,6 +37,7 @@ public class EndeffectorSubsystem extends SubsystemBase{
     private SparkMaxConfig m_RLimitEnable;
     private SparkMaxConfig m_AllLimitEnable;
     private SparkMaxConfig m_NoLimitEnable;
+    private AbsoluteEncoder m_AbsoluteEncoder;
 
     public EndeffectorSubsystem(){
         m_motor = new SparkMax(EndeffectorConstants.kMotorID, MotorType.kBrushless);
@@ -50,7 +53,8 @@ public class EndeffectorSubsystem extends SubsystemBase{
         forwardLimitSwitch = m_motor.getForwardLimitSwitch();
         reverseLimitSwitch = m_motor.getReverseLimitSwitch();
         
-    
+        m_AbsoluteEncoder = m_motor.getAbsoluteEncoder();
+
 
 
 
@@ -59,7 +63,11 @@ public class EndeffectorSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
 
-        
+        SmartDashboard.putNumber("Arm Encoder Position", getArmEncoder());
+        SmartDashboard.putBoolean("Forward Limit Reached", ForwardLimitReached());
+        SmartDashboard.putBoolean("Reverse Limit Reached", ReverseLimitReached());
+
+
 
         
         
@@ -84,7 +92,9 @@ public class EndeffectorSubsystem extends SubsystemBase{
 
 
 
-
+public double getArmEncoder(){
+    return (1 - m_AbsoluteEncoder.getPosition()) - ArmConstants.kAbsoluteOffset;
+}
 
 
 public Command endeffector_Flimit_Enable() {
@@ -102,7 +112,21 @@ public Command endeffector_Flimit_Enable() {
     return this.runOnce(() -> m_motor.configureAsync(m_NoLimitEnable, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
   }
 
+  public Command ReGrip(){
+    return new FunctionalCommand(
+        ()->{},
+         ()->setSpeed(.1),
+         (interrupted) -> m_motor.set(0),
+            () -> ReverseLimitReached(), this).andThen(
+                new FunctionalCommand(
+                    ()->{},
+                     ()->setSpeed(-.06),
+                     (interrupted) -> m_motor.set(0),
+                        () -> !ReverseLimitReached(), this)
+            );
+  }
 
+  //positive speed brings up, revese limit switch is the top limit
 
   public Command Intake(){
     return new FunctionalCommand(
@@ -112,12 +136,12 @@ public Command endeffector_Flimit_Enable() {
             () -> ReverseLimitReached(), this);
   }
 
-  public Command Score(){
+  public Command Score(Boolean l4Score){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(-.3),
+         ()->setSpeed(l4Score ? .5 : -.8),
          (interrupted) -> m_motor.set(0),
-            () -> !ReverseLimitReached(), this);
+            () -> !ReverseLimitReached() && !ForwardLimitReached(), this);
   }
 
    public Command RunEndeffectorManualSpeedCommand(DoubleSupplier getSpeed) {

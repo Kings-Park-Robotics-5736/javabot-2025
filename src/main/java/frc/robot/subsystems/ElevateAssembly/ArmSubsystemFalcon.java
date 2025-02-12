@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,7 +77,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
             System.out.println("!!!!!ERROR!!!! Could not initialize the + Arm. Restart robot!");
         }
 
-        m_motor.setPosition(Math.toRadians(90)); //this is the arm offset value
+       
         
 
         m_motor.setNeutralMode(NeutralModeValue.Brake);
@@ -111,6 +112,12 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         usedV = ArmConstants.kFFValues.kv;
         usedG = ArmConstants.kFFValues.kg;
 
+    }
+
+    public void setInitialPosition(double position){
+
+        System.out.println("Setting position to " + position  + " or " + Units.rotationsToDegrees(position) + " degrees");
+        m_motor.setPosition(Units.rotationsToRadians(position)); //this is the arm offset value
     }
 
     public void resetAfterDisable(){

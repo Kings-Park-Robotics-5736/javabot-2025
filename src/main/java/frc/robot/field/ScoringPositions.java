@@ -54,6 +54,13 @@ public final class ScoringPositions {
         RIGHT
     }
 
+    public enum ScoreHeight{
+        L1,
+        L2,
+        L3,
+        L4
+    }
+
 
 
 

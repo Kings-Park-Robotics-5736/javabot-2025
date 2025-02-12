@@ -111,7 +111,7 @@ public final class Constants {
     ;
 
     public static final PidConstants kPidValues = new PidConstants(5, 0, 0.0);
-    public static final Limits kLimits = new Limits(0, 25);
+    public static final Limits kLimits = new Limits(0, 24.1);
     public static final FeedForwardConstants kFFValues = new FeedForwardConstants(.015, .12391, 0, .24024);
 
     public static final int kMaxVelocity = 100;
@@ -124,11 +124,13 @@ public final class Constants {
 
 
     public static final double kL1Position = 0.0;
-    public static final double kL2Position = 59.5;
-    public static final double kL3Position = 59.5;
-    public static final double kL4Position = 24.5;
+    public static final double kL2Position = 10;
+    public static final double kL3Position = 15.35;
+    public static final double kL4Position = 23.9;
     public static final double kIntakePosition = 8;
     public static final double kOutofthewayPosition = 12;
+    public static final double kIntakeWaitingPosition = 14;
+
   }
 
   public static final class ArmConstants {
@@ -144,6 +146,7 @@ public final class Constants {
     
     public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
 
+    public static final double kAbsoluteOffset = (1-0.841);
    
     public static final double kPositionTolerance = Math.toRadians(1.0);
     public static final double kStaleTolerance = Math.toRadians(3);
@@ -154,10 +157,13 @@ public final class Constants {
     public static final Limits kLimits = new Limits(Math.toRadians(0),Math.toRadians(230));
 
     public static final double L1Angle = Math.toRadians(0);
-    public static final double L2Angle = Math.toRadians(25);
-    public static final double L3Angle = Math.toRadians(25);
+    public static final double L2Angle = Math.toRadians(150.5);
+    public static final double L3Angle = Math.toRadians(143.2);
     public static final double L4Angle = Math.toRadians(51);
-    public static final double intakeAngle = Math.toRadians(220);
+    public static final double L4PrepAngle = Math.toRadians(65);
+
+    public static final double intakeAngle = Math.toRadians(211.89);
+    public static final double vertical = Math.toRadians(90);
 
 
   }
