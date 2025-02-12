@@ -97,9 +97,8 @@ public final class Constants {
 
 
   public static final class ClimbConstants {
-    public static final int kForwardSpeed = 4000;
-    public static final int kReverseSpeed = -3000;
-    public static final byte kMotorID = 5; // or 2
+    public static final boolean kMotorInverted = false;
+    public static final byte kMotorID = 5;
   }
 
 

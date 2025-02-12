@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DriveConstants;
@@ -30,6 +31,7 @@ import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ArmSubsystemFalcon;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -58,6 +60,7 @@ public class RobotContainer {
         public Limelight m_limelight_side = new Limelight("limelight-side");
         //public EndeffectorSubsystem m_endeffector = new EndeffectorSubsystem();
         public ElevateSubsystem m_elevate = new ElevateSubsystem();
+        public ClimbSubsystem m_climb = new ClimbSubsystem();
 
         private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side);// use only 1 limelight for
                                                                                           // driving now since we dont
@@ -405,6 +408,12 @@ public class RobotContainer {
                  new JoystickButton(m_driverController, XboxController.Button.kB.value)
                  //.whileTrue(new CenterToGoalCommand(m_robotDrive, false, true));
                  .whileTrue(m_elevate.ScoreL4());
+
+
+
+                 
+                 new POVButton(m_driverController, 0).whileTrue(m_climb.runClimberForward());
+                 new POVButton(m_driverController, 180).whileTrue(m_climb.runClimberReverse());
 
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
