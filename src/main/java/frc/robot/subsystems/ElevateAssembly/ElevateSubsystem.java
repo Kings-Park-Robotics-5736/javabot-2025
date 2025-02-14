@@ -2,11 +2,13 @@ package frc.robot.subsystems.ElevateAssembly;
 
 import java.util.function.DoubleSupplier;
 
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -15,18 +17,34 @@ public class ElevateSubsystem extends SubsystemBase {
     private final ArmSubsystemFalcon m_arm;
     private final EndeffectorSubsystem m_endeffector;
     private final ElevatorSubsystemFalcon m_elevator;
+    private DigitalInput m_coralIntakeSensor;
+    private final Trigger coralSensorIntakeTrigger;
+
 
     public ElevateSubsystem(){
         m_arm = new ArmSubsystemFalcon(()->getArmEncoderPosition());
         m_endeffector = new EndeffectorSubsystem();
         m_elevator = new ElevatorSubsystemFalcon("Elevator");
+        m_coralIntakeSensor = new DigitalInput(0);
+
+        coralSensorIntakeTrigger  =  new Trigger(() -> {
+                        return coralOnCone() && ! m_endeffector.ForwardLimitReached() && ! m_endeffector.ReverseLimitReached();
+                }).onTrue(new WaitCommand(.5).andThen(GoToIntakeAndIntake()));    
+
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Forward Limit Reached", m_endeffector.ForwardLimitReached());
         SmartDashboard.putBoolean("Reverse Limit Reached", m_endeffector.ReverseLimitReached());
+
+
         
+        
+    }
+
+    public boolean coralOnCone(){
+        return !m_coralIntakeSensor.get();
     }
 
     public void setArmInitialPosition(){
@@ -92,7 +110,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
     private Command GoToScorePosition(double elevatorPosition, double armFinalPosition){
-        return GoOutOfTheWay().andThen(RunElevatorToPositionCommand(elevatorPosition).alongWith(m_arm.RunArmToPositionCommand(armFinalPosition).alongWith(Regrip())));
+        return GoOutOfTheWay().andThen(RunElevatorToPositionCommand(elevatorPosition).alongWith(m_arm.RunArmToPositionCommand(armFinalPosition).alongWith(ReGripL2L3())));
     }
 
     private Command Score(double elevatorPosition, double armFinalPosition){
@@ -105,7 +123,7 @@ public class ElevateSubsystem extends SubsystemBase {
     }
 
     private Command ScoreL4(double elevatorPosition, double armPrepPosition, double armFinalPosition){
-        return GoToL4Position(elevatorPosition, armPrepPosition, armFinalPosition).andThen(m_endeffector.Score(true)).andThen(PrepForIntakePosition());
+        return GoToL4Position(elevatorPosition, armPrepPosition, armFinalPosition).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition());
     }
 
     //Commands to go to AND shoot out for all levels
@@ -121,7 +139,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
     //Command to shoot out for L1-L3
     public Command OnlyScore(){
-        return m_endeffector.Score(false).andThen(PrepForIntakePosition());
+        return m_endeffector.Score(false).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition());
     }
 
     //commands to go to the scoring commands, but NOT shoot
@@ -146,6 +164,10 @@ public class ElevateSubsystem extends SubsystemBase {
 
     public Command Regrip(){
         return m_endeffector.ReGrip();
+    }
+
+    public Command ReGripL2L3(){
+        return m_endeffector.ReGripL2L3();
     }
 
 

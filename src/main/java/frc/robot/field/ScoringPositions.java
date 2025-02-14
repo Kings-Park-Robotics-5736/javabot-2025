@@ -49,6 +49,29 @@ public final class ScoringPositions {
         ScorePositions.TWELVE, ScorePositions.TWO, ScorePositions.FOUR, ScorePositions.SIX, ScorePositions.EIGHT, ScorePositions.TEN
     };
 
+    public static final String[] scorePositionsListAlphaNames = {
+        "HG", "FE", "CD", "AB", "LK", "JI"
+    };
+
+    public static final String ScoreClockPositionToAlphaName(ScorePositions pos){
+        switch(pos){
+            case TWELVE:
+                return "HG";
+            case TWO:
+                return "FE";
+            case FOUR:
+                return "CD";
+            case SIX:
+                return "AB";
+            case EIGHT:
+                return "LK";
+            case TEN:
+            default:
+                return "JI";
+
+        }
+    }
+
     public enum ScoreLocation{
         LEFT,
         RIGHT

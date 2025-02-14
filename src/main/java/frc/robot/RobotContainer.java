@@ -427,9 +427,10 @@ public class RobotContainer {
                  .whileTrue(m_elevate.OnlyScore());
 
                  new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                 .whileTrue(m_elevate.GoToIntakeAndIntake());
+                 .whileTrue(m_elevate.PrepForIntakePosition());
 
                  new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+
                  .whileTrue(m_elevate.ResetElevatorEncoder());
 
                  new POVButton(m_driverController, 0).whileTrue(m_climb.runClimberForward());
@@ -445,6 +446,28 @@ public class RobotContainer {
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
                 
+
+                new JoystickButton(m_actionController, XboxController.Button.kA.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
+                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->true, ()->false)
+                );
+
+                new JoystickButton(m_actionController, XboxController.Button.kA.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
+                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->false, ()->false)
+                );
+
+                new JoystickButton(m_actionController, XboxController.Button.kB.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
+                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->true, ()->false)
+                );
+                new JoystickButton(m_actionController, XboxController.Button.kB.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
+                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->false, ()->false)
+                );
+
+                new JoystickButton(m_actionController, XboxController.Button.kY.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
+                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->true, ()->true)
+                );
+                new JoystickButton(m_actionController, XboxController.Button.kY.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
+                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->false, ()->true)
+                );
 
         }
 

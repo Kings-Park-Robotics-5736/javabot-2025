@@ -1,5 +1,6 @@
 package frc.robot.subsystems.ElevateAssembly;
 import static edu.wpi.first.units.Units.Volts;
+import static java.lang.Math.abs;
 
 import java.util.function.DoubleSupplier;
 
@@ -177,10 +178,12 @@ public class ArmSubsystemFalcon extends SubsystemBase {
 
         if(!manualControl){
             RunArmToPos();
-            if(getFalconAngularVelocityRadiansPerSec()<0.1){
-                setInitialPosition(m_armEncoderPositionSupplier.getAsDouble());
-            }
         }
+           
+        if(getFalconAngularVelocityRadiansPerSec()<0.001 && getFalconAngleRadians() > Math.toRadians(120) && Math.abs(getFalconAngleRadians() - Units.rotationsToRadians(m_armEncoderPositionSupplier.getAsDouble())) > Math.toRadians(1.5)){
+            setInitialPosition(m_armEncoderPositionSupplier.getAsDouble());
+        }
+        
     }
 
      public void RunArmToPos() {

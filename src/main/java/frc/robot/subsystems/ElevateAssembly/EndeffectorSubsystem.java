@@ -1,9 +1,12 @@
 package frc.robot.subsystems.ElevateAssembly;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.EndeffectorConstants;
 
@@ -64,6 +67,9 @@ public class EndeffectorSubsystem extends SubsystemBase{
     public void periodic() {
 
         SmartDashboard.putNumber("Arm Encoder Position", getArmEncoder());
+
+        SmartDashboard.putNumber("Arm Encoder RAW Position", m_AbsoluteEncoder.getPosition());
+
         SmartDashboard.putBoolean("Forward Limit Reached", ForwardLimitReached());
         SmartDashboard.putBoolean("Reverse Limit Reached", ReverseLimitReached());
 
@@ -82,6 +88,7 @@ public class EndeffectorSubsystem extends SubsystemBase{
     }
 
  public void setSpeed(double speed){
+    SmartDashboard.putNumber("Endeffector Speed", speed);
      m_motor.set(speed);
  }
  public void stopEndeffector(){
@@ -100,7 +107,7 @@ public double getArmEncoder(){
 
 
   public Command ReGrip(){
-    return new FunctionalCommand(
+    return (new FunctionalCommand(
         ()->{},
          ()->setSpeed(.1),
          (interrupted) -> m_motor.set(0),
@@ -108,9 +115,26 @@ public double getArmEncoder(){
                 new FunctionalCommand(
                     ()->{},
                      ()->setSpeed(-.06),
+                     (interrupted) -> {m_motor.set(0); System.out.println("Finished Regrip");},
+                        () -> !ReverseLimitReached(), this)
+            )).raceWith(new WaitCommand(.75));
+  }
+
+  public Command ReGripL2L3(){
+    return (new FunctionalCommand(
+        ()->{},
+         ()->setSpeed(.1),
+         (interrupted) -> m_motor.set(0),
+            () -> ReverseLimitReached(), this).andThen(
+                new FunctionalCommand(
+                    ()->{},
+                     ()->setSpeed(-.05),
                      (interrupted) -> m_motor.set(0),
                         () -> !ReverseLimitReached(), this)
-            );
+                        .andThen(new InstantCommand(()->setSpeed(.1)))
+                        .andThen(new WaitCommand(.1))
+                        .andThen(new InstantCommand(()->m_motor.set(0)))
+            )).raceWith(new WaitCommand(.75));
   }
 
   //positive speed brings up, revese limit switch is the top limit
@@ -118,7 +142,7 @@ public double getArmEncoder(){
   public Command Intake(){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(.3),
+         ()->setSpeed(.3 ),
          (interrupted) -> m_motor.set(0),
             () -> ReverseLimitReached(), this);
   }
@@ -126,7 +150,7 @@ public double getArmEncoder(){
   public Command Score(Boolean l4Score){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(l4Score ? .5 : -.8),
+         ()->setSpeed(l4Score ? 1 : -1),
          (interrupted) -> m_motor.set(0),
             () -> !ReverseLimitReached() && !ForwardLimitReached(), this);
   }

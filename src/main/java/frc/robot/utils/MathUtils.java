@@ -1,5 +1,6 @@
 package frc.robot.utils;
 
+import java.util.function.BooleanSupplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -7,11 +8,19 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScorePositions;
+import frc.robot.subsystems.drive.DriveSubsystem;
+
+import java.util.function.Supplier;
 
 public class MathUtils {
 
 
-    
+    public static Supplier<String> getClosestScoringTargetSupplier(DriveSubsystem robotDrive, BooleanSupplier left, BooleanSupplier top) {
+        return () -> {
+            ScorePositions pos = getClosestScoringTarget(robotDrive.getPose());
+            return pos.toString() + (left.getAsBoolean() ? "LEFT" : "RIGHT") + (top.getAsBoolean() ? "L4" : "L3");
+        };
+    }
 
     public static ScorePositions getClosestScoringTarget(Pose2d robotPose){
         var alliance = DriverStation.getAlliance();
@@ -39,30 +48,6 @@ public class MathUtils {
         return ScoringPositions.scorePositionsList[poseIndex];
     }
 
-    
-
-    public static Pose2d getRobotPoseAtScoringTarget(ScoringPositions.ScorePositions clockScorePosition, ScoringPositions.ScoreLocation side){
-
-        final double ROBOT_WIDTH_WITH_BUMPERS = Units.inchesToMeters(18.25); //meters
-        final double ROBOT_LEFT_SCORE_OFFSET  = Units.inchesToMeters(2.848); //meters
-        final double ROBOT_RIGHT_SCORE_OFFSET = Units.inchesToMeters(15.788); //meters
-
-        double offset = side == ScoringPositions.ScoreLocation.LEFT ? ROBOT_LEFT_SCORE_OFFSET : ROBOT_RIGHT_SCORE_OFFSET;
-
-        var alliance = DriverStation.getAlliance();
-
-        Pose2d AprilTagCoord = ScoringPositions.ScorePositionToPose(clockScorePosition, alliance.get());
-
-        double robotAngle = AprilTagCoord.getRotation().getRadians() - Math.toRadians(180);
-        double robotX;
-        double robotY;
-        
-        robotX = AprilTagCoord.getX() + Math.cos(AprilTagCoord.getRotation().getRadians())*(ROBOT_WIDTH_WITH_BUMPERS * .5) + Math.sin(AprilTagCoord.getRotation().getRadians()) * offset;
-
-        robotY = AprilTagCoord.getX() + Math.sin(AprilTagCoord.getRotation().getRadians())*(ROBOT_WIDTH_WITH_BUMPERS * .5) + Math.cos(AprilTagCoord.getRotation().getRadians()) * offset;
-        
-        return new Pose2d( new Translation2d(robotX,robotY), Rotation2d.fromRadians(robotAngle));
-    }
 
    
 }
