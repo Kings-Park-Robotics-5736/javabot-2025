@@ -15,11 +15,43 @@ import java.util.function.Supplier;
 public class MathUtils {
 
 
-    public static Supplier<String> getClosestScoringTargetSupplier(DriveSubsystem robotDrive, BooleanSupplier left, BooleanSupplier top) {
+    public static String BuildMapKeyString(ScorePositions position, Boolean left, Boolean top) {
+        String key = position.toString() + (left ? "LEFT" : "RIGHT") + (top ? "L4" : "L3");
+        return key;
+    }
+
+    public static Supplier<String> getClosestScoringTargetSupplier(DriveSubsystem robotDrive, Boolean left, Boolean top) {
         return () -> {
             ScorePositions pos = getClosestScoringTarget(robotDrive.getPose());
-            return pos.toString() + (left.getAsBoolean() ? "LEFT" : "RIGHT") + (top.getAsBoolean() ? "L4" : "L3");
+            return BuildMapKeyString(pos, left, top);
         };
+    }
+
+
+    public static double GetDistanceToCloasestScoringTarget(Pose2d robotPose) {
+        var alliance = DriverStation.getAlliance();
+        double minDistance = 10000;
+
+        Pose2d[] scoringPositions = {};
+        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
+            scoringPositions = ScoringPositions.BlueScoringLocations;
+        } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+            scoringPositions = ScoringPositions.RedScoringLocations;
+        }
+
+        for (int i = 0; i < scoringPositions.length; i++) {
+            Pose2d position = scoringPositions[i];
+            double distance = position.getTranslation().getDistance(robotPose.getTranslation());
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+
+        return minDistance;
+    }
+
+    public static Boolean IsWithinRange(Pose2d robotPose){
+        return GetDistanceToCloasestScoringTarget(robotPose) < ScoringPositions.maxDistanceToScoreMeters;
     }
 
     public static ScorePositions getClosestScoringTarget(Pose2d robotPose){

@@ -27,7 +27,7 @@ public class DriveToReefCommand extends Command{
     @Override
     public void initialize() {
         ScorePositions closestTarget = MathUtils.getClosestScoringTarget(m_drive.getPose());
-        m_pathFollowCommand = TrajectoryCommandsFactory.getPathFollowCommand(m_drive, closestTarget,m_scoreLocation, m_scoreHeight);
+        m_pathFollowCommand = TrajectoryCommandsFactory.getPathFollowCommandFromPositionLocAndHeight(m_drive, closestTarget,m_scoreLocation, m_scoreHeight);
         m_pathFollowCommand.initialize();
     }
     @Override

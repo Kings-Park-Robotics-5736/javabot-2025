@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.jar.Attributes.Name;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -31,10 +34,12 @@ import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ArmSubsystemFalcon;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.GoalType;
 import frc.robot.utils.Types.PositionType;
 import frc.robot.utils.Types.SysidMechanism;
@@ -59,7 +64,8 @@ public class RobotContainer {
         public Limelight m_limelight = new Limelight("limelight");
         public Limelight m_limelight_side = new Limelight("limelight-side");
         //public EndeffectorSubsystem m_endeffector = new EndeffectorSubsystem();
-        public ElevateSubsystem m_elevate = new ElevateSubsystem();
+        public ScoringPositionSelector m_scoringPositionSelector = new ScoringPositionSelector();
+        public ElevateSubsystem m_elevate = new ElevateSubsystem(m_scoringPositionSelector);
         public ClimbSubsystem m_climb = new ClimbSubsystem();
 
         private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side);// use only 1 limelight for
@@ -145,6 +151,18 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("CenterToTargetInfinite", new CenterToGoalCommand(m_robotDrive, true));
                 NamedCommands.registerCommand("CenterToTargetInfiniteInverse", new CenterToGoalCommand(m_robotDrive, true, true, GoalType.SPEAKER, Math.toRadians(10)));
+                
+                //create named commands for each command in ElevateSubsystem
+                NamedCommands.registerCommand("ElevateToL2", m_elevate.GotoScoreL2PositionCommand());
+                NamedCommands.registerCommand("ElevateToL3", m_elevate.GotoScoreL3PositionCommand());
+                NamedCommands.registerCommand("ElevateToL4", m_elevate.GotoScoreL4PositionCommand());
+                NamedCommands.registerCommand("ElevateToScorePrep", m_elevate.PrepScore());
+                NamedCommands.registerCommand("ElevateToIntake", m_elevate.PrepForIntakePosition());
+                NamedCommands.registerCommand("ElevateToIntakeAndIntake", m_elevate.GoToIntakeAndIntake());
+                NamedCommands.registerCommand("ShootOutL1L3", m_elevate.OnlyScore());
+                NamedCommands.registerCommand("ShootOutL4", m_elevate.OnlyScoreL4());
+                NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", m_elevate.OnlyScoreL4NoIntakeReturn());
+                NamedCommands.registerCommand("WaitForCoral", m_elevate.WaitForCoral());
 
           }
 
@@ -160,16 +178,12 @@ public class RobotContainer {
 
                         case INTAKE_TOP:
                         case INTAKE_BOTTOM:
-                               // configureButtonBindingsIntakeSysID();
                                 break;
                         case DRIVE:
                                 configureButtonBindingsDriveSysID();
                                 break;
                         case SHOOTER_LEFT:
-                                //configureButtonBindingsShooterLeftSysID();
-                                break;
                         case SHOOTER_RIGHT:
-                                //configureButtonBindingsShooterRightSysID();
                                 break;
                         case ELEVATOR:
                                 configButtonBindingsElevatorSysID();
@@ -224,95 +238,16 @@ public class RobotContainer {
                                 .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
                 new JoystickButton(m_driverController, XboxController.Button.kY.value)
                                 .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+                m_robotDrive.setDefaultCommand(
+                // The left stick controls translation of the robot.
+                // Turning is controlled by the X axis of the right stick.
+                new RunCommand(
+                                () -> driveWithJoystick(true),
+                                m_robotDrive));
         }
-        /*
-        private void configureButtonBindingsIntakeSysID() {
-                new JoystickButton(m_driverController, XboxController.Button.kA.value)
-                                .whileTrue(m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward,
-                                                PositionType.TOP)
-                                                .alongWith(m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward,
-                                                                PositionType.BOTTOM)));
-                new JoystickButton(m_driverController, XboxController.Button.kB.value)
-                                .whileTrue(m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse,
-                                                PositionType.TOP)
-                                                .alongWith(m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse,
-                                                                PositionType.BOTTOM)));
-                new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                                .whileTrue(m_intake.sysIdDynamic(SysIdRoutine.Direction.kForward, PositionType.TOP)
-                                                .alongWith(m_intake.sysIdDynamic(SysIdRoutine.Direction.kForward,
-                                                                PositionType.BOTTOM)));
-                new JoystickButton(m_driverController, XboxController.Button.kY.value)
-                                .whileTrue(m_intake.sysIdDynamic(SysIdRoutine.Direction.kReverse, PositionType.TOP)
-                                                .alongWith(m_intake.sysIdDynamic(SysIdRoutine.Direction.kReverse,
-                                                                PositionType.BOTTOM)));
-
-                new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                                .toggleOnTrue(m_intake.RunIntakeForwardCommand());
-
-                new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-                                .toggleOnTrue(m_intake.RunIntakeBackwardCommand());
-        }
-
-        private void configureButtonBindingsShooterLeftSysID() {
-                new JoystickButton(m_driverController, XboxController.Button.kA.value)
-                                .whileTrue(m_Launcher.sysIdShooterQuasistatic(SysIdRoutine.Direction.kForward,
-                                                PositionType.LEFT));
-                new JoystickButton(m_driverController, XboxController.Button.kB.value)
-                                .whileTrue(m_Launcher.sysIdShooterQuasistatic(SysIdRoutine.Direction.kReverse,
-                                                PositionType.LEFT));
-                new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                                .whileTrue(m_Launcher.sysIdShooterDynamic(SysIdRoutine.Direction.kForward,
-                                                PositionType.LEFT));
-                new JoystickButton(m_driverController, XboxController.Button.kY.value)
-                                .whileTrue(m_Launcher.sysIdShooterDynamic(SysIdRoutine.Direction.kReverse,
-                                                PositionType.LEFT));
-
-                new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                                .toggleOnTrue(m_Launcher.RunShooterForwardCommand());
-
-                new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-                                .toggleOnTrue(m_Launcher.RunShooterBackwardCommand());
-        }
-
-        private void configureButtonBindingsShooterRightSysID() {
-                new JoystickButton(m_driverController, XboxController.Button.kA.value)
-                                .whileTrue(m_Launcher.sysIdShooterQuasistatic(SysIdRoutine.Direction.kForward,
-                                                PositionType.RIGHT));
-                new JoystickButton(m_driverController, XboxController.Button.kB.value)
-                                .whileTrue(m_Launcher.sysIdShooterQuasistatic(SysIdRoutine.Direction.kReverse,
-                                                PositionType.RIGHT));
-                new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                                .whileTrue(m_Launcher.sysIdShooterDynamic(SysIdRoutine.Direction.kForward,
-                                                PositionType.RIGHT));
-                new JoystickButton(m_driverController, XboxController.Button.kY.value)
-                                .whileTrue(m_Launcher.sysIdShooterDynamic(SysIdRoutine.Direction.kReverse,
-                                                PositionType.RIGHT));
-
-                new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                                .toggleOnTrue(m_Launcher.RunShooterForwardCommand());
-
-                new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-                                .toggleOnTrue(m_Launcher.RunShooterBackwardCommand());
-        }
-
-        private void configButtonBindingsKickupRightSysID() {
-                new JoystickButton(m_driverController, XboxController.Button.kA.value)
-                                .whileTrue(m_Launcher.sysIdKickupQuasistatic(SysIdRoutine.Direction.kForward));
-                new JoystickButton(m_driverController, XboxController.Button.kB.value)
-                                .whileTrue(m_Launcher.sysIdKickupQuasistatic(SysIdRoutine.Direction.kReverse));
-                new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                                .whileTrue(m_Launcher.sysIdKickupDynamic(SysIdRoutine.Direction.kForward));
-                new JoystickButton(m_driverController, XboxController.Button.kY.value)
-                                .whileTrue(m_Launcher.sysIdKickupDynamic(SysIdRoutine.Direction.kReverse));
+    
 
 
-                new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                                .toggleOnTrue(m_Launcher.RunKickupForwardCommand());
-
-                new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-                                .toggleOnTrue(m_Launcher.RunKickupBackwardCommand());
-        }
-*/
         private void configButtonBindingsArmSysID() {
                 new JoystickButton(m_driverController, XboxController.Button.kA.value)
                                 .whileTrue(m_elevate.sysIdArmQuasistatic(SysIdRoutine.Direction.kForward));
@@ -364,17 +299,7 @@ public class RobotContainer {
 
                 new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
                                 .whileTrue(m_elevate.RunElevatorToPositionCommand(24.5));
-/*
-                new JoystickButton(m_driverController, XboxController.Button.kA.value)
-                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(-90)));
-                new JoystickButton(m_driverController, XboxController.Button.kB.value)
-                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(0)));
-                new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(180)));
-                new JoystickButton(m_driverController, XboxController.Button.kY.value)
-                                .whileTrue(m_arm.RunArmToPositionCommand(Math.toRadians(90)));
 
-*/
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
                 }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> m_driverController.getRightTriggerAxis()));
@@ -419,19 +344,21 @@ public class RobotContainer {
 
                  new JoystickButton(m_driverController, XboxController.Button.kY.value)
                  .whileTrue(m_elevate.ScoreL4Command());
-
+                
                  new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                 .whileTrue(m_elevate.PrepScoreL4());
+                        .whileTrue(m_elevate.PrepForIntakePosition());
+
+                
 
                  new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-                 .whileTrue(m_elevate.OnlyScore());
+                 .whileTrue(TrajectoryCommandsFactory.GoToRightIntake(m_robotDrive).alongWith(m_elevate.PrepForIntakePosition()));
 
                  new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-                 .whileTrue(m_elevate.PrepForIntakePosition());
+                 .whileTrue(TrajectoryCommandsFactory.GoToLeftIntake(m_robotDrive).alongWith(m_elevate.PrepForIntakePosition()));
+
 
                  new JoystickButton(m_driverController, XboxController.Button.kStart.value)
-
-                 .whileTrue(m_elevate.ResetElevatorEncoder());
+                 .onTrue(m_elevate.ResetElevatorEncoder());
 
                  new POVButton(m_driverController, 0).whileTrue(m_climb.runClimberForward());
                  new POVButton(m_driverController, 180).whileTrue(m_climb.runClimberReverse());
@@ -447,27 +374,67 @@ public class RobotContainer {
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
                 
 
+                /*******************************************
+                 * ACTION CONTROLLER
+                 *******************************************/
                 new JoystickButton(m_actionController, XboxController.Button.kA.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
-                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->true, ()->false)
+                        m_elevate.DriveToNearestScoreCommand(m_robotDrive, true, ScoreHeight.L2)
                 );
 
                 new JoystickButton(m_actionController, XboxController.Button.kA.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
-                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->false, ()->false)
+                        m_elevate.DriveToNearestScoreCommand(m_robotDrive, false, ScoreHeight.L2)
                 );
 
                 new JoystickButton(m_actionController, XboxController.Button.kB.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
-                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->true, ()->false)
+                        m_elevate.DriveToNearestScoreCommand(m_robotDrive, true, ScoreHeight.L3)
                 );
                 new JoystickButton(m_actionController, XboxController.Button.kB.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
-                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->false, ()->false)
+                        m_elevate.DriveToNearestScoreCommand(m_robotDrive, false, ScoreHeight.L3)
                 );
 
                 new JoystickButton(m_actionController, XboxController.Button.kY.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
-                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->true, ()->true)
+                        m_elevate.DriveToNearestScoreCommand(m_robotDrive, true, ScoreHeight.L4)
                 );
                 new JoystickButton(m_actionController, XboxController.Button.kY.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
-                        TrajectoryCommandsFactory.getAllScoringCommands(m_robotDrive, ()->false, ()->true)
+                        m_elevate.DriveToNearestScoreCommand(m_robotDrive, false, ScoreHeight.L4)
                 );
+
+                new POVButton(m_actionController, 0).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetPreviousScorePosition()));
+                new POVButton(m_actionController, 180).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetNextScorePosition()));
+
+                new Trigger(() -> {
+                        return m_driverController.getRightTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kA.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L2));
+                new Trigger(() -> {
+                        return m_driverController.getLeftTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kA.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L2));
+                new Trigger(() -> {
+                        return m_driverController.getRightTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kB.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L3));
+                new Trigger(() -> {
+                        return m_driverController.getLeftTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kB.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L3));
+                new Trigger(() -> {
+                        return m_driverController.getRightTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kY.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L4));
+                new Trigger(() -> {
+                        return m_driverController.getLeftTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kY.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L4));
+                        
+
+               new Trigger(()->{
+                        return m_actionController.getLeftY() > 0.2;
+               }).whileTrue(m_climb.runClimberForward());    
+               
+                 new Trigger(()->{
+                           return m_actionController.getLeftY() < -0.2;
+                 }).whileTrue(m_climb.runClimberReverse());    
 
         }
 
@@ -487,7 +454,6 @@ public class RobotContainer {
         }
 
         public void publishAuto() {
-                SmartDashboard.putNumber("Pi Theta", m_picam.getPiCamAngle());
         }
 
 }

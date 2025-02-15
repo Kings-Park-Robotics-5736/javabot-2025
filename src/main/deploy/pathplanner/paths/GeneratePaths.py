@@ -113,16 +113,20 @@ for tag in path_data:
         samplePath['waypoints'][0]['anchor']['y'] = startY
         samplePath['waypoints'][0]['nextControl']['x'] = controlX
         samplePath['waypoints'][0]['nextControl']['y'] = controlY
+        samplePath['waypoints'][0]['linkedName'] = "SCORE" + tag['name'] + "L4" + names[i] + "START"
 
         #in samplePath, replace the second waypoint with the new waypoint robotPositionX, robotPositionY, robotRotationL4
         samplePath['waypoints'][1]['anchor']['x'] = robotPositionX
         samplePath['waypoints'][1]['anchor']['y'] = robotPositionY
         samplePath['waypoints'][1]['prevControl']['x'] = controlX
         samplePath['waypoints'][1]['prevControl']['y'] = controlY
+        samplePath['waypoints'][1]['linkedName'] = "SCORE" + tag['name'] + "L4" + names[i] + "END"
+
 
         #put the rotation L4 in the goalEndState and idealStartingState
         samplePath['goalEndState']['rotation'] = robotRotationL4
         samplePath['idealStartingState']['rotation'] = robotRotationL4
+        
 
         #write the json object with the format tag[name] + "L4" + names[i] + ".json"
         with open(tag['name'] + "L4" + names[i] + "GEN.path", "w") as f:

@@ -1,0 +1,188 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "right_start_to_score_f"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToScorePrep"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FEL4LeftGEN"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "f_score_to_right_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "right_intake_to_score_c"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToL4"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CDL4LeftGEN"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "c_score_to_right_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "right_intake_to_score_d"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToL4"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CDL4RightGEN"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "d_score_to_right_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToIntake"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

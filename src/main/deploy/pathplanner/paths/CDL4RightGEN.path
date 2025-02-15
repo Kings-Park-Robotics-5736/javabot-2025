@@ -12,7 +12,7 @@
                 "y": 2.4878579731296138
             },
             "isLocked": false,
-            "linkedName": null
+            "linkedName": "SCORECDL4RightSTART"
         },
         {
             "anchor": {
@@ -25,7 +25,7 @@
             },
             "nextControl": null,
             "isLocked": false,
-            "linkedName": null
+            "linkedName": "SCORECDL4RightEND"
         }
     ],
     "rotationTargets": [],

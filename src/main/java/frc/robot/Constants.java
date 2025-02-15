@@ -122,7 +122,7 @@ public final class Constants {
     public static final double kPositionTolerance = 1.0;
 
 
-    public static final double kL1Position = 0.0;
+    public static final double kL1Position = 1;
     public static final double kL2Position = 10;
     public static final double kL3Position = 15.0;
     public static final double kL4Position = 23.9;
@@ -155,7 +155,7 @@ public final class Constants {
 
     public static final Limits kLimits = new Limits(Math.toRadians(0),Math.toRadians(230));
 
-    public static final double L1Angle = Math.toRadians(0);
+    public static final double L1Angle = Math.toRadians(120);
     public static final double L2Angle = Math.toRadians(150.5);
     public static final double L3Angle = Math.toRadians(143.2);
     public static final double L4Angle = Math.toRadians(51);
@@ -163,6 +163,7 @@ public final class Constants {
 
     public static final double intakeAngle = Math.toRadians(209.89);
     public static final double vertical = Math.toRadians(90);
+    public static final double AllHoldingAngle = Math.toRadians(110);
 
 
   }
