@@ -23,4 +23,12 @@ public class JoystickCommandsFactory {
                 (interrupted) -> device.setRumble(RumbleType.kBothRumble, 0),
                 () -> false);
     }
+
+    public static Command RumbleControllerTillCancel(GenericHID device, RumbleType rumbleType) {
+        return new FunctionalCommand(
+                () -> {},
+                () -> device.setRumble(rumbleType, 1),
+                (interrupted) -> device.setRumble(RumbleType.kBothRumble, 0),
+                () -> false);
+    }
 }
