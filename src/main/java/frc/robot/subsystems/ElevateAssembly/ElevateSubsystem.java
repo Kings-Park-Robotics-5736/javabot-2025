@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,18 +28,20 @@ public class ElevateSubsystem extends SubsystemBase {
     private DigitalInput m_coralIntakeSensor;
     private final Trigger coralSensorIntakeTrigger;
     private final ScoringPositionSelector m_ScoringPositionSelector;
+    private final DriveSubsystem m_robotDrive;
 
 
-    public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector){
+    public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector, DriveSubsystem robotDrive){
         m_arm = new ArmSubsystemFalcon(()->getArmEncoderPosition());
         m_endeffector = new EndeffectorSubsystem();
         m_elevator = new ElevatorSubsystemFalcon("Elevator");
         m_coralIntakeSensor = new DigitalInput(0);
         m_ScoringPositionSelector = scoringPositionSelector;
+        m_robotDrive = robotDrive;
 
         coralSensorIntakeTrigger  =  new Trigger(() -> {
                         return coralOnCone() && ! m_endeffector.ForwardLimitReached() && ! m_endeffector.ReverseLimitReached();
-                }).onTrue(new WaitCommand(.5).andThen(GoToIntakeAndIntake()));    
+                }).onTrue(((new WaitCommand(0.5).andThen(GoToIntakeAndIntake()))));    
 
     }
 
@@ -134,8 +137,18 @@ public class ElevateSubsystem extends SubsystemBase {
      **********************************************/
     public Command GoToIntakeAndIntake(){
         return GoOutOfTheWay()
+        .andThen(m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle))
+        .andThen(m_elevator.RunElevatorToIntakeSafeCommandRetries().alongWith(m_endeffector.Intake()))
+        .andThen(new WaitUntilCommand(()->MathUtils.IsAwayFromIntakeStation(m_robotDrive.getPose())))
+        .andThen(PrepScore());
+    }
+
+
+    public Command GoToIntakeAndIntakeAsDriveWithChecks(){
+        return (GoOutOfTheWay()
         .andThen(m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle)
-        .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake())))
+        .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake())))).unless(()->!coralOnCone())
+        .andThen(new WaitUntilCommand(()->MathUtils.IsAwayFromIntakeStation(m_robotDrive.getPose())))
         .andThen(PrepScore());
     }
 
@@ -242,16 +255,18 @@ public class ElevateSubsystem extends SubsystemBase {
      }
 
      public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
-        return initialCommand.alongWith(
-            new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose()))
+        return (initialCommand.alongWith( //.alongWith(GoToIntakeAndIntake().asProxy()).
+            GoToIntakeAndIntakeAsDriveWithChecks().andThen(
+            new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose())))
             .andThen(GetPositionCommandFromHeight(height)))
-        .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore());
+            .andThen(() -> robotDrive.forceStop())
+        .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore()));
         
      }
 
 
      public Command DriveToNearestScoreCommand(DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
-        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringClosestCommand(robotDrive, false, height == ScoreHeight.L4), robotDrive, left, height);
+        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringClosestCommand(robotDrive, left, height == ScoreHeight.L4), robotDrive, left, height);
         
      }
 

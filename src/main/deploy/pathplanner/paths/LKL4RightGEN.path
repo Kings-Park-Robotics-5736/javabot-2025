@@ -3,25 +3,25 @@
     "waypoints": [
         {
             "anchor": {
-                "x": 3.2448416494963017,
-                "y": 5.379433177816496
+                "x": 3.246777389478841,
+                "y": 5.380550777816496
             },
             "prevControl": null,
             "nextControl": {
-                "x": 3.3698416494963017,
-                "y": 5.162926826870387
+                "x": 3.371777389478841,
+                "y": 5.164044426870387
             },
             "isLocked": false,
             "linkedName": "SCORELKL4RightSTART"
         },
         {
             "anchor": {
-                "x": 3.4948416494963017,
-                "y": 4.946420475924277
+                "x": 3.496777389478841,
+                "y": 4.947538075924276
             },
             "prevControl": {
-                "x": 3.3698416494963017,
-                "y": 5.162926826870387
+                "x": 3.371777389478841,
+                "y": 5.164044426870387
             },
             "nextControl": null,
             "isLocked": false,
@@ -47,7 +47,7 @@
     "reversed": false,
     "folder": null,
     "idealStartingState": {
-        "velocity": 0,
+        "velocity": 0.25,
         "rotation": 30
     },
     "useDefaultConstraints": true

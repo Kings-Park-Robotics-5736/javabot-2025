@@ -3,25 +3,25 @@
     "waypoints": [
         {
             "anchor": {
-                "x": 3.9394203505036973,
-                "y": 2.271351622183504
+                "x": 3.9374846105211576,
+                "y": 2.272469222183504
             },
             "prevControl": null,
             "nextControl": {
-                "x": 4.064420350503697,
-                "y": 2.4878579731296138
+                "x": 4.062484610521158,
+                "y": 2.488975573129614
             },
             "isLocked": false,
             "linkedName": "SCORECDL4RightSTART"
         },
         {
             "anchor": {
-                "x": 4.189420350503697,
-                "y": 2.704364324075723
+                "x": 4.187484610521158,
+                "y": 2.7054819240757233
             },
             "prevControl": {
-                "x": 4.064420350503697,
-                "y": 2.4878579731296138
+                "x": 4.062484610521158,
+                "y": 2.488975573129614
             },
             "nextControl": null,
             "isLocked": false,
@@ -47,7 +47,7 @@
     "reversed": false,
     "folder": null,
     "idealStartingState": {
-        "velocity": 0,
+        "velocity": 0.25,
         "rotation": 150
     },
     "useDefaultConstraints": true

@@ -54,6 +54,13 @@ public class MathUtils {
         return GetDistanceToCloasestScoringTarget(robotPose) < ScoringPositions.maxDistanceToScoreMeters;
     }
 
+    public static Boolean IsAwayFromIntakeStation(Pose2d robotPose) {
+        return robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_BLUE.getTranslation()) > 1 &&
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_BLUE.getTranslation()) > 1 &&
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_RED.getTranslation()) > 1 &&
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_RED.getTranslation()) > 1;
+    }
+
     public static ScorePositions getClosestScoringTarget(Pose2d robotPose){
         var alliance = DriverStation.getAlliance();
        

@@ -109,12 +109,12 @@ public double getArmEncoder(){
   public Command ReGrip(){
     return (new FunctionalCommand(
         ()->{},
-         ()->setSpeed(.1),
+         ()->setSpeed(.4),
          (interrupted) -> m_motor.set(0),
             () -> ReverseLimitReached(), this).andThen(
                 new FunctionalCommand(
                     ()->{},
-                     ()->setSpeed(-.06),
+                     ()->setSpeed(-.2),
                      (interrupted) -> {m_motor.set(0); System.out.println("Finished Regrip");},
                         () -> !ReverseLimitReached(), this)
             )).raceWith(new WaitCommand(.75));
@@ -123,15 +123,15 @@ public double getArmEncoder(){
   public Command ReGripL2L3(){
     return (new FunctionalCommand(
         ()->{},
-         ()->setSpeed(.1),
+         ()->setSpeed(.4),
          (interrupted) -> m_motor.set(0),
             () -> ReverseLimitReached(), this).andThen(
                 new FunctionalCommand(
                     ()->{},
-                     ()->setSpeed(-.05),
+                     ()->setSpeed(-.2),
                      (interrupted) -> m_motor.set(0),
                         () -> !ReverseLimitReached(), this)
-                        .andThen(new InstantCommand(()->setSpeed(.1)))
+                        .andThen(new InstantCommand(()->setSpeed(.2)))
                         .andThen(new WaitCommand(.1))
                         .andThen(new InstantCommand(()->m_motor.set(0)))
             )).raceWith(new WaitCommand(.75));
@@ -142,7 +142,7 @@ public double getArmEncoder(){
   public Command Intake(){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(.3 ),
+         ()->setSpeed(.5 ),
          (interrupted) -> m_motor.set(0),
             () -> ReverseLimitReached(), this);
   }

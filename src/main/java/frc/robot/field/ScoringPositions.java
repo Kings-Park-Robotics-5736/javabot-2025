@@ -12,6 +12,13 @@ public final class ScoringPositions {
     public static final double speakerOpeningFromFloorMeters = 2.0574;
 
 
+
+    public static final Pose2d INTAKE_RIGHT_BLUE = new Pose2d(new Translation2d(0.851154, 0.574), Rotation2d.fromDegrees(54));
+    public static final Pose2d INTAKE_LEFT_BLUE = new Pose2d(new Translation2d(0.851154, 7.34), Rotation2d.fromDegrees(306));
+    public static final Pose2d INTAKE_RIGHT_RED = new Pose2d(new Translation2d(16.697, 7.34), Rotation2d.fromDegrees(234));
+    public static final Pose2d INTAKE_LEFT_RED = new Pose2d(new Translation2d(16.697,0.574 ), Rotation2d.fromDegrees(126));
+
+
     //BLUE scoring april tags
     public static final Pose2d BLUEATSIX = new Pose2d(new Translation2d(3.66, 4.03), Rotation2d.fromDegrees(180));
     public static final Pose2d BLUEATEIGHT = new Pose2d(new Translation2d(4.07, 4.75), Rotation2d.fromDegrees(120));
@@ -44,6 +51,25 @@ public final class ScoringPositions {
         EIGHT,
         TEN
     };
+
+    public static final double ScorePositionToRumbleValue(ScorePositions pos){
+        switch(pos){
+            case TWELVE:
+                return 0.1;
+            case TWO:
+                return 0.2;
+            case FOUR:
+                return 0.3;
+            case SIX:
+                return 0.4;
+            case EIGHT:
+                return 0.5;
+            case TEN:
+            default:
+                return 0.6;
+
+        }
+    }
 
     public static final ScorePositions[] scorePositionsList = {
         ScorePositions.TWELVE, ScorePositions.TWO, ScorePositions.FOUR, ScorePositions.SIX, ScorePositions.EIGHT, ScorePositions.TEN

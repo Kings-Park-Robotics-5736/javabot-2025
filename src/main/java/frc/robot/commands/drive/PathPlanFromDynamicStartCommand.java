@@ -8,8 +8,10 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -106,30 +108,54 @@ public class PathPlanFromDynamicStartCommand extends Command {
     @Override
     public void initialize() {
 
+        var alliance = DriverStation.getAlliance();
+        //guard against double flipping - if pos < 8.5, we are on blue, otherwise already on red
+        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red && m_endPose.getX() < 8.5) {
+            m_endPose = FlippingUtil.flipFieldPose(m_endPose);
+        }
          List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
             m_initialPoseSupplier.get(),
             new Pose2d(m_endPose.getX(), m_endPose.getY(), m_endPose.getRotation()) // The start pose of the path
         );
+        System.out.println("Driving to " + m_endPose.getX() + ", " + m_endPose.getY() );
 
-        // delay trajectory creation until this initialize.
-        m_pathFollowCommand = TrajectoryCommandsFactory.generatePPPathToPose(waypoints, m_endPose.getRotation());
-        m_pathFollowCommand.initialize();
+        //calculate distance between start and end points
+        double distance = Math.sqrt(Math.pow(m_endPose.getX() - m_initialPoseSupplier.get().getX(), 2) + Math.pow(m_endPose.getY() - m_initialPoseSupplier.get().getY(), 2));
+
+        if(distance > 0.0254){
+            // delay trajectory creation until this initialize.
+            m_pathFollowCommand = TrajectoryCommandsFactory.generatePPPathToPose(waypoints, m_endPose.getRotation());
+            try{
+                m_pathFollowCommand.initialize();
+            }catch(Exception e){
+                m_pathFollowCommand = null;
+            }
+        } else {
+            m_pathFollowCommand = null;
+        }
         m_pathPlannerDoneCounter = 0;
     }
 
     @Override
     public void end(boolean interrupted) {
-       
+       if(m_pathFollowCommand != null){
         m_pathFollowCommand.end(interrupted);
+       }
     }
 
     @Override
     public void execute() {
-        m_pathFollowCommand.execute();
+        if(m_pathFollowCommand != null){
+            m_pathFollowCommand.execute();
+        }
     }
 
     @Override
     public boolean isFinished() {
+
+        if(m_pathFollowCommand == null){
+            return true;
+        }
 
         if (m_continueTillAtPos) {
             if (m_pathFollowCommand.isFinished()) {

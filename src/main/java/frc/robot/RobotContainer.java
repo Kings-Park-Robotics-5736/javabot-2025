@@ -9,6 +9,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -31,6 +33,7 @@ import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
@@ -41,6 +44,7 @@ import frc.robot.utils.Types.SysidMechanism;
 import frc.robot.vision.Limelight;
 import frc.robot.vision.Limelight.LEDMode;
 import frc.robot.vision.PiCamera;
+import frc.robot.utils.MathUtils;
 
 
 /*
@@ -56,19 +60,23 @@ public class RobotContainer {
         private final SysidMechanism enabledSysid = SysidMechanism.NONE;
 
         private final PiCamera m_picam = new PiCamera();
-        public Limelight m_limelight = new Limelight("limelight");
-        public Limelight m_limelight_side = new Limelight("limelight-side");
-        //public EndeffectorSubsystem m_endeffector = new EndeffectorSubsystem();
-        public ScoringPositionSelector m_scoringPositionSelector = new ScoringPositionSelector();
-        public ElevateSubsystem m_elevate = new ElevateSubsystem(m_scoringPositionSelector);
+        public Limelight m_limelight = new Limelight("limelight-chute");
+        public Limelight m_limelight_side = new Limelight("limelight-climb");
+
+        XboxController m_driverController = new XboxController(IOConstants.kDriverControllerPort);
+        XboxController m_actionController = new XboxController(IOConstants.kActionControllerPort);
+        XboxController m_output_controller = new XboxController(IOConstants.kArduinoOutputPort);
+        public ScoringPositionSelector m_scoringPositionSelector = new ScoringPositionSelector(m_output_controller);
+
         public ClimbSubsystem m_climb = new ClimbSubsystem();
 
-        private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side);// use only 1 limelight for
+        private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side, m_output_controller);// use only 1 limelight for
                                                                                           // driving now since we dont
                                                                                           // have great measurements
                                                                                           // m_limelight_side);
 
-       
+        public ElevateSubsystem m_elevate = new ElevateSubsystem(m_scoringPositionSelector,m_robotDrive);
+
         private final PowerDistribution PDH = new PowerDistribution(1, ModuleType.kRev);
         private final SendableChooser<Command> autoChooser;
 
@@ -76,8 +84,7 @@ public class RobotContainer {
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
-        XboxController m_driverController = new XboxController(IOConstants.kDriverControllerPort);
-        XboxController m_actionController = new XboxController(IOConstants.kActionControllerPort);
+
 
         private void driveWithJoystick(Boolean fieldRelative) {
                 // Get the x speed. We are inverting this because Xbox controllers return
@@ -125,7 +132,7 @@ public class RobotContainer {
                 if (rot != 0){
                         SmartDashboard.putBoolean("Square to Target?", false);
                 }
-                if(m_driverController.getLeftBumperButton()){
+                if(m_driverController.getLeftTriggerAxis()>0){
                         fieldRelative = false;
                           xSpeed = -xSpeed;
                         ySpeed = -ySpeed;
@@ -216,8 +223,7 @@ public class RobotContainer {
 
                 m_elevate.setArmInitialPosition();
 
-        
-        
+                
         
         }
 
@@ -362,11 +368,11 @@ public class RobotContainer {
 
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
-                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> m_driverController.getRightTriggerAxis()));
+                }).whileTrue(m_elevate.OnlyScore());
 
-                new Trigger(() -> {
+                /*new Trigger(() -> {
                         return m_driverController.getLeftTriggerAxis() > 0;
-                }).whileTrue(m_elevate.RunElevatorManualSpeedCommand(() -> -m_driverController.getLeftTriggerAxis()));    
+                }).whileTrue(m_elevate.GoToIntakeAndIntake());   */ 
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
                 
@@ -376,64 +382,64 @@ public class RobotContainer {
                  *******************************************/
                 new JoystickButton(m_actionController, XboxController.Button.kA.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
                         m_elevate.DriveToNearestScoreCommand(m_robotDrive, true, ScoreHeight.L2).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble))
                 );
 
                 new JoystickButton(m_actionController, XboxController.Button.kA.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
                         m_elevate.DriveToNearestScoreCommand(m_robotDrive, false, ScoreHeight.L2).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble))
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
                 );
 
                 new JoystickButton(m_actionController, XboxController.Button.kB.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
                         m_elevate.DriveToNearestScoreCommand(m_robotDrive, true, ScoreHeight.L3).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble))
                 );
                 new JoystickButton(m_actionController, XboxController.Button.kB.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
                         m_elevate.DriveToNearestScoreCommand(m_robotDrive, false, ScoreHeight.L3).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble))
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
                 );
 
                 new JoystickButton(m_actionController, XboxController.Button.kY.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
                         m_elevate.DriveToNearestScoreCommand(m_robotDrive, true, ScoreHeight.L4).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble))
                 );
                 new JoystickButton(m_actionController, XboxController.Button.kY.value).and(new JoystickButton(m_actionController, XboxController.Button.kRightBumper.value)).whileTrue(
                         m_elevate.DriveToNearestScoreCommand(m_robotDrive, false, ScoreHeight.L4).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble))
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
                 );
 
                 new POVButton(m_actionController, 0).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetPreviousScorePosition()));
                 new POVButton(m_actionController, 180).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetNextScorePosition()));
 
                 new Trigger(() -> {
-                        return m_driverController.getRightTriggerAxis() > 0;
-                }).and(new JoystickButton(m_actionController, XboxController.Button.kA.value)).whileTrue(
-                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L2).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble)));
-                new Trigger(() -> {
-                        return m_driverController.getLeftTriggerAxis() > 0;
+                        return m_actionController.getRightTriggerAxis() > 0;
                 }).and(new JoystickButton(m_actionController, XboxController.Button.kA.value)).whileTrue(
                         m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L2).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
-                new Trigger(() -> {
-                        return m_driverController.getRightTriggerAxis() > 0;
-                }).and(new JoystickButton(m_actionController, XboxController.Button.kB.value)).whileTrue(
-                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L3).raceWith(JoystickCommandsFactory
                         .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble)));
                 new Trigger(() -> {
-                        return m_driverController.getLeftTriggerAxis() > 0;
+                        return m_actionController.getLeftTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kA.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L2).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
+                new Trigger(() -> {
+                        return m_actionController.getRightTriggerAxis() > 0;
                 }).and(new JoystickButton(m_actionController, XboxController.Button.kB.value)).whileTrue(
                         m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L3).raceWith(JoystickCommandsFactory
-                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
-                new Trigger(() -> {
-                        return m_driverController.getRightTriggerAxis() > 0;
-                }).and(new JoystickButton(m_actionController, XboxController.Button.kY.value)).whileTrue(
-                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L4).raceWith(JoystickCommandsFactory
                         .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble)));
                 new Trigger(() -> {
-                        return m_driverController.getLeftTriggerAxis() > 0;
+                        return m_actionController.getLeftTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kB.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L3).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
+                new Trigger(() -> {
+                        return m_actionController.getRightTriggerAxis() > 0;
                 }).and(new JoystickButton(m_actionController, XboxController.Button.kY.value)).whileTrue(
                         m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L4).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble)));
+                new Trigger(() -> {
+                        return m_actionController.getLeftTriggerAxis() > 0;
+                }).and(new JoystickButton(m_actionController, XboxController.Button.kY.value)).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L4).raceWith(JoystickCommandsFactory
                         .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
                         
 

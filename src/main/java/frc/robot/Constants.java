@@ -52,10 +52,10 @@ public final class Constants {
     public static final boolean kFrontRightTurningEncoderReversed = true;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
-    public static final boolean kFrontLeftDriveReversed = true;
-    public static final boolean kRearLeftDriveReversed = true;
-    public static final boolean kFrontRightDriveReversed = false;
-    public static final boolean kRearRightDriveReversed = false;
+    public static final boolean kFrontLeftDriveReversed = false;
+    public static final boolean kRearLeftDriveReversed = false;
+    public static final boolean kFrontRightDriveReversed = true;
+    public static final boolean kRearRightDriveReversed = true;
 
     public static final double kFrontLeftAngleOffset = 0.319580078125;// 0.358643; //unit is from -1 to 1, normalized
     public static final double kFrontRightAngleOffset = 0.083740234375;
@@ -83,10 +83,11 @@ public final class Constants {
     public static final double ksVoltsTurning = .10059;
     public static final double kvVoltSecondsPerMeterTurning = 0.3749;
     public static final double kaVoltSecondsSquaredPerMeterTurning = 0.1142;
-    public static final double ksVoltsDrive = 0.0532576;
-    public static final double kvVoltsDrive = 2.5721;
-    public static final double kaVoltsDrive = 0.455225;
-    public static final double kPDrive = 1.4120225;
+    public static final double ksVoltsDrive = 0.031663025;
+    public static final double kvVoltsDrive = 2.479025;
+    public static final double kaVoltsDrive = 0.25903;
+    public static final double kPDrive = .6418375
+    ;
 
     public static final double kMaxSpeedMetersPerSecond = 4;
     public static final double kMaxRotationSpeedMetersPerSecond = 6;
@@ -123,11 +124,11 @@ public final class Constants {
 
 
     public static final double kL1Position = 1;
-    public static final double kL2Position = 10;
-    public static final double kL3Position = 15.0;
+    public static final double kL2Position = 8.8;
+    public static final double kL3Position = 15.5;
     public static final double kL4Position = 23.9;
-    public static final double kIntakePosition = 8;
-    public static final double kOutofthewayPosition = 10;
+    public static final double kIntakePosition = 7.75;
+    public static final double kOutofthewayPosition = 10.5;
     public static final double kIntakeWaitingPosition = 12;
 
   }
@@ -145,7 +146,7 @@ public final class Constants {
     
     public static final FeedForwardConstants kFFValues = new FeedForwardConstants(0.06, 1.2666, 0, .19);
 
-    public static final double kAbsoluteOffset = (1-0.678);
+    public static final double kAbsoluteOffset = (1-0.85);
    
     public static final double kPositionTolerance = Math.toRadians(1.0);
     public static final double kStaleTolerance = Math.toRadians(3);
@@ -156,12 +157,13 @@ public final class Constants {
     public static final Limits kLimits = new Limits(Math.toRadians(0),Math.toRadians(230));
 
     public static final double L1Angle = Math.toRadians(120);
-    public static final double L2Angle = Math.toRadians(150.5);
-    public static final double L3Angle = Math.toRadians(143.2);
+
+    public static final double L2Angle = Math.toRadians(158.5);
+    public static final double L3Angle = Math.toRadians(156);
     public static final double L4Angle = Math.toRadians(51);
     public static final double L4PrepAngle = Math.toRadians(65);
 
-    public static final double intakeAngle = Math.toRadians(209.89);
+    public static final double intakeAngle = Math.toRadians(217);
     public static final double vertical = Math.toRadians(90);
     public static final double AllHoldingAngle = Math.toRadians(110);
 
@@ -197,6 +199,8 @@ public final class Constants {
   public static final class IOConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kActionControllerPort = 1;
+    public static final int kArduinoOutputPort = 2;
+
   }
 
   public static final class AutoConstants {

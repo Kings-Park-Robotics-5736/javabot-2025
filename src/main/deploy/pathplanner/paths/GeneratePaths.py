@@ -54,7 +54,7 @@ samplePath = """
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.25,
     "rotation": 90.0
   },
   "useDefaultConstraints": true
@@ -89,12 +89,14 @@ for line in lines:
 
 print(path_data)
 bumperWidth = 36.5
-offsetShort = 2.848
-offsetLong = 15.788
+offsetShort = 2.7
+offsetLong = 15.7
 offsets = [offsetShort, offsetLong]
+offsetsL23 = [-offsetLong - 1, -offsetShort]
 names = ["Left", "Right"]
 for tag in path_data:
     robotRotationL4 = tag['rotation'] - 90
+    robotRotationL23 =  tag['rotation'] -90-180
     for i in range(0,2):
         robotPositionX = tag['x'] + math.cos(math.radians(tag['rotation']))*(bumperWidth*.5)+math.cos(math.radians(360 - tag['rotation'] - 90))*offsets[i]
         robotPositionY = tag['y'] + math.sin(math.radians(tag['rotation']))*(bumperWidth*.5)-math.sin(math.radians(360 - tag['rotation'] - 90))*offsets[i]
@@ -130,5 +132,42 @@ for tag in path_data:
 
         #write the json object with the format tag[name] + "L4" + names[i] + ".json"
         with open(tag['name'] + "L4" + names[i] + "GEN.path", "w") as f:
+            json.dump(samplePath, f, indent=4)
+
+    for i in range(0,2):
+        robotPositionX = tag['x'] + math.cos(math.radians(tag['rotation']))*(bumperWidth*.5)+math.cos(math.radians(360 - tag['rotation'] - 90))*offsetsL23[i]
+        robotPositionY = tag['y'] + math.sin(math.radians(tag['rotation']))*(bumperWidth*.5)-math.sin(math.radians(360 - tag['rotation'] - 90))*offsetsL23[i]
+        robotPositionX *= 0.0254
+        robotPositionY *= 0.0254
+        startX = robotPositionX + .5 *math.cos(math.radians(tag['rotation']))
+        startY = robotPositionY + .5 *math.sin(math.radians(tag['rotation']))
+
+        controlX = startX + .25  * math.sin(math.radians(robotRotationL23+180))
+        controlY = startY - .25 * math.cos(math.radians(robotRotationL23+180))
+
+
+        print(tag['name'] + " " + names[i] + " " + str(robotPositionX) + " " + str(robotPositionY) + " "  + str(robotRotationL23) + ", start: " + str(startX) + " " + str(startY))
+        # in samplePath, replace the first waypoint with the new waypoint startX, startY, robotRotationL4
+        samplePath['waypoints'][0]['anchor']['x'] = startX
+        samplePath['waypoints'][0]['anchor']['y'] = startY
+        samplePath['waypoints'][0]['nextControl']['x'] = controlX
+        samplePath['waypoints'][0]['nextControl']['y'] = controlY
+        samplePath['waypoints'][0]['linkedName'] = "SCORE" + tag['name'] + "L23" + names[i] + "START"
+
+        #in samplePath, replace the second waypoint with the new waypoint robotPositionX, robotPositionY, robotRotationL4
+        samplePath['waypoints'][1]['anchor']['x'] = robotPositionX
+        samplePath['waypoints'][1]['anchor']['y'] = robotPositionY
+        samplePath['waypoints'][1]['prevControl']['x'] = controlX
+        samplePath['waypoints'][1]['prevControl']['y'] = controlY
+        samplePath['waypoints'][1]['linkedName'] = "SCORE" + tag['name'] + "L23" + names[i] + "END"
+
+
+        #put the rotation L4 in the goalEndState and idealStartingState
+        samplePath['goalEndState']['rotation'] = robotRotationL23
+        samplePath['idealStartingState']['rotation'] = robotRotationL23
+        
+
+        #write the json object with the format tag[name] + "L4" + names[i] + ".json"
+        with open(tag['name'] + "L23" + names[i] + "GEN.path", "w") as f:
             json.dump(samplePath, f, indent=4)
 

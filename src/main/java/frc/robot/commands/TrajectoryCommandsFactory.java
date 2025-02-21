@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -9,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import frc.robot.commands.drive.PathPlanFromDynamicStartCommand;
 import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.field.ScoringPositions.ScoreLocation;
@@ -39,7 +43,7 @@ public class TrajectoryCommandsFactory {
         try{
             path = PathPlannerPath.fromPathFile(pathName);
         } catch (Exception e){
-            System.out.println("Error loading path");
+            System.out.println("Error loading path " + pathName);
         }
         return path;
     }
@@ -48,7 +52,7 @@ public class TrajectoryCommandsFactory {
         String pathName = "";
         String alphaPosition = ScoringPositions.ScoreClockPositionToAlphaName(position);
         String alphaLocation = location == ScoreLocation.LEFT ? "Left" : "Right";
-        String alphaHeight = (height == ScoreHeight.L1 || height == ScoreHeight.L2) ? "L23" : height == ScoreHeight.L4 ? "L4" : "" ;
+        String alphaHeight = (height == ScoreHeight.L1 || height == ScoreHeight.L2 || height == ScoreHeight.L3) ? "L23" : height == ScoreHeight.L4 ? "L4" : "" ;
 
         pathName = alphaPosition + alphaHeight + alphaLocation + "GEN";
 
@@ -75,7 +79,11 @@ public class TrajectoryCommandsFactory {
         PathPlannerPath path = getPathFromFile(pathName);
 
         if( path != null){
-            return AutoBuilder.pathfindThenFollowPath(path, constraints);
+            Pose2d endPose = new Pose2d(path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().getX(), 
+            path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().getY(),
+            path.getGoalEndState().rotation());
+
+            return Commands.runOnce(()->System.out.println("Running Auto " + pathName + "with end pose " + endPose.toString())).andThen(AutoBuilder.pathfindThenFollowPath(path, constraints));
         }
         return Commands.run(() -> {
             System.out.println("Error loading path");
@@ -93,14 +101,13 @@ public class TrajectoryCommandsFactory {
             path.getGoalEndState().rotation());
 
             return AutoBuilder.pathfindThenFollowPath(path, constraints)
-                    .andThen(generatePPPathFindToPose(robotDrive, endPose));
-                    /*.andThen(new PathPlanFromDynamicStartCommand(
+                    .andThen(new PathPlanFromDynamicStartCommand(
                         () -> robotDrive.getPose(),
                         robotDrive,
                         endPose,
                         new ArrayList<PathPoint>(),
                         true
-                    ));*/
+                    ));
         }
         return Commands.run(() -> {
             System.out.println("Error loading path");
@@ -149,7 +156,7 @@ public class TrajectoryCommandsFactory {
 
 
     public static final Map<String, Command> getAllScoringCommands(DriveSubsystem robotDrive, Boolean left, Boolean top) {
-        Map<String, Command> commands = Collections.emptyMap();
+        Map<String, Command> commands = new HashMap<>();
         for (ScorePositions pos : ScoringPositions.scorePositionsList) {
             for (ScoreLocation loc : ScoreLocation.values()) {
                 for (ScoreHeight height : ScoreHeight.values()) {

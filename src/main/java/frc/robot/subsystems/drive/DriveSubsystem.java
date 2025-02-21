@@ -29,6 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,6 +38,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.utils.MathUtils;
 import frc.robot.vision.Limelight;
+import frc.robot.field.ScoringPositions;
+import frc.robot.field.ScoringPositions.ScorePositions;
 
 public class DriveSubsystem extends SubsystemBase {
 
@@ -95,6 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_transXLockoutValue;
   private double m_transYLockoutValue;
   private long m_lastPoseUpdate;
+  private double startTime = 0;
 
   private boolean pathPlannerInitSuccess;
   private boolean visionEnabled;
@@ -102,11 +106,15 @@ public class DriveSubsystem extends SubsystemBase {
   private Limelight m_limelight;
   private Limelight m_limelight_side;
 
+  private Pose2d lastPose = null;
+
   private final SwerveDrivePoseEstimator m_poseEstimator;
 
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
   private final MutDistance m_distance = Meters.mutable(0);
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
+  private final XboxController m_outputController;
+  ScorePositions m_scorePosition = null;
 
   private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
       // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
@@ -162,11 +170,13 @@ public class DriveSubsystem extends SubsystemBase {
           this));
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem(Limelight ll, Limelight l2) {
+  public DriveSubsystem(Limelight ll, Limelight l2, XboxController outputController) {
 
     m_joystickLockoutTranslate = false;
     m_joystickLockoutRotate = false;
     m_joystickLockoutRotateFieldOriented = false;
+
+    m_outputController = outputController;
 
     visionEnabled=true;
     SmartDashboard.putBoolean("LimelightVisionEnabled", visionEnabled);
@@ -254,6 +264,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Robot Pose X", getPose().getX());
     SmartDashboard.putNumber("Robot Pose Y", getPose().getY());
 
+
   }
 
 
@@ -309,7 +320,7 @@ public class DriveSubsystem extends SubsystemBase {
             .getDistance(limelightPose.getTranslation());
 
 
-        if(primary){
+        if(true){
           if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
             transStd = 0.5;
             rotStd = 10;
@@ -320,7 +331,7 @@ public class DriveSubsystem extends SubsystemBase {
             transStd = 1.5;
             rotStd = 20;
           }
-        }else{
+        }/*else{
             if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
             transStd = 1.5;
             rotStd = 20;
@@ -331,7 +342,7 @@ public class DriveSubsystem extends SubsystemBase {
             transStd = 2.5;
             rotStd = 30;
           }
-        }
+        }*/
         if (limelightPose.getX() > .5) {
           // Apply vision measurements. pose[6] holds the latency/frame delay
           m_poseEstimator.addVisionMeasurement(
@@ -350,7 +361,25 @@ public class DriveSubsystem extends SubsystemBase {
     // Update the odometry in the periodic block
     updateOdometry();
     SmartDashboard.getBoolean("LimelightVisionEnabled", visionEnabled);
-    SmartDashboard.putString("AUTO CLOSEST POSITION", MathUtils.getClosestScoringTarget(getPose()).toString());
+
+    var closestScoringPose = MathUtils.getClosestScoringTarget(getPose());
+    if(m_scorePosition == null || !m_scorePosition.equals(closestScoringPose)){
+      m_scorePosition = closestScoringPose;
+      m_outputController.setRumble(XboxController.RumbleType.kRightRumble, ScoringPositions.ScorePositionToRumbleValue(m_scorePosition));
+    }
+    SmartDashboard.putString("AUTO CLOSEST POSITION", closestScoringPose.toString());
+    
+    
+    if(lastPose != null){
+    //get the velocity, using startTime, current time, getPose, and lastPose
+     var poseDelta = getPose().getTranslation().minus(lastPose.getTranslation());
+     var velocity = Math.sqrt(poseDelta.getX() *  poseDelta.getX() + poseDelta.getY() *poseDelta.getY()) / (Timer.getFPGATimestamp() - startTime);
+     SmartDashboard.putNumber("Velocity", velocity);
+
+    }
+     startTime = Timer.getFPGATimestamp();
+     lastPose = getPose();
+    // output the distance 
   }
 
 
@@ -409,7 +438,9 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean joystick) {
-
+    SmartDashboard.putNumber("XSpeed", xSpeed);
+    SmartDashboard.putNumber("yspeed", ySpeed);
+    SmartDashboard.putNumber("rotation speed", rot);
     if ((joystick && !m_joystickLockoutTranslate) || !joystick) {
 
       if (m_joystickLockoutRotate && joystick) {

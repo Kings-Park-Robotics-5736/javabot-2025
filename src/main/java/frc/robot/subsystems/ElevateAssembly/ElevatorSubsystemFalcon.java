@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.utils.TalonUtils;
@@ -40,6 +41,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
 
     private int staleCounter = 0;
     private double lastPosition = 0;
+    private int stallCounter = 0;
 
     private double m_setpoint;
     private boolean manualControl;
@@ -135,7 +137,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
             RunElevator();
            
         }
-
+        SmartDashboard.putNumber("Stator Current", m_leader.getStatorCurrent().refresh().getValueAsDouble());
         SmartDashboard.putNumber("Elevator Enc Pos", getElevatorPosition());
 
     }
@@ -190,6 +192,24 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
                 () -> isFinished(), this);
     }
 
+
+    private Command RunElevatorToIntakeSafeCommand(){
+        return new FunctionalCommand(
+                () -> {manualControl = false; InitMotionProfile(ElevatorConstants.kIntakePosition);},
+                () -> {},
+                (interrupted) -> {},
+                () -> (isFinished() || isStalled()), this);
+    }
+
+    public Command RunElevatorToIntakeSafeCommandRetries(){
+        return RunElevatorToIntakeSafeCommand()
+                .andThen((RunElevatorToPositionCommand(ElevatorConstants.kOutofthewayPosition))
+                .andThen(new WaitCommand(0.5))
+                .andThen(RunElevatorToIntakeSafeCommand())).unless(()->!isStalled());
+    }
+
+
+
     public Command ResetElevatorEncoderCommand() {
         return this.runOnce(() -> resetEncoder());
     }
@@ -212,6 +232,20 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
 
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.dynamic(direction); 
+    }
+
+    public Boolean isStalled(){
+        System.out.print(m_leader.getStatorCurrent().refresh().getValueAsDouble());
+        if(m_leader.getStatorCurrent().refresh().getValueAsDouble()>45){
+            stallCounter++;
+        }else{
+            stallCounter=0;
+        }
+        if(stallCounter > 50){
+            System.out.println("STALL!!!!!!!!!!!!!!!!!!!!!!!");
+            return true;
+        }
+        return false;
     }
 
   
