@@ -45,6 +45,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
 
     private double m_setpoint;
     private boolean manualControl;
+    private boolean stallStop = false;
     private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
  private final MutVoltage m_appliedVoltage = (Volts.mutable(0));
@@ -137,7 +138,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
             RunElevator();
            
         }
-        SmartDashboard.putNumber("Stator Current", m_leader.getStatorCurrent().refresh().getValueAsDouble());
+        //SmartDashboard.putNumber("Stator Current", m_leader.getStatorCurrent().refresh().getValueAsDouble());
         SmartDashboard.putNumber("Elevator Enc Pos", getElevatorPosition());
 
     }
@@ -186,26 +187,30 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
      */
     public Command RunElevatorToPositionCommand(double position) {
         return new FunctionalCommand(
-                () -> {manualControl = false; InitMotionProfile(position);},
+                () -> {manualControl = false; InitMotionProfile(position);System.out.println("Elevator to " + position);},
                 () -> {},
                 (interrupted) -> {},
-                () -> isFinished(), this);
+                () -> isFinished(true), this);
     }
 
 
     private Command RunElevatorToIntakeSafeCommand(){
         return new FunctionalCommand(
-                () -> {manualControl = false; InitMotionProfile(ElevatorConstants.kIntakePosition);},
-                () -> {},
+                () -> {manualControl = false; InitMotionProfile(ElevatorConstants.kIntakePosition);System.out.println("ELEVATOR TO INTAKE====================="); stallStop=false;},
+                () -> { if (isStalled()  || isFinished(false) ){
+                    stallStop = true;
+                }
+            },
                 (interrupted) -> {},
-                () -> (isFinished() || isStalled()), this);
+                () -> stallStop, this);
     }
 
     public Command RunElevatorToIntakeSafeCommandRetries(){
         return RunElevatorToIntakeSafeCommand()
-                .andThen((RunElevatorToPositionCommand(ElevatorConstants.kOutofthewayPosition))
+                .andThen(((RunElevatorToPositionCommand(ElevatorConstants.kL3Position))
                 .andThen(new WaitCommand(0.5))
-                .andThen(RunElevatorToIntakeSafeCommand())).unless(()->!isStalled());
+                .andThen(RunElevatorToIntakeSafeCommand())).unless(()->!isStalled()));
+
     }
 
 
@@ -236,7 +241,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
 
     public Boolean isStalled(){
         System.out.print(m_leader.getStatorCurrent().refresh().getValueAsDouble());
-        if(m_leader.getStatorCurrent().refresh().getValueAsDouble()>45){
+        if(m_leader.getStatorCurrent().refresh().getValueAsDouble()>20 || staleCounter > 25){
             stallCounter++;
         }else{
             stallCounter=0;
@@ -267,6 +272,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
      */
     private void InitMotionProfile(double setpoint) {
         m_setpoint = setpoint;
+        staleCounter = 0;
       
     }
 
@@ -274,7 +280,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
      * @brief Checks if the elevator has reached its target
      * @return true if the elevator has reached its target, false otherwise
      */
-    private Boolean ElevatorReachedTarget() {
+    private Boolean ElevatorReachedTarget(Boolean useStale) {
 
         // check if the elevator has stalled and is no longer moving
         // if it hasn't moved (defined by encoder change less than kDiffThreshold),
@@ -294,11 +300,11 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         // we say that the elevator has reached its target if it is within
         // kDiffThreshold of the target,
         // or if it has been within a looser kStaleTolerance for kStaleThreshold cycles
-        return delta < ElevatorConstants.kDiffThreshold || (delta < ElevatorConstants.kStaleTolerance && staleCounter > ElevatorConstants.kStaleThreshold);
+        return delta < ElevatorConstants.kDiffThreshold || (useStale && delta < ElevatorConstants.kStaleTolerance && staleCounter > ElevatorConstants.kStaleThreshold);
     }
 
-    private Boolean isFinished() {
-        var isFinished =  ElevatorReachedTarget();
+    private Boolean isFinished(Boolean useStale) {
+        var isFinished =  ElevatorReachedTarget(useStale);
         //SmartDashboard.putBoolean("isfinished " + m_name, isFinished);
         return isFinished;
     }

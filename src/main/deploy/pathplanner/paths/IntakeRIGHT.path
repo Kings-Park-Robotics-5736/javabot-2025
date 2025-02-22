@@ -47,7 +47,7 @@
   "reversed": false,
   "folder": "Intakes",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.25,
     "rotation": 144.0
   },
   "useDefaultConstraints": true

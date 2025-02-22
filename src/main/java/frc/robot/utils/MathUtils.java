@@ -17,6 +17,7 @@ public class MathUtils {
 
     public static String BuildMapKeyString(ScorePositions position, Boolean left, Boolean top) {
         String key = position.toString() + (left ? "LEFT" : "RIGHT") + (top ? "L4" : "L3");
+        System.out.println("Driving to key " + key);
         return key;
     }
 
@@ -55,10 +56,17 @@ public class MathUtils {
     }
 
     public static Boolean IsAwayFromIntakeStation(Pose2d robotPose) {
-        return robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_BLUE.getTranslation()) > 1 &&
-                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_BLUE.getTranslation()) > 1 &&
-                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_RED.getTranslation()) > 1 &&
-                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_RED.getTranslation()) > 1;
+        return robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_BLUE.getTranslation()) > .5 &&
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_BLUE.getTranslation()) > .5 &&
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_RED.getTranslation()) > .5 &&
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_RED.getTranslation()) > .5;
+    }
+
+    public static Boolean IsCloseToIntakeStation(Pose2d robotPose) {
+        return robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_BLUE.getTranslation()) <1.5 ||
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_BLUE.getTranslation()) <1.5 ||
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_LEFT_RED.getTranslation()) <1.5 ||
+                robotPose.getTranslation().getDistance(ScoringPositions.INTAKE_RIGHT_RED.getTranslation()) <1.5;
     }
 
     public static ScorePositions getClosestScoringTarget(Pose2d robotPose){

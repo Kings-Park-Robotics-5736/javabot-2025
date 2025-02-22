@@ -117,9 +117,9 @@ public final class Constants {
     public static final int kMaxVelocity = 100;
     public static final int kMaxAcceleration = 100;
 
-    public static final double kStaleTolerance = .5;
-    public static final double kDiffThreshold = 0.15;
-    public static final int kStaleThreshold = 10;
+    public static final double kStaleTolerance = .35;
+    public static final double kDiffThreshold = 0.10;
+    public static final int kStaleThreshold = 30;
     public static final double kPositionTolerance = 1.0;
 
 

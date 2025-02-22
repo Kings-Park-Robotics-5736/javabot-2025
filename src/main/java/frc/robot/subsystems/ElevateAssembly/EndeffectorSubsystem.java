@@ -70,8 +70,8 @@ public class EndeffectorSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("Arm Encoder RAW Position", m_AbsoluteEncoder.getPosition());
 
-        SmartDashboard.putBoolean("Forward Limit Reached", ForwardLimitReached());
-        SmartDashboard.putBoolean("Reverse Limit Reached", ReverseLimitReached());
+        //SmartDashboard.putBoolean("Forward Limit Reached", ForwardLimitReached());
+        //SmartDashboard.putBoolean("Reverse Limit Reached", ReverseLimitReached());
 
 
 

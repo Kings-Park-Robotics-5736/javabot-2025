@@ -11,7 +11,9 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.util.FlippingUtil;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -105,6 +107,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private Limelight m_limelight;
   private Limelight m_limelight_side;
+  private Limelight m_Limelight3;
 
   private Pose2d lastPose = null;
 
@@ -170,7 +173,7 @@ public class DriveSubsystem extends SubsystemBase {
           this));
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem(Limelight ll, Limelight l2, XboxController outputController) {
+  public DriveSubsystem(Limelight ll, Limelight l2,Limelight l3, XboxController outputController) {
 
     m_joystickLockoutTranslate = false;
     m_joystickLockoutRotate = false;
@@ -186,10 +189,20 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_limelight = ll;
     m_limelight_side = l2;
+    m_Limelight3 = l3;
 
     m_lastPoseUpdate = 0;
 
+    
     m_gyro.setYaw(180);
+
+    
+    var alliance = DriverStation.getAlliance();
+    //guard against double flipping - if pos < 8.5, we are on blue, otherwise already on red
+    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+      m_gyro.setYaw(0);
+
+    }
 
     RobotConfig config;
     pathPlannerInitSuccess = true;
@@ -207,10 +220,9 @@ public class DriveSubsystem extends SubsystemBase {
           // alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
+          var alliance1 = DriverStation.getAlliance();
+          if (alliance1.isPresent()) {
+            return alliance1.get() == DriverStation.Alliance.Red;
           }
           return false;
         },
@@ -256,6 +268,9 @@ public class DriveSubsystem extends SubsystemBase {
       addLimelightVisionMeasurement(m_limelight, true);
       if (m_limelight_side != null) {
         addLimelightVisionMeasurement(m_limelight_side, false);
+      }
+      if (m_Limelight3 != null){
+        addLimelightVisionMeasurement(m_Limelight3, false);
       }
     }
 
@@ -311,7 +326,8 @@ public class DriveSubsystem extends SubsystemBase {
       pose = poseWithTime.value;
       Pose2d limelightPose = ll.AsPose2d(pose);
 
-      double[] cameraToAprilTagPose = m_limelight.getTargetPoseCameraSpace();
+      double[] cameraToAprilTagPose = ll.getTargetPoseCameraSpace();
+      double yawToTarget = Math.atan(Math.abs(cameraToAprilTagPose[0])/ Math.abs(cameraToAprilTagPose[2]));
 
       if(cameraToAprilTagPose.length > 0){
         double distanceToAprilTagSquared = cameraToAprilTagPose[0] * cameraToAprilTagPose[0]
@@ -319,9 +335,23 @@ public class DriveSubsystem extends SubsystemBase {
         double poseDelta = m_poseEstimator.getEstimatedPosition().getTranslation()
             .getDistance(limelightPose.getTranslation());
 
+            SmartDashboard.putNumber("Dist2AprilTag", distanceToAprilTagSquared);
+            SmartDashboard.putNumber("PoseDelta", poseDelta);
+            
+            SmartDashboard.putNumber("Closest Tag", ll.getTargetID());
 
+          if(MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && distanceToAprilTagSquared > 4 && (ll.getTargetID() == 7 ||  ll.getTargetID() == 18)){
+            return;
+          }
+            //ignore very sharp angle tags
+          //  if(Math.abs(yawToTarget) > Math.toRadians(50) && distanceToAprilTagSquared > 8){
+           //   return;
+           // }
         if(true){
-          if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
+          if (distanceToAprilTagSquared < 6 && poseDelta < .35) {
+            transStd = 0.20;
+            rotStd = 10;
+          } else if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
             transStd = 0.5;
             rotStd = 10;
           } else if (distanceToAprilTagSquared < 25) {
@@ -368,8 +398,9 @@ public class DriveSubsystem extends SubsystemBase {
       m_outputController.setRumble(XboxController.RumbleType.kRightRumble, ScoringPositions.ScorePositionToRumbleValue(m_scorePosition));
     }
     SmartDashboard.putString("AUTO CLOSEST POSITION", closestScoringPose.toString());
+    SmartDashboard.putBoolean("CloseToIntake",MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()));
     
-    
+    /*
     if(lastPose != null){
     //get the velocity, using startTime, current time, getPose, and lastPose
      var poseDelta = getPose().getTranslation().minus(lastPose.getTranslation());
@@ -379,6 +410,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
      startTime = Timer.getFPGATimestamp();
      lastPose = getPose();
+     */
     // output the distance 
   }
 
@@ -420,6 +452,8 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         },
         pose);
+
+        
 
   }
 

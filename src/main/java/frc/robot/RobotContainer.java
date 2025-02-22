@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -62,6 +63,7 @@ public class RobotContainer {
         private final PiCamera m_picam = new PiCamera();
         public Limelight m_limelight = new Limelight("limelight-chute");
         public Limelight m_limelight_side = new Limelight("limelight-climb");
+        public Limelight m_limelight_three = new Limelight("limelight-elevate");
 
         XboxController m_driverController = new XboxController(IOConstants.kDriverControllerPort);
         XboxController m_actionController = new XboxController(IOConstants.kActionControllerPort);
@@ -70,7 +72,7 @@ public class RobotContainer {
 
         public ClimbSubsystem m_climb = new ClimbSubsystem();
 
-        private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side, m_output_controller);// use only 1 limelight for
+        private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side,m_limelight_three, m_output_controller);// use only 1 limelight for
                                                                                           // driving now since we dont
                                                                                           // have great measurements
                                                                                           // m_limelight_side);
@@ -163,8 +165,9 @@ public class RobotContainer {
                 NamedCommands.registerCommand("ElevateToIntakeAndIntake", m_elevate.GoToIntakeAndIntake());
                 NamedCommands.registerCommand("ShootOutL1L3", m_elevate.OnlyScore());
                 NamedCommands.registerCommand("ShootOutL4", m_elevate.OnlyScoreL4());
-                NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", m_elevate.OnlyScoreL4NoIntakeReturn());
+                NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", new WaitCommand(.15).andThen(m_elevate.OnlyScoreL4NoIntakeReturn()));
                 NamedCommands.registerCommand("WaitForCoral", m_elevate.WaitForCoral());
+                NamedCommands.registerCommand("MoveToL4WhileDrive", m_elevate.AutoIntakeAndL4PositionWhileDriving());
 
           }
 
@@ -347,7 +350,7 @@ public class RobotContainer {
                  .whileTrue(m_elevate.ScoreL4Command());
                 
                  new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                        .whileTrue(m_elevate.PrepForIntakePosition());
+                        .whileTrue(m_elevate.Regrip());
 
                 
 
@@ -363,16 +366,13 @@ public class RobotContainer {
                  new JoystickButton(m_driverController, XboxController.Button.kStart.value)
                  .onTrue(m_elevate.ResetElevatorEncoder());
 
-                 new POVButton(m_driverController, 0).whileTrue(m_climb.runClimberForward());
-                 new POVButton(m_driverController, 180).whileTrue(m_climb.runClimberReverse());
+                 new POVButton(m_driverController, 0).whileTrue(m_elevate.PrepForIntakePosition());
+                 new POVButton(m_driverController, 180).whileTrue(m_elevate.GoToIntakeAndIntake());
 
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
                 }).whileTrue(m_elevate.OnlyScore());
 
-                /*new Trigger(() -> {
-                        return m_driverController.getLeftTriggerAxis() > 0;
-                }).whileTrue(m_elevate.GoToIntakeAndIntake());   */ 
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
                 

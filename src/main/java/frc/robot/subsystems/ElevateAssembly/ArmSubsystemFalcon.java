@@ -130,9 +130,9 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     @Override
     public void periodic() {
        
-        SmartDashboard.putNumber("Falcon Angle Deg", Math.toDegrees((getFalconAngleRadians())));
-        SmartDashboard.putNumber("Falcon Angular Velocity", getFalconAngularVelocityRadiansPerSec());
-
+        SmartDashboard.putNumber("Arm Falcon Angle Deg", Math.toDegrees((getFalconAngleRadians())));
+        //SmartDashboard.putNumber("Falcon Angular Velocity", getFalconAngularVelocityRadiansPerSec());
+/*
         var newP = SmartDashboard.getNumber("ARM P", usedP);
         var newI = SmartDashboard.getNumber("ARM I", usedI);
         var newD = SmartDashboard.getNumber("ARM D", usedD);
@@ -175,6 +175,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
             TalonUtils.ApplyTalonConfig(m_motor, configs);
             System.out.println("Using G of " + usedG);
         }
+            */
 
         if(!manualControl){
             RunArmToPos();
@@ -191,8 +192,8 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         m_motor.setControl(m_request.withPosition(m_globalSetpoint + armManualOffset));
 
        
-        SmartDashboard.putNumber("Arm Position Eror", Math.toDegrees(m_globalSetpoint - getArmAngleRadians()));
-        SmartDashboard.putNumber("Arm Offset Manual", Math.toDegrees(armManualOffset));
+       // SmartDashboard.putNumber("Arm Position Eror", Math.toDegrees(m_globalSetpoint - getArmAngleRadians()));
+        //SmartDashboard.putNumber("Arm Offset Manual", Math.toDegrees(armManualOffset));
         SmartDashboard.putNumber("Arm Global Setpoint ", Math.toDegrees(m_globalSetpoint));
         
     }
@@ -265,10 +266,17 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     }
 
     private Boolean isFinished() {
-        System.out.println("emergency stop " + emergencyStop + ", " + "arm target: " + armReachedTarget());
 
         var isFinished = emergencyStop || armReachedTarget();
         return isFinished;
+    }
+
+    private Boolean isFinished(Boolean finishEarly){
+        if(finishEarly){
+            return isFinished();
+        }
+        double delta = Math.abs(getArmAngleRadians() - m_globalSetpoint);
+        return isFinished() || delta < Math.toRadians(5);
     }
 
 
@@ -295,6 +303,11 @@ public class ArmSubsystemFalcon extends SubsystemBase {
 
 
 
+
+    public Command RunArmToPositionCommand(double setpoint) {
+        return RunArmToPositionCommand(setpoint, false);
+
+    }
     /**
      * 
      * @param setpoint the desired arm position IN RADIANS
@@ -303,7 +316,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
      * @return
      */
 
-    public Command RunArmToPositionCommand(double setpoint) {
+    public Command RunArmToPositionCommand(double setpoint, Boolean finishEarly) {
         return new FunctionalCommand(
                 () -> {
                     RunArmToPosition(setpoint);
@@ -313,7 +326,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                     emergencyStop = false;
                 },
                 () -> {
-                    return isFinished();
+                    return isFinished(finishEarly);
                 }, this);
     }
 
