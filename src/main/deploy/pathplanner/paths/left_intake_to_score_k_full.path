@@ -1,0 +1,68 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.2350291349170774,
+        "y": 7.018175705961451
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.934103260869565,
+        "y": 6.679755434782607
+      },
+      "isLocked": false,
+      "linkedName": "INTAKE_LEFT_END"
+    },
+    {
+      "anchor": {
+        "x": 3.779483415110556,
+        "y": 5.110758475924277
+      },
+      "prevControl": {
+        "x": 3.4321961134403414,
+        "y": 5.651838
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "SCORELKL4LeftEND"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.8363806844819522,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 29.999999999999996
+  },
+  "reversed": false,
+  "folder": "AutoPaths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 36.0
+  },
+  "useDefaultConstraints": true
+}

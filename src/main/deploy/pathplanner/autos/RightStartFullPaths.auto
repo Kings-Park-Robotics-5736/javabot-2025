@@ -9,28 +9,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "right_start_to_score_f"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ElevateToScorePrep"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "FEL4LeftGEN"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "right_start_to_score_f_full"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ForceStop"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -40,6 +34,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
           }
         },
         {
@@ -70,13 +70,13 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoral"
+            "name": "ForceStop"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "right_intake_to_score_c"
+            "name": "WaitForCoral"
           }
         },
         {
@@ -84,18 +84,37 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "ElevateToL4"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "right_intake_to_score_c_full"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ForceStop"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "CDL4LeftGEN"
+                  "name": "MoveToL4WhileDrive"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
           }
         },
         {
@@ -126,13 +145,13 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoral"
+            "name": "ForceStop"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "right_intake_to_score_d"
+            "name": "WaitForCoral"
           }
         },
         {
@@ -140,18 +159,37 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "ElevateToL4"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "right_intake_to_score_d_full"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ForceStop"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "CDL4RightGEN"
+                  "name": "MoveToL4WhileDrive"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
           }
         },
         {

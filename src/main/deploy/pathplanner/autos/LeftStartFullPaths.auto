@@ -1,0 +1,226 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "left_start_to_score_i_full"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ForceStop"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "i_score_to_left_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "left_intake_to_score_l_full"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ForceStop"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveToL4WhileDrive"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "l_score_to_left_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "left_intake_to_score_k_full"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ForceStop"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveToL4WhileDrive"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "k_score_to_left_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToIntake"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
