@@ -100,14 +100,16 @@ public class TrajectoryCommandsFactory {
             path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().getY(),
             path.getGoalEndState().rotation());
 
-            return AutoBuilder.pathfindThenFollowPath(path, constraints)
+            return (Commands.runOnce(()->System.out.println("Running PP Path Find W/ Align to path " + pathName)) 
+                    .andThen(AutoBuilder.pathfindThenFollowPath(path, constraints))
                     .andThen(new PathPlanFromDynamicStartCommand(
                         () -> robotDrive.getPose(),
                         robotDrive,
                         endPose,
                         new ArrayList<PathPoint>(),
                         true
-                    ));
+                    ))
+                    .andThen(Commands.runOnce(()->System.out.println("Done Running PP Path Find W/ Align to path " + pathName)))).withName("PP Path Find W/ Align to path " + pathName);
         }
         return Commands.run(() -> {
             System.out.println("Error loading path");

@@ -100,7 +100,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
 
         BaseStatusSignal.setUpdateFrequencyForAll(250,m_motor.getPosition(), m_motor.getVelocity(), m_motor.getMotorVoltage());
         m_motor.optimizeBusUtilization();
-        SignalLogger.start();
+        //SignalLogger.start();
  
 
         SmartDashboard.putNumber("ARM P", ArmConstants.kPidValues.p);
@@ -292,11 +292,36 @@ public class ArmSubsystemFalcon extends SubsystemBase {
         return setpoint;
     }
 
+    public void PrettyPrint(double setpoint){
+        //print the name of the constant that corresponds to the setpoint
+        if(setpoint == ArmConstants.intakeAngle){
+            System.out.println("------------ Starting Arm to Intake Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else if(setpoint == ArmConstants.vertical){
+            System.out.println("------------ Starting Arm to Vertical Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else if(setpoint == ArmConstants.L1Angle){
+            System.out.println("------------ Starting Arm to L1 Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else if(setpoint == ArmConstants.L2Angle){
+            System.out.println("------------ Starting Arm to L2 Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else if(setpoint == ArmConstants.L3Angle){
+            System.out.println("------------ Starting Arm to L3 Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else if(setpoint == ArmConstants.L4Angle){
+            System.out.println("------------ Starting Arm to L4 Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else if (setpoint == ArmConstants.L4PrepAngle){
+            System.out.println("------------ Starting Arm to L4 Prep Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else if (setpoint == ArmConstants.AllHoldingAngle){
+            System.out.println("------------ Starting Arm to All Holding Angle " + Math.toDegrees(setpoint) + " --------------");
+        }else{
+            System.out.println("------------ Starting Arm to Angle " + Math.toDegrees(setpoint) + " --------------");
+        }
+
+
+            
+    }
+
 
     public void RunArmToPosition(double setpoint){
         double sanitizedSetpoint = sanitizePositionSetpoint(setpoint);
-        System.out.println("-----------------Starting Arm to position " + sanitizedSetpoint + " --------------");
-      
+        PrettyPrint(sanitizedSetpoint);      
         m_globalSetpoint = sanitizedSetpoint;
         manualControl = false;
     }
@@ -327,7 +352,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                 },
                 () -> {
                     return isFinished(finishEarly);
-                }, this);
+                }, this).withName("RunArmToPositionCommand");
     }
 
     public void UpdateAngleManually(double diff){

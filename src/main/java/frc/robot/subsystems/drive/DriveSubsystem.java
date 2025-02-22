@@ -327,7 +327,6 @@ public class DriveSubsystem extends SubsystemBase {
       Pose2d limelightPose = ll.AsPose2d(pose);
 
       double[] cameraToAprilTagPose = ll.getTargetPoseCameraSpace();
-      double yawToTarget = Math.atan(Math.abs(cameraToAprilTagPose[0])/ Math.abs(cameraToAprilTagPose[2]));
 
       if(cameraToAprilTagPose.length > 0){
         double distanceToAprilTagSquared = cameraToAprilTagPose[0] * cameraToAprilTagPose[0]
@@ -343,10 +342,7 @@ public class DriveSubsystem extends SubsystemBase {
           if(MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && distanceToAprilTagSquared > 4 && (ll.getTargetID() == 7 ||  ll.getTargetID() == 18)){
             return;
           }
-            //ignore very sharp angle tags
-          //  if(Math.abs(yawToTarget) > Math.toRadians(50) && distanceToAprilTagSquared > 8){
-           //   return;
-           // }
+            
         if(true){
           if (distanceToAprilTagSquared < 6 && poseDelta < .35) {
             transStd = 0.20;
@@ -398,7 +394,7 @@ public class DriveSubsystem extends SubsystemBase {
       m_outputController.setRumble(XboxController.RumbleType.kRightRumble, ScoringPositions.ScorePositionToRumbleValue(m_scorePosition));
     }
     SmartDashboard.putString("AUTO CLOSEST POSITION", closestScoringPose.toString());
-    SmartDashboard.putBoolean("CloseToIntake",MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()));
+    //SmartDashboard.putBoolean("CloseToIntake",MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()));
     
     /*
     if(lastPose != null){

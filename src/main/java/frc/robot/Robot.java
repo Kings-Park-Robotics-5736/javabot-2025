@@ -106,6 +106,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!AUTO START");
+
+    m_robotContainer.setIsAutonomous(true);
   }
 
   /** This function is called periodically during autonomous. */
@@ -122,6 +125,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.setIsAutonomous(false);
+    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!TELEOP START");
+
   }
 
   /** This function is called periodically during operator control. */

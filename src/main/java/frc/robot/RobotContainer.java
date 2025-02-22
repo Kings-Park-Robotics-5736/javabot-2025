@@ -86,6 +86,8 @@ public class RobotContainer {
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
+        private Boolean m_isAuto = false;
+
 
 
         private void driveWithJoystick(Boolean fieldRelative) {
@@ -95,7 +97,6 @@ public class RobotContainer {
                 var leftY = m_driverController.getLeftY();
                 var leftX = m_driverController.getLeftX();
                 var rightX = m_driverController.getRightX();
-                //System.out.println("LeftY Pre = " + leftY);
 
                 if(m_driverController.getLeftStickButton()){
                        leftY /=2; 
@@ -106,7 +107,6 @@ public class RobotContainer {
                 if(m_driverController.getRightStickButton()){
                         rightX /=2;
                 }
-                //System.out.println("LeftY After = " + leftY);
                 var xSpeed = -m_xspeedLimiter
                                 .calculate(MathUtil.applyDeadband(leftY, 0.08))
                                 * DriveConstants.kMaxSpeedMetersPerSecond;
@@ -469,6 +469,11 @@ public class RobotContainer {
         }
 
         public void publishAuto() {
+        }
+
+        public void setIsAutonomous(boolean isAuto){
+                m_isAuto = isAuto;
+                m_elevate.setIsAutonomous(m_isAuto);
         }
 
 }

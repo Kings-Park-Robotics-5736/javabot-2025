@@ -140,6 +140,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         }
         //SmartDashboard.putNumber("Stator Current", m_leader.getStatorCurrent().refresh().getValueAsDouble());
         SmartDashboard.putNumber("Elevator Enc Pos", getElevatorPosition());
+        
 
     }
 
@@ -167,6 +168,28 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
     }
 
 
+    private void PrettyPrint(double position){
+        if (position == ElevatorConstants.kIntakePosition){
+            System.out.println("==========Begin setting Elevator to Intake position===============");
+        }else if (position == ElevatorConstants.kL1Position){
+            System.out.println("==========Begin setting Elevator to L1 position===============");
+        }else if (position == ElevatorConstants.kL2Position){
+            System.out.println("==========Begin setting Elevator to L2 position===============");
+        }else if (position == ElevatorConstants.kL3Position){
+            System.out.println("==========Begin setting Elevator to L3 position===============");
+        }else if (position == ElevatorConstants.kL4Position){
+            System.out.println("==========Begin setting Elevator to L4 position===============");
+        }else if (position == ElevatorConstants.kOutofthewayPosition){
+            System.out.println("==========Begin setting Elevator to Out of the way position===============");
+        }else if (position == ElevatorConstants.kIntakeWaitingPosition){
+            System.out.println("==========Begin setting Elevator to Intake Waiting position===============");
+        }else{
+            System.out.println("==========Begin setting Elevator to " + position + "===============");
+        }
+
+
+    }
+
     /**
      * @brief Runs the Elevator at a given speed (-1 to 1) in manual mode until interrupted
      * @param getSpeed a lambda that takes no arguments and returns the desired speed of the Elevator [ () => double ]
@@ -186,30 +209,30 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
      * @return the composed command to run the Elevator to a given positions
      */
     public Command RunElevatorToPositionCommand(double position) {
-        return new FunctionalCommand(
-                () -> {manualControl = false; InitMotionProfile(position);System.out.println("Elevator to " + position);},
+        return (new FunctionalCommand(
+                () -> {manualControl = false; InitMotionProfile(position);PrettyPrint(position);},
                 () -> {},
                 (interrupted) -> {},
-                () -> isFinished(true), this);
+                () -> isFinished(true), this)).withName("RunElevatorToPositionCommand");
     }
 
 
     private Command RunElevatorToIntakeSafeCommand(){
-        return new FunctionalCommand(
-                () -> {manualControl = false; InitMotionProfile(ElevatorConstants.kIntakePosition);System.out.println("ELEVATOR TO INTAKE====================="); stallStop=false;},
+        return (new FunctionalCommand(
+                () -> {manualControl = false; InitMotionProfile(ElevatorConstants.kIntakePosition);System.out.println("ELEVATOR TO SAFE INTAKE====================="); stallStop=false;},
                 () -> { if (isStalled()  || isFinished(false) ){
                     stallStop = true;
                 }
             },
                 (interrupted) -> {},
-                () -> stallStop, this);
+                () -> stallStop, this)).withName("RunElevatorToIntakeSafeCommand");
     }
 
     public Command RunElevatorToIntakeSafeCommandRetries(){
-        return RunElevatorToIntakeSafeCommand()
+        return (RunElevatorToIntakeSafeCommand()
                 .andThen(((RunElevatorToPositionCommand(ElevatorConstants.kL3Position))
                 .andThen(new WaitCommand(0.5))
-                .andThen(RunElevatorToIntakeSafeCommand())).unless(()->!isStalled()));
+                .andThen(RunElevatorToIntakeSafeCommand())).unless(()->!isStalled()))).withName("RunElevatorToIntakeSafeCommandRetries");
 
     }
 
@@ -240,7 +263,6 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
     }
 
     public Boolean isStalled(){
-        System.out.print(m_leader.getStatorCurrent().refresh().getValueAsDouble());
         if(m_leader.getStatorCurrent().refresh().getValueAsDouble()>20 || staleCounter > 25){
             stallCounter++;
         }else{

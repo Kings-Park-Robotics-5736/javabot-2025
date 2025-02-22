@@ -107,7 +107,7 @@ public double getArmEncoder(){
 
 
   public Command ReGrip(){
-    return (new FunctionalCommand(
+    return ((new FunctionalCommand(
         ()->{},
          ()->setSpeed(.4),
          (interrupted) -> m_motor.set(0),
@@ -117,11 +117,11 @@ public double getArmEncoder(){
                      ()->setSpeed(-.2),
                      (interrupted) -> {m_motor.set(0); System.out.println("Finished Regrip");},
                         () -> !ReverseLimitReached(), this)
-            )).raceWith(new WaitCommand(.75));
+            )).raceWith(new WaitCommand(.75))).withName("ReGrip");
   }
 
   public Command ReGripL2L3(){
-    return (new FunctionalCommand(
+    return ((new FunctionalCommand(
         ()->{},
          ()->setSpeed(.4),
          (interrupted) -> m_motor.set(0),
@@ -134,25 +134,25 @@ public double getArmEncoder(){
                         .andThen(new InstantCommand(()->setSpeed(.2)))
                         .andThen(new WaitCommand(.1))
                         .andThen(new InstantCommand(()->m_motor.set(0)))
-            )).raceWith(new WaitCommand(.75));
+            )).raceWith(new WaitCommand(.75))).withName("ReGripL2L3");
   }
 
   //positive speed brings up, revese limit switch is the top limit
 
   public Command Intake(){
-    return new FunctionalCommand(
+    return (new FunctionalCommand(
         ()->{},
          ()->setSpeed(.5 ),
          (interrupted) -> m_motor.set(0),
-            () -> ReverseLimitReached(), this);
+            () -> ReverseLimitReached(), this)).withName("Intake");
   }
 
   public Command Score(Boolean l4Score){
-    return new FunctionalCommand(
+    return (new FunctionalCommand(
         ()->{},
          ()->setSpeed(l4Score ? 1 : -1),
          (interrupted) -> m_motor.set(0),
-            () -> !ReverseLimitReached() && !ForwardLimitReached(), this);
+            () -> !ReverseLimitReached() && !ForwardLimitReached(), this)).withName("Score");
   }
 
    public Command RunEndeffectorManualSpeedCommand(DoubleSupplier getSpeed) {

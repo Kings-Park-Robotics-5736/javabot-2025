@@ -117,7 +117,7 @@ public class PathPlanFromDynamicStartCommand extends Command {
             m_initialPoseSupplier.get(),
             new Pose2d(m_endPose.getX(), m_endPose.getY(), m_endPose.getRotation()) // The start pose of the path
         );
-        System.out.println("Driving to " + m_endPose.getX() + ", " + m_endPose.getY() );
+        System.out.println("PathPlanDynamicStart Init Driving to " + m_endPose.getX() + ", " + m_endPose.getY() );
 
         //calculate distance between start and end points
         double distance = Math.sqrt(Math.pow(m_endPose.getX() - m_initialPoseSupplier.get().getX(), 2) + Math.pow(m_endPose.getY() - m_initialPoseSupplier.get().getY(), 2));
@@ -138,9 +138,10 @@ public class PathPlanFromDynamicStartCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-       if(m_pathFollowCommand != null){
-        m_pathFollowCommand.end(interrupted);
-       }
+        System.out.println("PathPlanDynamicStart END. Goal pose: " + m_endPose.toString() + ", Actual pose: " + m_robotDrive.getPose().toString());
+        if(m_pathFollowCommand != null){
+            m_pathFollowCommand.end(interrupted);
+        }
     }
 
     @Override

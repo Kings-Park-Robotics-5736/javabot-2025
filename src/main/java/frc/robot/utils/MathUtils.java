@@ -17,7 +17,7 @@ public class MathUtils {
 
     public static String BuildMapKeyString(ScorePositions position, Boolean left, Boolean top) {
         String key = position.toString() + (left ? "LEFT" : "RIGHT") + (top ? "L4" : "L3");
-        System.out.println("Driving to key " + key);
+        System.out.println("COMMAND SELECTOR: Driving to built key " + key);
         return key;
     }
 
