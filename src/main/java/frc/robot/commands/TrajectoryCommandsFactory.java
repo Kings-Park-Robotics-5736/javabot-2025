@@ -142,6 +142,11 @@ public class TrajectoryCommandsFactory {
         return generatePPPathFindToPathThenAlign(robotDrive, getPathName(position, location, height));
     }
 
+
+    public static Command getPathFollowCommandClearAlgae(DriveSubsystem robotDrive, ScorePositions position) {
+        return generatePPPathFindToPathThenAlign(robotDrive, "CLEAR" + ScoringPositions.ScoreClockPositionToAlphaName(position) + "GEN");
+    }
+
     public static Pose2d getPathFinishingPose(ScorePositions position, ScoreLocation location, ScoreHeight height){
 
         PathPlannerPath path = getPathFromFile(getPathName(position, location, height));
@@ -168,6 +173,25 @@ public class TrajectoryCommandsFactory {
         }
 
         return commands;
+    }
+
+
+    public static final Map<String, Command> getAllClearingCommands(DriveSubsystem robotDrive) {
+        Map<String, Command> commands = new HashMap<>();
+        for (ScorePositions pos : ScoringPositions.scorePositionsList) {
+                commands.put("CLEAR" + pos.toString(), getPathFollowCommandClearAlgae(robotDrive,pos));
+        }
+
+        return commands;
+    }
+
+
+    public static final Command getClearingSelectedCommand(DriveSubsystem robotDrive, Supplier<String> selectedCommandSupplier){
+        Map <String, Command> commands = getAllClearingCommands(robotDrive);
+        return new SelectCommand<>(
+            commands,
+            selectedCommandSupplier
+        );
     }
 
     public static final Command getScoringClosestCommand(DriveSubsystem robotDrive, Boolean left, Boolean top){

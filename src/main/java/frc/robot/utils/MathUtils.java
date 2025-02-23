@@ -21,6 +21,12 @@ public class MathUtils {
         return key;
     }
 
+    public static String BuildMapKeyStringClear(ScorePositions position ) {
+        String key = "CLEAR" + position.toString();
+        System.out.println("COMMAND SELECTOR: Driving to built key for ALGAE: " + key);
+        return key;
+    }
+
     public static Supplier<String> getClosestScoringTargetSupplier(DriveSubsystem robotDrive, Boolean left, Boolean top) {
         return () -> {
             ScorePositions pos = getClosestScoringTarget(robotDrive.getPose());

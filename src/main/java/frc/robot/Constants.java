@@ -100,6 +100,9 @@ public final class Constants {
   public static final class ClimbConstants {
     public static final boolean kMotorInverted = true;
     public static final byte kMotorID = 5;
+
+    public static final double kFullyOutPosition = 15;
+    public static final double kFullyInPosition = 0;
   }
 
 
@@ -130,6 +133,11 @@ public final class Constants {
     public static final double kIntakePosition = 7.75;
     public static final double kOutofthewayPosition = 10.5;
     public static final double kIntakeWaitingPosition = 12;
+
+    public static final double kClearAlgaeLowPosition1 = 15;
+    public static final double kClearAlgaeLowPosition2 = 14;
+    public static final double kClearAlgaeHighPosition1 = 20;
+    public static final double kClearAlgaeHighPosition2 = 19;
 
   }
 
@@ -166,6 +174,8 @@ public final class Constants {
     public static final double intakeAngle = Math.toRadians(217);
     public static final double vertical = Math.toRadians(90);
     public static final double AllHoldingAngle = Math.toRadians(110);
+
+    public static final double ClearAlgaeAngle = Math.toRadians(0);
 
 
   }

@@ -261,6 +261,24 @@ public class ElevateSubsystem extends SubsystemBase {
         return m_endeffector.ReGripL2L3();
     }
 
+
+    public Command ClearAlgaeHighStep1(){
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeHighPosition1).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.ClearAlgaeAngle));
+    }
+
+    public Command ClearAlgaeLowStep1(){
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeLowPosition1).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.ClearAlgaeAngle));
+    }
+
+    public Command ClearAlgaeHighStep2(){
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeHighPosition2);
+    }
+
+    public Command ClearAlgaeLowStep2(){
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeLowPosition2);
+    }
+
+
     
    
 
@@ -311,6 +329,19 @@ public class ElevateSubsystem extends SubsystemBase {
         
      }
 
+
+     public Command DriveToClearingPosition(DriveSubsystem robotDrive){
+        return (TrajectoryCommandsFactory.getClearingSelectedCommand(robotDrive, ()-> MathUtils.BuildMapKeyStringClear(m_ScoringPositionSelector.getScorePosition())));
+     }
+     
+
+     public Command ClearAlgaeHigh(DriveSubsystem robotDrive){
+        return (DriveToClearingPosition(robotDrive).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2()));
+     }
+
+        public Command ClearAlgaeLow(DriveSubsystem robotDrive){
+            return (DriveToClearingPosition(robotDrive).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2()));
+        }
     
     
 }

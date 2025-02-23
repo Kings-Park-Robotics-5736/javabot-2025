@@ -375,6 +375,8 @@ public class RobotContainer {
 
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
+
+                SmartDashboard.putData("Reset Arm Encoder", (Commands.runOnce(() ->m_elevate.setArmInitialPosition())));
                 
 
                 /*******************************************
@@ -449,7 +451,20 @@ public class RobotContainer {
                
                  new Trigger(()->{
                            return m_actionController.getLeftY() < -0.2;
-                 }).whileTrue(m_climb.runClimberReverse());    
+                 }).whileTrue(m_climb.runClimberReverse());
+
+
+
+                new Trigger(()->{
+                        return m_actionController.getRightY() < -0.8;
+              }).whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
+
+                  new Trigger(()->{
+                        return m_actionController.getRightY() > 0.8;
+                  }).whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
+                 
+                 
+
 
         }
 
