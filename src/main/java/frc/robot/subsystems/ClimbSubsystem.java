@@ -35,7 +35,19 @@ public class ClimbSubsystem extends SubsystemBase{
         m_motor.set(speed);
     }
 
+    public double getPosition(){
+        return m_motor.getEncoder().getPosition();
+    }
+
     
+
+public Command runClimberToInPosition(){
+    return new FunctionalCommand(()->setSpeed(-1), ()->{}, (interrupted) -> m_motor.set(0), ()-> getPosition() <= ClimbConstants.kFullyInPosition, this);
+}    
+
+public Command runClimberToOutPosition(){
+    return new FunctionalCommand(()->setSpeed(1), ()->{}, (interrupted) -> m_motor.set(0), ()-> getPosition() >= ClimbConstants.kFullyOutPosition, this);
+}
 
 public Command runClimberForward(){
     return new FunctionalCommand(
@@ -47,7 +59,7 @@ public Command runClimberForward(){
 public Command runClimberReverse(){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(-.8),
+         ()->setSpeed(-.1),
          (interrupted) -> m_motor.set(0),
          () -> false, this);
 }

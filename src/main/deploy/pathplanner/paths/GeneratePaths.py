@@ -91,6 +91,7 @@ print(path_data)
 bumperWidth = 36.5
 offsetShort = 2.7
 offsetLong = 15.7
+offsetAlgae =11
 offsets = [offsetShort, offsetLong]
 offsetsL23 = [-offsetLong - 1, -offsetShort]
 names = ["Left", "Right"]
@@ -170,4 +171,43 @@ for tag in path_data:
         #write the json object with the format tag[name] + "L4" + names[i] + ".json"
         with open(tag['name'] + "L23" + names[i] + "GEN.path", "w") as f:
             json.dump(samplePath, f, indent=4)
+
+
+    #algae clear paths
+    robotPositionX = tag['x'] + math.cos(math.radians(tag['rotation']))*(bumperWidth*.5)+math.cos(math.radians(360 - tag['rotation'] - 90))*offsetAlgae
+    robotPositionY = tag['y'] + math.sin(math.radians(tag['rotation']))*(bumperWidth*.5)-math.sin(math.radians(360 - tag['rotation'] - 90))*offsetAlgae
+    robotPositionX *= 0.0254
+    robotPositionY *= 0.0254
+    startX = robotPositionX + .5 *math.cos(math.radians(tag['rotation']))
+    startY = robotPositionY + .5 *math.sin(math.radians(tag['rotation']))
+
+    controlX = startX + .25  * math.sin(math.radians(robotRotationL4))
+    controlY = startY - .25 * math.cos(math.radians(robotRotationL4))
+
+
+    print(tag['name'] + " " + names[i] + " " + str(robotPositionX) + " " + str(robotPositionY) + " "  + str(robotRotationL4) + ", start: " + str(startX) + " " + str(startY))
+    # in samplePath, replace the first waypoint with the new waypoint startX, startY, robotRotationL4
+    samplePath['waypoints'][0]['anchor']['x'] = startX
+    samplePath['waypoints'][0]['anchor']['y'] = startY
+    samplePath['waypoints'][0]['nextControl']['x'] = controlX
+    samplePath['waypoints'][0]['nextControl']['y'] = controlY
+    samplePath['waypoints'][0]['linkedName'] = "CLEAR" + tag['name'] + "START"
+
+    #in samplePath, replace the second waypoint with the new waypoint robotPositionX, robotPositionY, robotRotationL4
+    samplePath['waypoints'][1]['anchor']['x'] = robotPositionX
+    samplePath['waypoints'][1]['anchor']['y'] = robotPositionY
+    samplePath['waypoints'][1]['prevControl']['x'] = controlX
+    samplePath['waypoints'][1]['prevControl']['y'] = controlY
+    samplePath['waypoints'][1]['linkedName'] = "CLEAR" + tag['name'] + "END"
+
+
+    #put the rotation L4 in the goalEndState and idealStartingState
+    samplePath['goalEndState']['rotation'] = robotRotationL4
+    samplePath['idealStartingState']['rotation'] = robotRotationL4
+    
+
+    #write the json object with the format tag[name] + "L4" + names[i] + ".json"
+    with open("CLEAR" +tag['name']  + "GEN.path", "w") as f:
+        json.dump(samplePath, f, indent=4)
+
 
