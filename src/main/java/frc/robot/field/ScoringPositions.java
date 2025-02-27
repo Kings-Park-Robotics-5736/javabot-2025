@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public final class ScoringPositions {
     public static final Pose2d kBlueScoringPosition = new Pose2d(new Translation2d(0, 5.55), Rotation2d.fromDegrees(0));
     public static final Pose2d kRedScoringPosition = new Pose2d(new Translation2d(16.5, 5.55), Rotation2d.fromDegrees(0));
-    public static final double maxDistanceToScoreMeters = 2;
+    public static final double maxDistanceToScoreMeters = 1.5;
     public static final double speakerOpeningFromFloorMeters = 2.0574;
 
 

@@ -26,7 +26,6 @@ public class ElevateSubsystem extends SubsystemBase {
     private final EndeffectorSubsystem m_endeffector;
     private final ElevatorSubsystemFalcon m_elevator;
     private DigitalInput m_coralIntakeSensor;
-    private final Trigger coralSensorIntakeTrigger;
     private final ScoringPositionSelector m_ScoringPositionSelector;
     private final DriveSubsystem m_robotDrive;
 
@@ -47,7 +46,7 @@ public class ElevateSubsystem extends SubsystemBase {
         SmartDashboard.putData(m_robotDrive);
 
 
-        coralSensorIntakeTrigger  =  new Trigger(() -> {
+        new Trigger(() -> {
                         return !m_isAuto && coralOnCone() && ! m_endeffector.ForwardLimitReached() && ! m_endeffector.ReverseLimitReached();
                 }).onTrue(((new WaitCommand(0.5).andThen(GoToIntakeAndIntake()))));
 
@@ -210,6 +209,11 @@ public class ElevateSubsystem extends SubsystemBase {
         return (GoToL4Position(elevatorPosition, armPrepPosition, armFinalPosition).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("ScoreL4");
     }
 
+
+    public Command ElevateHome(){
+        return m_arm.RunArmToPositionCommand(ArmConstants.vertical).andThen(m_elevator.RunElevatorToPositionCommand(1));
+    }
+
     /**********************************
      * Commands to go to and shoot at all levels in one go
      * *******************************/
@@ -263,19 +267,19 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
     public Command ClearAlgaeHighStep1(){
-        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeHighPosition1).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.ClearAlgaeAngle));
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeHighPosition1).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.vertical));
     }
 
     public Command ClearAlgaeLowStep1(){
-        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeLowPosition1).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.ClearAlgaeAngle));
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeLowPosition1).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.vertical));
     }
 
     public Command ClearAlgaeHighStep2(){
-        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeHighPosition2);
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeHighPosition2).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.ClearAlgaeAngle));
     }
 
     public Command ClearAlgaeLowStep2(){
-        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeLowPosition2);
+        return m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kClearAlgaeLowPosition2).alongWith(m_arm.RunArmToPositionCommand(ArmConstants.ClearAlgaeAngle));
     }
 
 
@@ -314,6 +318,7 @@ public class ElevateSubsystem extends SubsystemBase {
             new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose())))
             .andThen(GetPositionCommandFromHeight(height)))
             .andThen(() -> robotDrive.forceStop())
+        .andThen(new WaitCommand(.25))
         .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore())).withName("DriveAndScoreCommand");
         
      }

@@ -59,7 +59,7 @@ public Command runClimberForward(){
 public Command runClimberReverse(){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(-.1),
+         ()->setSpeed(-1),
          (interrupted) -> m_motor.set(0),
          () -> false, this);
 }

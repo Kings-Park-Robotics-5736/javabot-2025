@@ -11,11 +11,14 @@ import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import frc.robot.utils.LimelightHelpers;
+
 /**
  * Limelight camera class
  */
 public class Limelight {
     private NetworkTable table;
+    private String name;
     private NetworkTableEntry tx;
     private NetworkTableEntry ty;
     private NetworkTableEntry tv;
@@ -67,6 +70,7 @@ public class Limelight {
      */
     public Limelight(String tableName) {
         table = NetworkTableInstance.getDefault().getTable(tableName);
+        name = tableName;
         tx = table.getEntry("tx"); // horizontal offset (-29.8 - 29.8 degrees)
         ty = table.getEntry("ty"); // vertical offset (-24.85 - 24.85 degrees)
         tv = table.getEntry("tv"); // valid target (0 - 1)
@@ -89,6 +93,25 @@ public class Limelight {
         botPoseRedSubscriber = table.getDoubleArrayTopic("botpose_wpired").subscribe(emptyArray);
 
     }
+
+    public void SetRobotOrientation(double degrees){
+        LimelightHelpers.SetRobotOrientation(name, degrees, 0, 0, 0, 0, 0);
+
+    }
+
+
+    public LimelightHelpers.PoseEstimate GetBotPoseMT2(){
+        return  LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+    }     
+
+    public LimelightHelpers.PoseEstimate GetBotPoseMT1(){
+        return  LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+    }
+    
+    
+  
+
+
 
     /**
      * Get current LED mode
