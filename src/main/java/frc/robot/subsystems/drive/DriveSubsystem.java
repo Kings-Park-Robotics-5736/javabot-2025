@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.lang.reflect.Field;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
@@ -32,6 +34,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,6 +46,7 @@ import frc.robot.utils.MathUtils;
 import frc.robot.vision.Limelight;
 import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScorePositions;
+import frc.robot.utils.LimelightHelpers.PoseEstimate;
 
 public class DriveSubsystem extends SubsystemBase {
 
@@ -101,6 +106,9 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_transYLockoutValue;
   private long m_lastPoseUpdate;
   private double startTime = 0;
+
+  //init field object for elastic dashboard
+  private Field2d m_field = new Field2d();
 
   private boolean pathPlannerInitSuccess;
   private boolean visionEnabled;
@@ -174,6 +182,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem(Limelight ll, Limelight l2,Limelight l3, XboxController outputController) {
+
+    //init field dashboard
+    SmartDashboard.putData("Field", m_field);
 
     m_joystickLockoutTranslate = false;
     m_joystickLockoutRotate = false;
@@ -283,7 +294,12 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
 
-  private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
+private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
+  addLimelightVisionMeasurementV1(ll,primary);
+}
+    
+
+  private void addLimelightVisionMeasurementV1(Limelight ll, boolean primary) {
 
     double[] pose;
     double transStd;
@@ -294,19 +310,8 @@ public class DriveSubsystem extends SubsystemBase {
     if (!ll.getIsPipelineAprilTag()) {
       return;
     }
-    var alliance = DriverStation.getAlliance();
     boolean validPose = ll.checkValidTarget();
-
-    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-      poseWithTime = ll.getBotPoseBlue();
-    } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
-      poseWithTime = ll.getBotPoseBlue();
-    } else {
-      validPose = false;
-      pose = new double[6]; // empty 6 position array
-      poseWithTime = new TimestampedDoubleArray(0, 0, pose);
-    }
-
+    poseWithTime = ll.getBotPoseBlue();
     if (!validPose) {
       return;
     }
@@ -343,32 +348,19 @@ public class DriveSubsystem extends SubsystemBase {
             return;
           }
             
-        if(true){
-          if (distanceToAprilTagSquared < 6 && poseDelta < .35) {
-            transStd = 0.20;
-            rotStd = 10;
-          } else if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
-            transStd = 0.5;
-            rotStd = 10;
-          } else if (distanceToAprilTagSquared < 25) {
-            transStd = 1.0;
-            rotStd = 15;
-          } else {
-            transStd = 1.5;
-            rotStd = 20;
-          }
-        }/*else{
-            if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
-            transStd = 1.5;
-            rotStd = 20;
-          } else if (distanceToAprilTagSquared < 25) {
-            transStd = 2.0;
-            rotStd = 25;
-          } else {
-            transStd = 2.5;
-            rotStd = 30;
-          }
-        }*/
+        if (distanceToAprilTagSquared < 6 && poseDelta < .35) {
+          transStd = 0.20;
+          rotStd = 10;
+        } else if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
+          transStd = 0.5;
+          rotStd = 10;
+        } else if (distanceToAprilTagSquared < 16) {
+          transStd = 1.0;
+          rotStd = 15;
+        } else {
+          return;
+        }
+
         if (limelightPose.getX() > .5) {
           // Apply vision measurements. pose[6] holds the latency/frame delay
           m_poseEstimator.addVisionMeasurement(
@@ -382,8 +374,119 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+
+
+  private void addLimelightVisionMeasurementV2(Limelight ll, boolean primary) {
+
+    double transStd;
+    double rotStd;
+
+    if (!ll.getIsPipelineAprilTag()) {
+      return;
+    }
+
+    boolean validPose = ll.checkValidTarget();
+
+
+    PoseEstimate robot_blue_pose = ll.GetBotPoseMT1();
+
+    if (!validPose || robot_blue_pose == null) {
+      return;
+    }
+
+
+
+    if(robot_blue_pose.rawFiducials[0].ambiguity > .7)
+    {
+      return;
+    }
+    if(robot_blue_pose.rawFiducials[0].distToCamera > 4)
+    {
+      return;
+    }
+
+    // observed bad tracking when tag is very close to edge
+    double offsetX = ll.getTargetOffsetX();
+
+    if (Math.abs(offsetX) < 32.5) {
+
+
+      double[] cameraToAprilTagPose = ll.getTargetPoseCameraSpace();
+
+      if(cameraToAprilTagPose.length > 0){
+        double distanceToAprilTagSquared = cameraToAprilTagPose[0] * cameraToAprilTagPose[0]
+            + cameraToAprilTagPose[2] * cameraToAprilTagPose[2];
+        double poseDelta = m_poseEstimator.getEstimatedPosition().getTranslation()
+            .getDistance(robot_blue_pose.pose.getTranslation());
+
+            SmartDashboard.putNumber("Dist2AprilTag", distanceToAprilTagSquared);
+            SmartDashboard.putNumber("PoseDelta", poseDelta);
+            
+            SmartDashboard.putNumber("Closest Tag", ll.getTargetID());
+
+          if(MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && distanceToAprilTagSquared > 4 && (ll.getTargetID() == 7 ||  ll.getTargetID() == 18)){
+            return;
+          }
+            
+        if (distanceToAprilTagSquared < 6 && poseDelta < .35) {
+          transStd = 0.20;
+          rotStd = 10;
+        } else if (distanceToAprilTagSquared < 9 && poseDelta < .5) {
+          transStd = 0.5;
+          rotStd = 10;
+        } else if (distanceToAprilTagSquared < 16) {
+          transStd = 1.0;
+          rotStd = 15;
+        } else {
+            return;
+        }
+
+        if (robot_blue_pose.pose.getX() > .5) {
+          // Apply vision measurements. pose[6] holds the latency/frame delay
+          m_poseEstimator.addVisionMeasurement(
+            robot_blue_pose.pose,
+            robot_blue_pose.timestampSeconds,
+              VecBuilder.fill(transStd, transStd, Units.degreesToRadians(rotStd)));
+        }
+      }else{
+        System.out.println("Unable to add limelight measurement");
+      }
+    }
+  }
+
+
+  private void addLimelightVisionMeasurementV3(Limelight ll, boolean primary) {
+    
+    
+    
+    Boolean doRejectUpdate = false;
+
+    ll.SetRobotOrientation( m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+    PoseEstimate mt2 = ll.GetBotPoseMT2();
+    if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+    {
+      doRejectUpdate = true;
+    }
+    if(mt2.tagCount == 0)
+    {
+      doRejectUpdate = true;
+    }
+    if(!doRejectUpdate)
+    {
+      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,20));
+      m_poseEstimator.addVisionMeasurement(
+          mt2.pose,
+          mt2.timestampSeconds);
+    }
+  }
+
+
+
+
   @Override
   public void periodic() {
+    //update the field position on dashboard
+    m_field.setRobotPose(getPose());
     // Update the odometry in the periodic block
     updateOdometry();
     SmartDashboard.getBoolean("LimelightVisionEnabled", visionEnabled);
@@ -462,6 +565,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
+
+   
 
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     drive(xSpeed, ySpeed, rot, fieldRelative, false);

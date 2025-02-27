@@ -382,6 +382,11 @@ public class RobotContainer {
                 /*******************************************
                  * ACTION CONTROLLER
                  *******************************************/
+
+                new JoystickButton(m_actionController, XboxController.Button.kX.value)
+                .whileTrue(m_elevate.ElevateHome());
+
+
                 new JoystickButton(m_actionController, XboxController.Button.kA.value).and(new JoystickButton(m_actionController, XboxController.Button.kLeftBumper.value)).whileTrue(
                         m_elevate.DriveToNearestScoreCommand(m_robotDrive, true, ScoreHeight.L2).raceWith(JoystickCommandsFactory
                         .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble))

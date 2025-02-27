@@ -125,6 +125,7 @@ public final class Constants {
     public static final int kStaleThreshold = 30;
     public static final double kPositionTolerance = 1.0;
 
+    //.45 rotations per inch
 
     public static final double kL1Position = 1;
     public static final double kL2Position = 8.8;
@@ -134,10 +135,10 @@ public final class Constants {
     public static final double kOutofthewayPosition = 10.5;
     public static final double kIntakeWaitingPosition = 12;
 
-    public static final double kClearAlgaeLowPosition1 = 15;
+    public static final double kClearAlgaeLowPosition1 = 15.5;
     public static final double kClearAlgaeLowPosition2 = 14;
-    public static final double kClearAlgaeHighPosition1 = 20;
-    public static final double kClearAlgaeHighPosition2 = 19;
+    public static final double kClearAlgaeHighPosition1 = 20.5;
+    public static final double kClearAlgaeHighPosition2 = 18.9;
 
   }
 
@@ -175,7 +176,7 @@ public final class Constants {
     public static final double vertical = Math.toRadians(90);
     public static final double AllHoldingAngle = Math.toRadians(110);
 
-    public static final double ClearAlgaeAngle = Math.toRadians(0);
+    public static final double ClearAlgaeAngle = Math.toRadians(15);
 
 
   }
