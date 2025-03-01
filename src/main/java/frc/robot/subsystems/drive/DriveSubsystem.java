@@ -295,7 +295,7 @@ public class DriveSubsystem extends SubsystemBase {
 
 
 private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
-  addLimelightVisionMeasurementV1(ll,primary);
+  addLimelightVisionMeasurementV2(ll,primary);
 }
     
 
@@ -390,7 +390,7 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
     PoseEstimate robot_blue_pose = ll.GetBotPoseMT1();
 
-    if (!validPose || robot_blue_pose == null) {
+    if (!validPose || robot_blue_pose == null ||robot_blue_pose.rawFiducials.length < 1 ) {
       return;
     }
 
@@ -400,7 +400,7 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
     {
       return;
     }
-    if(robot_blue_pose.rawFiducials[0].distToCamera > 4)
+    if(robot_blue_pose.rawFiducials[0].distToCamera > 3)
     {
       return;
     }

@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -20,6 +21,8 @@ import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.MathUtils;
 import frc.robot.utils.ScoringPositionSelector;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.utils.Types.LEDState;
 
 public class ElevateSubsystem extends SubsystemBase {
     private final ArmSubsystemFalcon m_arm;
@@ -28,11 +31,12 @@ public class ElevateSubsystem extends SubsystemBase {
     private DigitalInput m_coralIntakeSensor;
     private final ScoringPositionSelector m_ScoringPositionSelector;
     private final DriveSubsystem m_robotDrive;
+    private final LEDSubsystem m_ledSystem;
 
     private Boolean m_isAuto = false;
 
 
-    public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector, DriveSubsystem robotDrive){
+    public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector, DriveSubsystem robotDrive, LEDSubsystem ledSubsystem) {
         m_arm = new ArmSubsystemFalcon(()->getArmEncoderPosition());
         m_endeffector = new EndeffectorSubsystem();
         m_elevator = new ElevatorSubsystemFalcon("Elevator");
@@ -45,11 +49,23 @@ public class ElevateSubsystem extends SubsystemBase {
         SmartDashboard.putData(m_endeffector);
         SmartDashboard.putData(m_robotDrive);
 
+        m_ledSystem = ledSubsystem;
+
 
         new Trigger(() -> {
                         return !m_isAuto && coralOnCone() && ! m_endeffector.ForwardLimitReached() && ! m_endeffector.ReverseLimitReached();
                 }).onTrue(((new WaitCommand(0.5).andThen(GoToIntakeAndIntake()))));
 
+
+                new Trigger( ()->{
+                    return coralOnCone() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached();
+                }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.HAVE_NOTE), m_ledSystem));
+                
+
+                new Trigger( ()->{
+                    return !coralOnCone() && !m_endeffector.ForwardLimitReached() && !m_endeffector.ReverseLimitReached();
+                }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.NONE), m_ledSystem));
+                
     }
 
     @Override
@@ -199,15 +215,27 @@ public class ElevateSubsystem extends SubsystemBase {
     }
 
     // bring the arm and the elevator up to the scoring position for l4
-    private Command GoToL4Position(double elevatorPosition, double armPrepPosition, double armFinalPosition){
-        return (GoOutOfTheWay().andThen(RunElevatorToPositionCommand(elevatorPosition).alongWith(Regrip()).alongWith(m_arm.RunArmToPositionCommand(armPrepPosition, false)))
-        .andThen(m_arm.RunArmToPositionCommand(armFinalPosition, false))).withName("GoToL4Position");
+    private Command GoToL4Position(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
+        return (GoOutOfTheWay().andThen(RunElevatorToPositionCommand(elevatorPosition).alongWith(Regrip()).alongWith(m_arm.RunArmToPositionCommand(armPrepPosition, endEarly)))
+        .andThen(m_arm.RunArmToPositionCommand(armFinalPosition, endEarly))).withName("GoToL4Position");
     }
 
-    //bring the arm and the elevator up to the scoring position and score for l4
-    private Command ScoreL4(double elevatorPosition, double armPrepPosition, double armFinalPosition){
-        return (GoToL4Position(elevatorPosition, armPrepPosition, armFinalPosition).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("ScoreL4");
+    private Command GoToL4PositionNoPre(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
+        return (GoOutOfTheWay().andThen(m_elevator.RunElevatorToPositionCommandEarlyFinish(elevatorPosition).alongWith(Regrip()).alongWith(m_arm.RunArmToPositionCommand(armFinalPosition, endEarly)))
+        ).withName("GoToL4Position");
     }
+
+
+
+    //bring the arm and the elevator up to the scoring position and score for l4
+    private Command ScoreL4(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
+        return (GoToL4Position(elevatorPosition, armPrepPosition, armFinalPosition,endEarly).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("ScoreL4");
+    }
+
+    private Command ScoreL4NoPre(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
+        return (GoToL4PositionNoPre(elevatorPosition, armPrepPosition, armFinalPosition,endEarly).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("ScoreL4");
+    }
+
 
 
     public Command ElevateHome(){
@@ -224,7 +252,11 @@ public class ElevateSubsystem extends SubsystemBase {
         return Score(ElevatorConstants.kL3Position, ArmConstants.L3Angle);
     }
     public Command ScoreL4Command(){
-        return ScoreL4(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle);
+        return ScoreL4(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, false);
+    }
+
+    public Command ScoreL4CommandEarlyEnd(){
+        return ScoreL4NoPre(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true);
     }
 
     //Command to shoot out for L1-L3
@@ -248,7 +280,7 @@ public class ElevateSubsystem extends SubsystemBase {
         return GoToScorePosition(ElevatorConstants.kL3Position, ArmConstants.L3Angle);
     }
     public Command GotoScoreL4PositionCommand(){
-        return GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle);
+        return GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, false);
     }
 
 
@@ -313,13 +345,26 @@ public class ElevateSubsystem extends SubsystemBase {
      
 
      public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
+
+        if(height == ScoreHeight.L4){
+            return DriveAndScoreCommandL4(initialCommand, robotDrive, left, height);
+        }else{
+            return (initialCommand.alongWith( 
+                GoToIntakeAndIntakeAsDriveWithChecks().andThen(
+                new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose())))
+                .andThen(GetPositionCommandFromHeight(height)))
+                .andThen(() -> robotDrive.forceStop())
+            .andThen(new WaitCommand(.25))
+            .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore())).withName("DriveAndScoreCommand");
+        }
+        
+     }
+
+     public Command DriveAndScoreCommandL4(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
         return (initialCommand.alongWith( 
-            GoToIntakeAndIntakeAsDriveWithChecks().andThen(
-            new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose())))
-            .andThen(GetPositionCommandFromHeight(height)))
+            GoToIntakeAndIntakeAsDriveWithChecks())
             .andThen(() -> robotDrive.forceStop())
-        .andThen(new WaitCommand(.25))
-        .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore())).withName("DriveAndScoreCommand");
+            .andThen(ScoreL4CommandEarlyEnd())).withName("DriveAndScoreCommandL4");
         
      }
 

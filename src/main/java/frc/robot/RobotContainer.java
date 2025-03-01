@@ -9,8 +9,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -34,18 +32,19 @@ import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
-import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.GoalType;
+import frc.robot.utils.Types.LEDState;
 import frc.robot.utils.Types.SysidMechanism;
 import frc.robot.vision.Limelight;
 import frc.robot.vision.Limelight.LEDMode;
 import frc.robot.vision.PiCamera;
-import frc.robot.utils.MathUtils;
+
 
 
 /*
@@ -72,12 +71,14 @@ public class RobotContainer {
 
         public ClimbSubsystem m_climb = new ClimbSubsystem();
 
+        public LEDSubsystem m_ledSystem = new LEDSubsystem();
+
         private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side,m_limelight_three, m_output_controller);// use only 1 limelight for
                                                                                           // driving now since we dont
                                                                                           // have great measurements
                                                                                           // m_limelight_side);
 
-        public ElevateSubsystem m_elevate = new ElevateSubsystem(m_scoringPositionSelector,m_robotDrive);
+        public ElevateSubsystem m_elevate = new ElevateSubsystem(m_scoringPositionSelector,m_robotDrive, m_ledSystem);
 
         private final PowerDistribution PDH = new PowerDistribution(1, ModuleType.kRev);
         private final SendableChooser<Command> autoChooser;
@@ -326,6 +327,7 @@ public class RobotContainer {
          */
         private void configureButtonBindings() {
                 
+                m_ledSystem.SetLEDState(LEDState.IN_RANGE);
 
                 //A -> Go to score L2, but dont score
                 //B -> Go to score L3, but dont score

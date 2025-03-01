@@ -216,6 +216,14 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
                 () -> isFinished(true), this)).withName("RunElevatorToPositionCommand");
     }
 
+    public Command RunElevatorToPositionCommandEarlyFinish(double position) {
+        return (new FunctionalCommand(
+                () -> {manualControl = false; InitMotionProfile(position);PrettyPrint(position);},
+                () -> {},
+                (interrupted) -> {},
+                () -> isFinishedEarly(true), this)).withName("RunElevatorToPositionCommand");
+    }
+
 
     private Command RunElevatorToIntakeSafeCommand(){
         return (new FunctionalCommand(
@@ -329,6 +337,14 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         var isFinished =  ElevatorReachedTarget(useStale);
         //SmartDashboard.putBoolean("isfinished " + m_name, isFinished);
         return isFinished;
+    }
+
+    private Boolean isFinishedEarly(Boolean useStale) {
+        double delta = Math.abs(getElevatorPosition() - m_setpoint);
+        var isFinished =  ElevatorReachedTarget(useStale);
+        return isFinished || delta < 3;
+
+
     }
 
     /**

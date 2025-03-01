@@ -262,5 +262,7 @@ public final class Constants {
     public static final int[] redRGB = {255,0,0};
     public static final int[] GreenRGB = {0,255,0};
      public static final int[] BlueRGB = {0,0,255};
+     public static final int[] PurpleRGB = {255,0,255};
+
   }
 }

@@ -272,11 +272,14 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     }
 
     private Boolean isFinished(Boolean finishEarly){
-        if(finishEarly){
+        SmartDashboard.putBoolean("Finish Early", finishEarly);
+        if(!finishEarly){
             return isFinished();
         }
         double delta = Math.abs(getArmAngleRadians() - m_globalSetpoint);
-        return isFinished() || delta < Math.toRadians(5);
+        SmartDashboard.putNumber("Arm Delta", delta);
+
+        return isFinished() || delta < Math.toRadians(10);
     }
 
 

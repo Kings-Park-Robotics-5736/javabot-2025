@@ -117,7 +117,7 @@ public class LEDSubsystem extends SubsystemBase {
                 break;
             case HAVE_NOTE:
                 setLEDOff();
-                 setAllLEDColor(LEDConstants.GreenRGB);
+                 setAllLEDColor(LEDConstants.PurpleRGB);
                  break;
             case NO_NOTE:
             case NONE:
