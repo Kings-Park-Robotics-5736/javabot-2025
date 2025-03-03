@@ -34,6 +34,7 @@ public class ElevateSubsystem extends SubsystemBase {
     private final LEDSubsystem m_ledSystem;
 
     private Boolean m_isAuto = false;
+    private Boolean isAutoDrive = false;
 
 
     public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector, DriveSubsystem robotDrive, LEDSubsystem ledSubsystem) {
@@ -53,7 +54,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
         new Trigger(() -> {
-                        return !m_isAuto && coralOnCone() && ! m_endeffector.ForwardLimitReached() && ! m_endeffector.ReverseLimitReached();
+                        return !m_isAuto && !isAutoDrive && coralOnCone() && ! m_endeffector.ForwardLimitReached() && ! m_endeffector.ReverseLimitReached();
                 }).onTrue(((new WaitCommand(0.5).andThen(GoToIntakeAndIntake()))));
 
 
@@ -361,10 +362,12 @@ public class ElevateSubsystem extends SubsystemBase {
      }
 
      public Command DriveAndScoreCommandL4(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
-        return (initialCommand.alongWith( 
-            GoToIntakeAndIntakeAsDriveWithChecks())
-            .andThen(() -> robotDrive.forceStop())
-            .andThen(ScoreL4CommandEarlyEnd())).withName("DriveAndScoreCommandL4");
+        return (Commands.runOnce(()->isAutoDrive=true)
+                .andThen(initialCommand.alongWith(GoToIntakeAndIntakeAsDriveWithChecks())
+                .andThen(() -> robotDrive.forceStop())
+                .andThen(ScoreL4CommandEarlyEnd())))
+                .finallyDo((interrupted)->{isAutoDrive = false;})
+                .withName("DriveAndScoreCommandL4");
         
      }
 

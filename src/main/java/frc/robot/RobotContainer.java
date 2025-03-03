@@ -31,6 +31,7 @@ import frc.robot.commands.JoystickCommandsFactory;
 import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
+import frc.robot.commands.drive.DriveToCoordinate;
 import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -470,6 +471,9 @@ public class RobotContainer {
                         return m_actionController.getRightY() > 0.8;
                   }).whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
                  
+
+                  new JoystickButton(m_actionController, XboxController.Button.kStart.value)
+                  .whileTrue(new DriveToCoordinate(m_robotDrive, 0, 0));
                  
 
 

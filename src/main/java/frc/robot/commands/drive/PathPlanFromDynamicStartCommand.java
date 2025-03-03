@@ -117,12 +117,12 @@ public class PathPlanFromDynamicStartCommand extends Command {
             m_initialPoseSupplier.get(),
             new Pose2d(m_endPose.getX(), m_endPose.getY(), m_endPose.getRotation()) // The start pose of the path
         );
-        System.out.println("PathPlanDynamicStart Init Driving to " + m_endPose.getX() + ", " + m_endPose.getY() );
+        System.out.println("PathPlanDynamicStart Init Driving to " + m_endPose.getX() + ", " + m_endPose.getY() + " From " + m_initialPoseSupplier.get().getX() + ", " + m_initialPoseSupplier.get().getY());
 
         //calculate distance between start and end points
         double distance = Math.sqrt(Math.pow(m_endPose.getX() - m_initialPoseSupplier.get().getX(), 2) + Math.pow(m_endPose.getY() - m_initialPoseSupplier.get().getY(), 2));
 
-        if(distance > 0.0254){
+        if(distance > 0.04){
             // delay trajectory creation until this initialize.
             m_pathFollowCommand = TrajectoryCommandsFactory.generatePPPathToPose(waypoints, m_endPose.getRotation());
             try{
@@ -131,6 +131,7 @@ public class PathPlanFromDynamicStartCommand extends Command {
                 m_pathFollowCommand = null;
             }
         } else {
+            System.out.println("PathPlanDynamicStart Init Skipping path creation, already at target");
             m_pathFollowCommand = null;
         }
         m_pathPlannerDoneCounter = 0;
@@ -162,8 +163,9 @@ public class PathPlanFromDynamicStartCommand extends Command {
             if (m_pathFollowCommand.isFinished()) {
                 m_pathPlannerDoneCounter++;
             }
-            return m_pathPlannerDoneCounter > 25 || (Math.abs(m_robotDrive.getPose().getX() - m_endPose.getX()) < .02
-                    && Math.abs(m_robotDrive.getPose().getY() - m_endPose.getY()) < .02);
+            return m_pathPlannerDoneCounter > 25 || (m_pathPlannerDoneCounter > 0 
+                    && Math.abs(m_robotDrive.getPose().getX() - m_endPose.getX()) < .05
+                    && Math.abs(m_robotDrive.getPose().getY() - m_endPose.getY()) < .05);
         } else {
             return m_pathFollowCommand.isFinished();
         }

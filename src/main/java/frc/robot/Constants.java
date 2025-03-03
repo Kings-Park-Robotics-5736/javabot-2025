@@ -136,9 +136,9 @@ public final class Constants {
     public static final double kIntakeWaitingPosition = 12;
 
     public static final double kClearAlgaeLowPosition1 = 15.5;
-    public static final double kClearAlgaeLowPosition2 = 14;
-    public static final double kClearAlgaeHighPosition1 = 20.5;
-    public static final double kClearAlgaeHighPosition2 = 18.9;
+    public static final double kClearAlgaeLowPosition2 = 15;
+    public static final double kClearAlgaeHighPosition1 = 21.5;
+    public static final double kClearAlgaeHighPosition2 = 20.9;
 
   }
 
@@ -251,7 +251,7 @@ public final class Constants {
   }
 
   public static final class CustomDriveDistanceCommandConstants {
-    public static final PidConstants kPidValues = new PidConstants(.5, .1, 0.00);
+    public static final PidConstants kPidValues = new PidConstants(5, .1, 0.00);
 
   }
 

@@ -276,7 +276,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
         }else{
             stallCounter=0;
         }
-        if(stallCounter > 50){
+        if(stallCounter > 25){
             System.out.println("STALL!!!!!!!!!!!!!!!!!!!!!!!");
             return true;
         }
