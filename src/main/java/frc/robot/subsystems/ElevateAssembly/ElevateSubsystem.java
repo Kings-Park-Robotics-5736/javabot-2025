@@ -152,14 +152,19 @@ public class ElevateSubsystem extends SubsystemBase {
     public Command RunElevatorToPositionCommand(double position){
         return m_elevator.RunElevatorToPositionCommand(position);
     }
+
+    public Command RunElevatorToPositionCommand(double position, Boolean async){
+        return m_elevator.RunElevatorToPositionCommand(position, async);
+    }
    
 
 
 
     //ensure arm is out of the way of the intake cone before rotating
     public Command GoOutOfTheWay(){
-        return (RunElevatorToPositionCommand(ElevatorConstants.kOutofthewayPosition).unless(()->m_elevator.elevatorInSafeSpot())).withName("GoOutOfTheWay");
+        return (m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kOutofthewayPosition).unless(()->m_elevator.elevatorInSafeSpot())).withName("GoOutOfTheWay");
     }
+
 
     /**********************************************
      * Intake Commands
@@ -200,7 +205,11 @@ public class ElevateSubsystem extends SubsystemBase {
     }
 
     public Command PrepForIntakePosition(){
-        return (GoOutOfTheWay().andThen(m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle).alongWith(RunElevatorToPositionCommand(ElevatorConstants.kIntakeWaitingPosition)))).withName("PrepForIntakePosition");
+        return PrepForIntakePosition(false);
+    }
+
+    public Command PrepForIntakePosition(Boolean async){
+        return (GoOutOfTheWay().andThen(m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle, async).alongWith(RunElevatorToPositionCommand(ElevatorConstants.kIntakeWaitingPosition, async)))).withName("PrepForIntakePosition");
     }
 
 
@@ -230,11 +239,15 @@ public class ElevateSubsystem extends SubsystemBase {
 
     //bring the arm and the elevator up to the scoring position and score for l4
     private Command ScoreL4(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
-        return (GoToL4Position(elevatorPosition, armPrepPosition, armFinalPosition,endEarly).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("ScoreL4");
+        return (GoToL4Position(elevatorPosition, armPrepPosition, armFinalPosition,endEarly).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.15)).andThen(PrepForIntakePosition())).withName("ScoreL4");
     }
 
     private Command ScoreL4NoPre(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
-        return (GoToL4PositionNoPre(elevatorPosition, armPrepPosition, armFinalPosition,endEarly).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("ScoreL4");
+        return (GoToL4PositionNoPre(elevatorPosition, armPrepPosition, armFinalPosition,endEarly).andThen(m_endeffector.Score(true)).andThen(new WaitCommand(.15)).andThen(PrepForIntakePosition(true))).withName("ScoreL4NoPre");
+    }
+
+    private Command ScoreL4NoPreNoReturn(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
+        return (GoToL4PositionNoPre(elevatorPosition, armPrepPosition, armFinalPosition,endEarly).andThen(m_endeffector.Score(true))).withName("ScoreL4NoPreNoReturn");
     }
 
 
@@ -260,14 +273,19 @@ public class ElevateSubsystem extends SubsystemBase {
         return ScoreL4NoPre(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true);
     }
 
+    public Command ScoreL4CommandEarlyEndNoReturn(){
+        return ScoreL4NoPreNoReturn(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true);
+    }
+
+
     //Command to shoot out for L1-L3
     public Command OnlyScore(){
-        return (m_endeffector.Score(false).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("OnlyScore");
+        return (m_endeffector.Score(false).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition(true))).withName("OnlyScore");
     }
 
     //command to shoot out for L4
     public Command OnlyScoreL4(){
-        return (m_endeffector.Score(true).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition())).withName("OnlyScoreL4");
+        return (m_endeffector.Score(true).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition(true))).withName("OnlyScoreL4");
     }
     public Command OnlyScoreL4NoIntakeReturn(){
         return m_endeffector.Score(true);
@@ -343,34 +361,41 @@ public class ElevateSubsystem extends SubsystemBase {
         .andThen(GotoScoreL4PositionCommand());
      }
 
+
+     
+     public Command AutoIntakePositionWhileDriving(){
+        return 
+         m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle)
+        .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake()))
+        .andThen(PrepScore());
+     }
+
+
      
 
      public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
 
         if(height == ScoreHeight.L4){
-            return DriveAndScoreCommandL4(initialCommand, robotDrive, left, height);
-        }else{
-            return (initialCommand.alongWith( 
-                GoToIntakeAndIntakeAsDriveWithChecks().andThen(
-                new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose())))
-                .andThen(GetPositionCommandFromHeight(height)))
-                .andThen(() -> robotDrive.forceStop())
-            .andThen(new WaitCommand(.25))
-            .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore())).withName("DriveAndScoreCommand");
-        }
-        
-     }
-
-     public Command DriveAndScoreCommandL4(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
-        return (Commands.runOnce(()->isAutoDrive=true)
+            return ((Commands.runOnce(()->isAutoDrive=true)
                 .andThen(initialCommand.alongWith(GoToIntakeAndIntakeAsDriveWithChecks())
                 .andThen(() -> robotDrive.forceStop())
                 .andThen(ScoreL4CommandEarlyEnd())))
-                .finallyDo((interrupted)->{isAutoDrive = false;})
+                .finallyDo((interrupted)->{isAutoDrive = false;}))
                 .withName("DriveAndScoreCommandL4");
+        }else{
+            return (Commands.runOnce(()->isAutoDrive=true)
+                    .andThen(initialCommand.alongWith( 
+                        GoToIntakeAndIntakeAsDriveWithChecks().andThen(
+                        new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose())))
+                        .andThen(GetPositionCommandFromHeight(height)))
+                    .andThen(() -> robotDrive.forceStop())
+                    .andThen(new WaitCommand(.20))
+                    .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore())))
+            .finallyDo((interrupted)->{isAutoDrive = false;})
+            .withName("DriveAndScoreCommand");
+        }
         
      }
-
 
      public Command DriveToNearestScoreCommand(DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
         return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringClosestCommand(robotDrive, left, height == ScoreHeight.L4), robotDrive, left, height);

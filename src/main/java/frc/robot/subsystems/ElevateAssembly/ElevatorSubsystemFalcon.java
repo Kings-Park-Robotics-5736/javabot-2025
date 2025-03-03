@@ -208,12 +208,16 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
      * @param position absolute position to run to (not a lambda)
      * @return the composed command to run the Elevator to a given positions
      */
-    public Command RunElevatorToPositionCommand(double position) {
+    public Command RunElevatorToPositionCommand(double position, Boolean async) {
         return (new FunctionalCommand(
                 () -> {manualControl = false; InitMotionProfile(position);PrettyPrint(position);},
                 () -> {},
                 (interrupted) -> {},
-                () -> isFinished(true), this)).withName("RunElevatorToPositionCommand");
+                () -> async || isFinished(true), this)).withName("RunElevatorToPositionCommand");
+    }
+
+    public Command RunElevatorToPositionCommand(double position) {
+        return RunElevatorToPositionCommand(position, false);
     }
 
     public Command RunElevatorToPositionCommandEarlyFinish(double position) {

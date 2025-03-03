@@ -345,6 +345,10 @@ public class ArmSubsystemFalcon extends SubsystemBase {
      */
 
     public Command RunArmToPositionCommand(double setpoint, Boolean finishEarly) {
+        return RunArmToPositionCommand(setpoint, finishEarly, false);
+    }
+
+    public Command RunArmToPositionCommand(double setpoint, Boolean finishEarly, Boolean async) {
         return new FunctionalCommand(
                 () -> {
                     RunArmToPosition(setpoint);
@@ -354,7 +358,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                     emergencyStop = false;
                 },
                 () -> {
-                    return isFinished(finishEarly);
+                    return async || isFinished(finishEarly);
                 }, this).withName("RunArmToPositionCommand");
     }
 

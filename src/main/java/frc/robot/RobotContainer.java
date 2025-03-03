@@ -170,7 +170,9 @@ public class RobotContainer {
                 NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", new WaitCommand(.15).andThen(m_elevate.OnlyScoreL4NoIntakeReturn()));
                 NamedCommands.registerCommand("WaitForCoral", m_elevate.WaitForCoral());
                 NamedCommands.registerCommand("MoveToL4WhileDrive", m_elevate.AutoIntakeAndL4PositionWhileDriving());
+                NamedCommands.registerCommand("IntakeWhileDrive", m_elevate.AutoIntakePositionWhileDriving());
 
+                NamedCommands.registerCommand("ScoreL4EarlyEndNoReturn", m_elevate.ScoreL4CommandEarlyEndNoReturn());
           }
 
         /**
