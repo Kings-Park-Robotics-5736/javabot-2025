@@ -252,7 +252,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
     private Command GoToL4PositionNoPre(double elevatorPosition, double armPrepPosition, double armFinalPosition, boolean endEarly){
         return (GoOutOfTheWay().andThen(m_elevator.RunElevatorToPositionCommandEarlyFinish(elevatorPosition).alongWith(Regrip()).alongWith(m_arm.RunArmToPositionCommand(armFinalPosition, endEarly)))
-        ).withName("GoToL4Position");
+        ).withName("GoToL4PositionNoPre");
     }
 
 
@@ -319,7 +319,11 @@ public class ElevateSubsystem extends SubsystemBase {
         return GoToScorePosition(ElevatorConstants.kL3Position, ArmConstants.L3Angle);
     }
     public Command GotoScoreL4PositionCommand(){
-        return GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, false);
+        return GotoScoreL4PositionCommand(false);
+    }
+
+    public Command GotoScoreL4PositionCommand(Boolean endEarly){
+        return GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, endEarly);
     }
 
 
@@ -382,7 +386,7 @@ public class ElevateSubsystem extends SubsystemBase {
         new WaitUntilCommand(()->coralOnCone()).andThen(
          m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle))
         .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake()))
-        .andThen(GotoScoreL4PositionCommand());
+        .andThen(GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true)).andThen(m_endeffector.Score(true));
      }
 
 

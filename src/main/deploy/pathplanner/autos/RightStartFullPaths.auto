@@ -118,18 +118,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ForceStop"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootOutL4NoIntakeReturn"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -193,21 +181,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ForceStop"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootOutL4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "d_score_to_right_intake"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "d_score_to_right_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevateToIntake"
+                }
+              }
+            ]
           }
         }
       ]
