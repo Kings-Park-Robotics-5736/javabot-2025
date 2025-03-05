@@ -442,11 +442,11 @@ public class ElevateSubsystem extends SubsystemBase {
      
 
      public Command ClearAlgaeHigh(DriveSubsystem robotDrive){
-        return (DriveToClearingPosition(robotDrive).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2()));
+        return ((DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2()));
      }
 
         public Command ClearAlgaeLow(DriveSubsystem robotDrive){
-            return (DriveToClearingPosition(robotDrive).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2()));
+            return ((DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2()));
         }
     
     
