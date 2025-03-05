@@ -26,6 +26,7 @@ import edu.wpi.first.cscore.VideoSource;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private Boolean isAuto = false;
 
   private RobotContainer m_robotContainer;
 
@@ -77,7 +78,9 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    m_robotContainer.resetArmElevator();
+    if(!isAuto){
+      m_robotContainer.resetArmElevator();
+    }
     
   }
 
@@ -109,6 +112,7 @@ public class Robot extends TimedRobot {
     System.out.println("!!!!!!!!!!!!!!!!!!!!!!!AUTO START");
 
     m_robotContainer.setIsAutonomous(true);
+    isAuto = true;
   }
 
   /** This function is called periodically during autonomous. */
@@ -127,6 +131,7 @@ public class Robot extends TimedRobot {
     }
     m_robotContainer.setIsAutonomous(false);
     System.out.println("!!!!!!!!!!!!!!!!!!!!!!!TELEOP START");
+    isAuto = false;
 
   }
 

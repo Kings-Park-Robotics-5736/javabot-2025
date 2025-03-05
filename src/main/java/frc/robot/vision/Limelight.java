@@ -174,6 +174,10 @@ public class Limelight {
         camMode.setNumber(mode.value);
     }
 
+    public void SetFiducialIDFiltersOverride( int[] validIDs){
+        LimelightHelpers.SetFiducialIDFiltersOverride(name, validIDs);
+    }
+
     /**
      * Preset operation mode - LED set to OFF, camera set to DRIVER
      */

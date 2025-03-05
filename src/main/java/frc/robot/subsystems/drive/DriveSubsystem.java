@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -106,6 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_transYLockoutValue;
   private long m_lastPoseUpdate;
   private double startTime = 0;
+  private boolean m_ignore12Oclock = false;
 
   //init field object for elastic dashboard
   private Field2d m_field = new Field2d();
@@ -294,6 +297,26 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
 
+  public void setIgnore12Oclock(boolean ignore){
+    m_ignore12Oclock = ignore;
+    //create an array list of n poses, and convert to array
+    //add call setfiducialidfiltersoverride
+    List <Integer> poses = new ArrayList<Integer>();
+
+    for(int i = 0; i <=22; i++){
+      if(ignore && (i == 10 || i == 21 || i == 3 || i == 16)){
+        continue;
+      }
+      poses.add(i);
+    }
+
+    m_limelight.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+    m_limelight_side.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+    m_Limelight3.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+
+    
+    }
+
 private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
   addLimelightVisionMeasurementV2(ll,primary);
 }
@@ -424,7 +447,19 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
             
             SmartDashboard.putNumber("Closest Tag", ll.getTargetID());
 
-          if(MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && distanceToAprilTagSquared > 4 && (ll.getTargetID() == 7 ||  ll.getTargetID() == 18)){
+          if(MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && distanceToAprilTagSquared > 2.5 && (ll.getTargetID() == 7 ||  ll.getTargetID() == 18)){
+            return;
+          }
+
+          if(!MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && (ll.getTargetID() == 1 ||  ll.getTargetID() == 2 || ll.getTargetID() == 13 || ll.getTargetID() == 12)){
+            return;
+          }
+
+          if((ll.getTargetID() == 16 || ll.getTargetID() == 3)){
+            return;
+          }
+
+          if(m_ignore12Oclock && (ll.getTargetID() == 10 ||  ll.getTargetID() == 21)){
             return;
           }
             

@@ -167,12 +167,15 @@ public class RobotContainer {
                 NamedCommands.registerCommand("ElevateToIntakeAndIntake", m_elevate.GoToIntakeAndIntake());
                 NamedCommands.registerCommand("ShootOutL1L3", m_elevate.OnlyScore());
                 NamedCommands.registerCommand("ShootOutL4", m_elevate.OnlyScoreL4());
-                NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", new WaitCommand(.15).andThen(m_elevate.OnlyScoreL4NoIntakeReturn()));
+                NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", (m_elevate.OnlyScoreL4NoIntakeReturn()));
                 NamedCommands.registerCommand("WaitForCoral", m_elevate.WaitForCoral());
+                NamedCommands.registerCommand("WaitForCoralOrChute",m_elevate.WaitForCoralOrChute());
                 NamedCommands.registerCommand("MoveToL4WhileDrive", m_elevate.AutoIntakeAndL4PositionWhileDriving());
                 NamedCommands.registerCommand("IntakeWhileDrive", m_elevate.AutoIntakePositionWhileDriving());
 
                 NamedCommands.registerCommand("ScoreL4EarlyEndNoReturn", m_elevate.ScoreL4CommandEarlyEndNoReturn());
+
+                NamedCommands.registerCommand("Ignore12Oclock", Commands.runOnce(()->m_robotDrive.setIgnore12Oclock(true)));
           }
 
         /**
@@ -467,11 +470,11 @@ public class RobotContainer {
 
                 new Trigger(()->{
                         return m_actionController.getRightY() < -0.8;
-              }).whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
+              }).whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
 
                   new Trigger(()->{
                         return m_actionController.getRightY() > 0.8;
-                  }).whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
+                  }).whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
                  
 
                   new JoystickButton(m_actionController, XboxController.Button.kStart.value)
@@ -502,6 +505,11 @@ public class RobotContainer {
         public void setIsAutonomous(boolean isAuto){
                 m_isAuto = isAuto;
                 m_elevate.setIsAutonomous(m_isAuto);
+
+                if(!isAuto){
+                        m_robotDrive.setIgnore12Oclock(false);
+                }
+               
         }
 
 }

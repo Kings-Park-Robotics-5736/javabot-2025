@@ -43,7 +43,7 @@ public class DriveToCoordinate extends Command {
     @Override
     public void initialize() {
         if(m_x == 0 || m_y == 0){
-            InitMotionProfile(m_robotDrive.getPose().getX()+.04, m_robotDrive.getPose().getY());
+            InitMotionProfile(m_robotDrive.getPose().getX()+.04, m_robotDrive.getPose().getY()+.04);
         }else{
             InitMotionProfile(m_x, m_y);
         }

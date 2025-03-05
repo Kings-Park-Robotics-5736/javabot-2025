@@ -29,12 +29,14 @@ public class ElevateSubsystem extends SubsystemBase {
     private final EndeffectorSubsystem m_endeffector;
     private final ElevatorSubsystemFalcon m_elevator;
     private DigitalInput m_coralIntakeSensor;
+    private DigitalInput m_chuteSensor;
     private final ScoringPositionSelector m_ScoringPositionSelector;
     private final DriveSubsystem m_robotDrive;
     private final LEDSubsystem m_ledSystem;
 
     private Boolean m_isAuto = false;
     private Boolean isAutoDrive = false;
+    private Boolean isChuteSeen = false;
 
 
     public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector, DriveSubsystem robotDrive, LEDSubsystem ledSubsystem) {
@@ -42,6 +44,8 @@ public class ElevateSubsystem extends SubsystemBase {
         m_endeffector = new EndeffectorSubsystem();
         m_elevator = new ElevatorSubsystemFalcon("Elevator");
         m_coralIntakeSensor = new DigitalInput(0);
+        m_chuteSensor = new DigitalInput(1);
+
         m_ScoringPositionSelector = scoringPositionSelector;
         m_robotDrive = robotDrive;
 
@@ -66,6 +70,14 @@ public class ElevateSubsystem extends SubsystemBase {
                 new Trigger( ()->{
                     return !coralOnCone() && !m_endeffector.ForwardLimitReached() && !m_endeffector.ReverseLimitReached();
                 }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.NONE), m_ledSystem));
+
+                new Trigger( ()->{
+                    return chuteSensorSeen();
+                }).onTrue(Commands.runOnce(()->isChuteSeen = true));
+
+                new Trigger(()->{
+                    return coralOnCone();
+                }).onTrue(Commands.runOnce(()->isChuteSeen = false));
                 
     }
 
@@ -86,6 +98,10 @@ public class ElevateSubsystem extends SubsystemBase {
 
     public boolean coralOnCone(){
         return !m_coralIntakeSensor.get();
+    }
+
+    public boolean chuteSensorSeen(){
+        return !m_chuteSensor.get();
     }
 
     public void setArmInitialPosition(){
@@ -188,8 +204,8 @@ public class ElevateSubsystem extends SubsystemBase {
     public Command GoToIntakeAndIntakeAsDriveWithChecks(){
         return ((GoOutOfTheWay()
         .andThen(m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle)
-        .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake())))).unless(()->!coralOnCone())
-        .andThen(new WaitUntilCommand(()->MathUtils.IsAwayFromIntakeStation(m_robotDrive.getPose())))
+        .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake())))).unless(()->!coralOnCone()&&(m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached())))
+        .andThen(new WaitUntilCommand(()->MathUtils.IsAwayFromIntakeStation(m_robotDrive.getPose()))
         .andThen(PrepScore())).withName("GoToIntakeAndIntakeAsDriveWithChecks");
     }
 
@@ -197,11 +213,15 @@ public class ElevateSubsystem extends SubsystemBase {
     public Command GoToIntakeAndIntakeAsDriveWithChecksNoWallWait(){
         return ((GoOutOfTheWay()
         .andThen(m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle)
-        .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake())))).unless(()->!coralOnCone())).withName("GoToIntakeAndIntakeAsDriveWithChecksNoWallWait");
+        .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake())))).unless(()->!coralOnCone()&&(m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached()))).withName("GoToIntakeAndIntakeAsDriveWithChecksNoWallWait");
     }
 
     public Command WaitForCoral(){
         return new WaitUntilCommand(()->coralOnCone()).withName("WaitForCoral");
+    }
+
+    public Command WaitForCoralOrChute(){
+        return new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withName("WaitForCoral");
     }
 
     public Command PrepForIntakePosition(){
@@ -285,7 +305,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
     //command to shoot out for L4
     public Command OnlyScoreL4(){
-        return (m_endeffector.Score(true).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition(true))).withName("OnlyScoreL4");
+        return (m_endeffector.Score(true).andThen(new WaitCommand(.05)).andThen(PrepForIntakePosition(true))).withName("OnlyScoreL4");
     }
     public Command OnlyScoreL4NoIntakeReturn(){
         return m_endeffector.Score(true);
@@ -354,9 +374,13 @@ public class ElevateSubsystem extends SubsystemBase {
         }
      }
 
+
+
+
      public Command AutoIntakeAndL4PositionWhileDriving(){
         return 
-         m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle)
+        new WaitUntilCommand(()->coralOnCone()).andThen(
+         m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle))
         .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake()))
         .andThen(GotoScoreL4PositionCommand());
      }
