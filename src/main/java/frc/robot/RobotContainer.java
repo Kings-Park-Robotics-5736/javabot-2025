@@ -176,6 +176,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("ScoreL4EarlyEndNoReturn", m_elevate.ScoreL4CommandEarlyEndNoReturn());
 
                 NamedCommands.registerCommand("Ignore12Oclock", Commands.runOnce(()->m_robotDrive.setIgnore12Oclock(true)));
+                NamedCommands.registerCommand("IgnoreMiddleScoring",  Commands.runOnce(()->m_robotDrive.setIgnoreAutoExtras(true)));
           }
 
         /**

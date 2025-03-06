@@ -136,9 +136,9 @@ public final class Constants {
     public static final double kIntakeWaitingPosition = 12;
 
     public static final double kClearAlgaeLowPosition1 = 15.5;
-    public static final double kClearAlgaeLowPosition2 = 14;
+    public static final double kClearAlgaeLowPosition2 = 13.3;
     public static final double kClearAlgaeHighPosition1 = 21.5;
-    public static final double kClearAlgaeHighPosition2 = 20.9;
+    public static final double kClearAlgaeHighPosition2 = 20.1;
 
   }
 

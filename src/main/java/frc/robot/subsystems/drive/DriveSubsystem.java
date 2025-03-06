@@ -304,7 +304,11 @@ public class DriveSubsystem extends SubsystemBase {
     List <Integer> poses = new ArrayList<Integer>();
 
     for(int i = 0; i <=22; i++){
-      if(ignore && (i == 10 || i == 21 || i == 3 || i == 16)){
+      if(ignore && (i == 10 || i == 21 || i == 3 || i == 16 )){
+        continue;
+      }
+
+      if(i == 15 || i == 14 || i == 4 || i == 5){
         continue;
       }
       poses.add(i);
@@ -316,6 +320,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     
     }
+
+    public void setIgnoreAutoExtras(boolean ignore){
+      List <Integer> poses = new ArrayList<Integer>();
+
+      for(int i = 0; i <=22; i++){
+        if(ignore && ( i == 3 || i == 16 )){
+          continue;
+        }
+  
+        if(i == 15 || i == 14 || i == 4 || i == 5){
+          continue;
+        }
+        poses.add(i);
+      }
+  
+      m_limelight.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+      m_limelight_side.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+      m_Limelight3.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+    }
+    
 
 private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
   addLimelightVisionMeasurementV2(ll,primary);
