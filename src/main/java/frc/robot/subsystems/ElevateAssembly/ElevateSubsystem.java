@@ -59,17 +59,8 @@ public class ElevateSubsystem extends SubsystemBase {
 
         new Trigger(() -> {
                         return !m_isAuto && !isAutoDrive && coralOnCone() && ! m_endeffector.ForwardLimitReached() && ! m_endeffector.ReverseLimitReached();
-                }).onTrue(((new WaitCommand(0.5).andThen(GoToIntakeAndIntake()))));
+                }).onTrue(((new WaitCommand(0.25).andThen(GoToIntakeAndIntake()))));
 
-
-                new Trigger( ()->{
-                    return coralOnCone() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached();
-                }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.HAVE_NOTE), m_ledSystem));
-                
-
-                new Trigger( ()->{
-                    return !coralOnCone() && !m_endeffector.ForwardLimitReached() && !m_endeffector.ReverseLimitReached();
-                }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.NONE), m_ledSystem));
 
                 new Trigger( ()->{
                     return chuteSensorSeen();
@@ -78,6 +69,22 @@ public class ElevateSubsystem extends SubsystemBase {
                 new Trigger(()->{
                     return coralOnCone();
                 }).onTrue(Commands.runOnce(()->isChuteSeen = false));
+
+                new Trigger( ()->{
+                    return !m_robotDrive.seeReef() && (coralOnCone() || chuteSensorSeen() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached());
+                }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.HAVE_NOTE), m_ledSystem));
+
+
+                new Trigger( ()->{
+                    return m_robotDrive.seeReef() && (coralOnCone() || chuteSensorSeen() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached());
+                }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.SEE_TAG), m_ledSystem));
+
+
+                new Trigger( ()->{
+                    return !coralOnCone() && !chuteSensorSeen() && !m_endeffector.ForwardLimitReached() && !m_endeffector.ReverseLimitReached();
+                }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.NONE), m_ledSystem));
+
+                
                 
     }
 
@@ -87,6 +94,7 @@ public class ElevateSubsystem extends SubsystemBase {
         //SmartDashboard.putBoolean("Reverse Limit Reached", m_endeffector.ReverseLimitReached());
         
         SmartDashboard.putString("MANUAL SELECTED POSITION", m_ScoringPositionSelector.getScorePositionString());
+
         
         
     }
@@ -178,7 +186,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
     //ensure arm is out of the way of the intake cone before rotating
     public Command GoOutOfTheWay(){
-        return (m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kOutofthewayPosition).unless(()->m_elevator.elevatorInSafeSpot())).withName("GoOutOfTheWay");
+        return (m_elevator.RunElevatorToPositionCommand(ElevatorConstants.kOutofthewayPosition).unless(()->(m_elevator.elevatorInSafeSpot() ))).withName("GoOutOfTheWay");
     }
 
 

@@ -50,7 +50,8 @@ public final class Types {
     IN_RANGE,
     HAVE_NOTE,
     NO_NOTE,
-    NONE
+    NONE,
+    SEE_TAG,
 }
   public enum DirectionType{
     UP,

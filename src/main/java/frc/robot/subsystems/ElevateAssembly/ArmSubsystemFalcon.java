@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.utils.TalonUtils;
 public class ArmSubsystemFalcon extends SubsystemBase {
 
@@ -398,6 +399,11 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                 () -> {
                     return false;
                 }, this);
+    }
+
+    public Boolean armInSafeSpot(){
+                return getArmAngleRadians() < Math.toRadians(120);
+ 
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {

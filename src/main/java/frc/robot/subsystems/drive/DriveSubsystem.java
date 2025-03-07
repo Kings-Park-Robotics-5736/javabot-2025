@@ -110,6 +110,9 @@ public class DriveSubsystem extends SubsystemBase {
   private double startTime = 0;
   private boolean m_ignore12Oclock = false;
 
+  private int reefTagCounter = 0;
+  private int reefTagNoCounter = 0;
+
   //init field object for elastic dashboard
   private Field2d m_field = new Field2d();
 
@@ -423,6 +426,24 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
 
 
+  private void trackReefTag(int tagId){
+    if(( tagId >=17 && tagId <=22 ) || ( tagId >=6 && tagId <=11 )){
+        reefTagCounter = 1;
+        reefTagNoCounter = 0;
+    }else{
+        reefTagNoCounter ++;
+    }
+
+    if (reefTagNoCounter >=25){
+      reefTagCounter = 0;
+    }
+
+  }
+
+  public Boolean seeReef(){
+    return reefTagCounter >0;
+  }
+
   private void addLimelightVisionMeasurementV2(Limelight ll, boolean primary) {
 
     double transStd;
@@ -438,6 +459,7 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
     PoseEstimate robot_blue_pose = ll.GetBotPoseMT1();
 
     if (!validPose || robot_blue_pose == null ||robot_blue_pose.rawFiducials.length < 1 ) {
+      trackReefTag(0);
       return;
     }
 
@@ -445,15 +467,18 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
     if(robot_blue_pose.rawFiducials[0].ambiguity > .7)
     {
+      trackReefTag(0);
       return;
     }
     if(robot_blue_pose.rawFiducials[0].distToCamera > 3)
     {
+      trackReefTag(0);
       return;
     }
 
     // observed bad tracking when tag is very close to edge
     double offsetX = ll.getTargetOffsetX();
+    Boolean seeTag = false;
 
     if (Math.abs(offsetX) < 32.5) {
 
@@ -502,6 +527,12 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
         if (robot_blue_pose.pose.getX() > .5) {
           // Apply vision measurements. pose[6] holds the latency/frame delay
+          seeTag = true;
+          try{
+            trackReefTag((int)ll.getTargetID());
+          } catch(Exception e){
+
+          }
           m_poseEstimator.addVisionMeasurement(
             robot_blue_pose.pose,
             robot_blue_pose.timestampSeconds,
@@ -510,6 +541,10 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
       }else{
         System.out.println("Unable to add limelight measurement");
       }
+    }
+
+    if(!seeTag){
+      trackReefTag(0);
     }
   }
 
