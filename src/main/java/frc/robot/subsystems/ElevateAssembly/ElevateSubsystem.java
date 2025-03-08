@@ -38,6 +38,7 @@ public class ElevateSubsystem extends SubsystemBase {
     private Boolean m_isAuto = false;
     private Boolean isAutoDrive = false;
     private Boolean isChuteSeen = false;
+    private Boolean isClimbing = false;
 
 
     public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector, DriveSubsystem robotDrive, LEDSubsystem ledSubsystem) {
@@ -77,12 +78,12 @@ public class ElevateSubsystem extends SubsystemBase {
                 }).onTrue(Commands.runOnce(()->isChuteSeen = false));
 
                 new Trigger( ()->{
-                    return !m_robotDrive.seeReef() && (coralOnCone() || chuteSensorSeen() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached());
+                    return !m_robotDrive.seeReef() && (isClimbing || coralOnCone() || chuteSensorSeen() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached());
                 }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.HAVE_NOTE), m_ledSystem));
 
 
                 new Trigger( ()->{
-                    return m_robotDrive.seeReef() && (coralOnCone() || chuteSensorSeen() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached());
+                    return m_robotDrive.seeReef() && (isClimbing || coralOnCone() || chuteSensorSeen() || m_endeffector.ForwardLimitReached() || m_endeffector.ReverseLimitReached());
                 }).onTrue(Commands.runOnce(()->m_ledSystem.SetLEDState(LEDState.SEE_TAG), m_ledSystem));
 
 
@@ -105,6 +106,10 @@ public class ElevateSubsystem extends SubsystemBase {
         
     }
 
+
+    public void setIsClimbing(boolean isClimb){
+        isClimbing = isClimb;
+    }
 
     public void setIsAutonomous(boolean isAuto){
         m_isAuto = isAuto;
@@ -465,7 +470,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
         public Command DriveToCage(DriveSubsystem robotDrive){
-            return TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition));
+            return Commands.runOnce(()->setIsClimbing(true)).andThen(TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition))) .finallyDo((interrupted)->setIsClimbing(false));
         }
     
     
