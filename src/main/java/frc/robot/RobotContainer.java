@@ -359,7 +359,7 @@ public class RobotContainer {
                  .whileTrue(m_elevate.ScoreL4Command());
                 
                  new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                        .whileTrue(m_elevate.Regrip());
+                        .whileTrue(m_elevate.DriveToCage(m_robotDrive));
 
                 
 

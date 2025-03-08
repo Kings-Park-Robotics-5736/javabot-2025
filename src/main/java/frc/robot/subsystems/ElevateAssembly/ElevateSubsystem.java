@@ -33,6 +33,7 @@ public class ElevateSubsystem extends SubsystemBase {
     private final ScoringPositionSelector m_ScoringPositionSelector;
     private final DriveSubsystem m_robotDrive;
     private final LEDSubsystem m_ledSystem;
+    private int m_cagePosition;
 
     private Boolean m_isAuto = false;
     private Boolean isAutoDrive = false;
@@ -49,10 +50,15 @@ public class ElevateSubsystem extends SubsystemBase {
         m_ScoringPositionSelector = scoringPositionSelector;
         m_robotDrive = robotDrive;
 
+        m_cagePosition = 0;
+
         SmartDashboard.putData(m_arm);
         SmartDashboard.putData(m_elevator);
         SmartDashboard.putData(m_endeffector);
         SmartDashboard.putData(m_robotDrive);
+
+        SmartDashboard.putNumber("Cage Position", 1);
+
 
         m_ledSystem = ledSubsystem;
 
@@ -95,7 +101,7 @@ public class ElevateSubsystem extends SubsystemBase {
         
         SmartDashboard.putString("MANUAL SELECTED POSITION", m_ScoringPositionSelector.getScorePositionString());
 
-        
+        m_cagePosition = (int)SmartDashboard.getNumber("Cage Position", 1);
         
     }
 
@@ -455,6 +461,11 @@ public class ElevateSubsystem extends SubsystemBase {
 
         public Command ClearAlgaeLow(DriveSubsystem robotDrive){
             return ((DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2()));
+        }
+
+
+        public Command DriveToCage(DriveSubsystem robotDrive){
+            return TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition));
         }
     
     
