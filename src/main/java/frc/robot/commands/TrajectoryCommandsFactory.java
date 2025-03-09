@@ -162,7 +162,7 @@ public class TrajectoryCommandsFactory {
     }
 
 
-    public static final Map<String, Command> getAllScoringCommands(DriveSubsystem robotDrive, Boolean left, Boolean top) {
+    public static final Map<String, Command> getAllScoringCommands(DriveSubsystem robotDrive) {
         Map<String, Command> commands = new HashMap<>();
         for (ScorePositions pos : ScoringPositions.scorePositionsList) {
             for (ScoreLocation loc : ScoreLocation.values()) {
@@ -195,11 +195,11 @@ public class TrajectoryCommandsFactory {
     }
 
     public static final Command getScoringClosestCommand(DriveSubsystem robotDrive, Boolean left, Boolean top){
-        return getScoringSelectedCommand(robotDrive, left, top, MathUtils.getClosestScoringTargetSupplier(robotDrive, left, top));
+        return getScoringSelectedCommand(robotDrive, MathUtils.getClosestScoringTargetSupplier(robotDrive, left, top));
     }
 
-    public static final Command getScoringSelectedCommand(DriveSubsystem robotDrive, Boolean left, Boolean top, Supplier<String> selectedCommandSupplier){
-        Map <String, Command> commands = getAllScoringCommands(robotDrive, left, top);
+    public static final Command getScoringSelectedCommand(DriveSubsystem robotDrive, Supplier<String> selectedCommandSupplier){
+        Map <String, Command> commands = getAllScoringCommands(robotDrive);
         return new SelectCommand<>(
             commands,
             selectedCommandSupplier

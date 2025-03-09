@@ -2,6 +2,7 @@ package frc.robot.subsystems.ElevateAssembly;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,9 +21,11 @@ import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.MathUtils;
+import frc.robot.utils.ReefButtonBox;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.utils.Types.LEDState;
+import frc.robot.field.ScoringPositions;
 
 public class ElevateSubsystem extends SubsystemBase {
     private final ArmSubsystemFalcon m_arm;
@@ -420,7 +423,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
      
 
-     public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
+     public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, ScoreHeight height){
 
         if(height == ScoreHeight.L4){
             return ((Commands.runOnce(()->isAutoDrive=true)
@@ -445,12 +448,17 @@ public class ElevateSubsystem extends SubsystemBase {
      }
 
      public Command DriveToNearestScoreCommand(DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
-        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringClosestCommand(robotDrive, left, height == ScoreHeight.L4), robotDrive, left, height);
+        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringClosestCommand(robotDrive, left, height == ScoreHeight.L4), robotDrive, height);
         
      }
 
      public Command DriveToSelectedCommand(DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
-        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringSelectedCommand(robotDrive, false, height == ScoreHeight.L4, ()-> MathUtils.BuildMapKeyString(m_ScoringPositionSelector.getScorePosition(), left, height== ScoreHeight.L4)), robotDrive, left, height);
+        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringSelectedCommand(robotDrive, ()-> MathUtils.BuildMapKeyString(m_ScoringPositionSelector.getScorePosition(), left, height== ScoreHeight.L4)), robotDrive, height);
+        
+     }
+
+     public Command DriveToReefBoxSelected(DriveSubsystem robotDrive, Supplier<ReefButtonBox.Button> positionButton, Supplier<ReefButtonBox.Button> heightButton){
+        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringSelectedCommand(robotDrive, ()-> MathUtils.BuildMapKeyStringFromButtonBox(positionButton.get(), heightButton.get())), robotDrive, ScoringPositions.ReefButtonBoxToHieght(heightButton.get()));
         
      }
 

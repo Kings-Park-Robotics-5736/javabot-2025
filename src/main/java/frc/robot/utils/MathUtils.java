@@ -15,6 +15,57 @@ import java.util.function.Supplier;
 public class MathUtils {
 
 
+    public static String BuildMapKeyStringFromButtonBox(ReefButtonBox.Button buttonIndex, ReefButtonBox.Button level){
+
+        Boolean top = level == ReefButtonBox.Button.kL4;
+        String key = "";
+        String levelString = (top ? "L4" : "L3");
+        
+        switch (buttonIndex) {
+            case kA:
+                key = "SIXLEFT" + levelString;
+                break;
+            case kB:
+                key = "SIXRIGHT" + levelString;
+                break;
+            case kC:
+                key = "FOURLEFT" + levelString;
+                break;
+            case kD:
+                key = "FOURRIGHT" + levelString;
+                break;
+            case kE:
+                key = "TWOLEFT" + levelString;
+                break;
+            case kF:
+                key = "TWORIGHT" + levelString;
+                break;
+            case kG:
+                key = "TWELVELEFT" + levelString;
+                break;
+            case kH:
+                key = "TWELVERIGHT" + levelString;
+                break;
+            case kI:
+                key = "TENLEFT" + levelString;
+                break;
+            case kJ:
+                key = "TENRIGHT" + levelString;
+                break;
+            case kK:
+                key = "EIGHTLEFT" + levelString;
+                break;
+            case kL:
+                key = "EIGHTRIGHT" + levelString;
+                break;
+            default:
+                key = "UNKNOWN";
+                break;
+        }
+        System.out.println("COMMAND SELECTOR: Driving to built key " + key);
+        return key;
+    }
+
     public static String BuildMapKeyString(ScorePositions position, Boolean left, Boolean top) {
         String key = position.toString() + (left ? "LEFT" : "RIGHT") + (top ? "L4" : "L3");
         System.out.println("COMMAND SELECTOR: Driving to built key " + key);

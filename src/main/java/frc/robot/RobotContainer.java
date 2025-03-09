@@ -38,6 +38,7 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.ReefButtonBox;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.GoalType;
 import frc.robot.utils.Types.LEDState;
@@ -68,6 +69,7 @@ public class RobotContainer {
         XboxController m_driverController = new XboxController(IOConstants.kDriverControllerPort);
         XboxController m_actionController = new XboxController(IOConstants.kActionControllerPort);
         XboxController m_output_controller = new XboxController(IOConstants.kArduinoOutputPort);
+        ReefButtonBox m_reefController = new ReefButtonBox(IOConstants.kReefControllerPort);
         public ScoringPositionSelector m_scoringPositionSelector = new ScoringPositionSelector(m_output_controller);
 
         public ClimbSubsystem m_climb = new ClimbSubsystem();
@@ -478,8 +480,26 @@ public class RobotContainer {
                   }).whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
                  
 
-                  new JoystickButton(m_actionController, XboxController.Button.kStart.value)
-                  .whileTrue(new DriveToCoordinate(m_robotDrive, 0, 0));
+                /**************************************
+                 * REEF BOX
+                 **************************************/
+                new JoystickButton(m_reefController, ReefButtonBox.Button.kElevatorDown.value)
+                .whileTrue(m_elevate.ElevateHome());
+                new JoystickButton(m_reefController, ReefButtonBox.Button.kClimbIn.value)
+                .whileTrue(m_climb.runClimberForward());
+                new JoystickButton(m_reefController, ReefButtonBox.Button.kClimbOut.value)
+                .whileTrue(m_climb.runClimberReverse());
+                new JoystickButton(m_reefController, ReefButtonBox.Button.kClearHigh.value)
+                .whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
+                new JoystickButton(m_reefController, ReefButtonBox.Button.kClearLow.value)
+                .whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
+
+
+                new Trigger(()->{
+                        return m_reefController.getAnyReefPositionPressed() && m_reefController.getAnyHeightPositionPressed();
+                }).whileTrue(m_elevate.DriveToReefBoxSelected(m_robotDrive, ()->m_reefController.getWhichReefButtonPressed(), ()->m_reefController.getWhichHeightButtonPressed()).raceWith(JoystickCommandsFactory
+                .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
+                 
                  
 
 

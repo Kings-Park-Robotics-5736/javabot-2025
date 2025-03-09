@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.utils.ReefButtonBox;
 
 public final class ScoringPositions {
     public static final Pose2d kBlueScoringPosition = new Pose2d(new Translation2d(0, 5.55), Rotation2d.fromDegrees(0));
@@ -111,6 +112,18 @@ public final class ScoringPositions {
     }
 
 
+    public static ScoreHeight ReefButtonBoxToHieght(ReefButtonBox.Button heightButton){
+        switch(heightButton){
+            case kL2:
+                return ScoreHeight.L2;
+            case kL3:
+                return ScoreHeight.L3;
+            case kL4:
+            default:
+                return ScoreHeight.L4;
+
+        }
+    }
 
 
     public static Pose2d ScorePositionToPose(ScorePositions pos, DriverStation.Alliance color){
