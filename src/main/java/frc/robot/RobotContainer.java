@@ -9,8 +9,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -33,19 +31,21 @@ import frc.robot.commands.JoystickCommandsFactory;
 import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.commands.drive.CenterToGoalCommand;
 import frc.robot.commands.drive.DriveDistanceCommand;
+import frc.robot.commands.drive.DriveToCoordinate;
 import frc.robot.commands.drive.DriveToTargetCommand;
-import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.GoalType;
+import frc.robot.utils.Types.LEDState;
 import frc.robot.utils.Types.SysidMechanism;
 import frc.robot.vision.Limelight;
 import frc.robot.vision.Limelight.LEDMode;
 import frc.robot.vision.PiCamera;
-import frc.robot.utils.MathUtils;
+
 
 
 /*
@@ -72,12 +72,14 @@ public class RobotContainer {
 
         public ClimbSubsystem m_climb = new ClimbSubsystem();
 
+        public LEDSubsystem m_ledSystem = new LEDSubsystem();
+
         private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_limelight, m_limelight_side,m_limelight_three, m_output_controller);// use only 1 limelight for
                                                                                           // driving now since we dont
                                                                                           // have great measurements
                                                                                           // m_limelight_side);
 
-        public ElevateSubsystem m_elevate = new ElevateSubsystem(m_scoringPositionSelector,m_robotDrive);
+        public ElevateSubsystem m_elevate = new ElevateSubsystem(m_scoringPositionSelector,m_robotDrive, m_ledSystem);
 
         private final PowerDistribution PDH = new PowerDistribution(1, ModuleType.kRev);
         private final SendableChooser<Command> autoChooser;
@@ -165,10 +167,16 @@ public class RobotContainer {
                 NamedCommands.registerCommand("ElevateToIntakeAndIntake", m_elevate.GoToIntakeAndIntake());
                 NamedCommands.registerCommand("ShootOutL1L3", m_elevate.OnlyScore());
                 NamedCommands.registerCommand("ShootOutL4", m_elevate.OnlyScoreL4());
-                NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", new WaitCommand(.15).andThen(m_elevate.OnlyScoreL4NoIntakeReturn()));
+                NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", (m_elevate.OnlyScoreL4NoIntakeReturn()));
                 NamedCommands.registerCommand("WaitForCoral", m_elevate.WaitForCoral());
+                NamedCommands.registerCommand("WaitForCoralOrChute",m_elevate.WaitForCoralOrChute());
                 NamedCommands.registerCommand("MoveToL4WhileDrive", m_elevate.AutoIntakeAndL4PositionWhileDriving());
+                NamedCommands.registerCommand("IntakeWhileDrive", m_elevate.AutoIntakePositionWhileDriving());
 
+                NamedCommands.registerCommand("ScoreL4EarlyEndNoReturn", m_elevate.ScoreL4CommandEarlyEndNoReturn());
+
+                NamedCommands.registerCommand("Ignore12Oclock", Commands.runOnce(()->m_robotDrive.setIgnore12Oclock(true)));
+                NamedCommands.registerCommand("IgnoreMiddleScoring",  Commands.runOnce(()->m_robotDrive.setIgnoreAutoExtras(true)));
           }
 
         /**
@@ -326,6 +334,7 @@ public class RobotContainer {
          */
         private void configureButtonBindings() {
                 
+                m_ledSystem.SetLEDState(LEDState.IN_RANGE);
 
                 //A -> Go to score L2, but dont score
                 //B -> Go to score L3, but dont score
@@ -350,7 +359,7 @@ public class RobotContainer {
                  .whileTrue(m_elevate.ScoreL4Command());
                 
                  new JoystickButton(m_driverController, XboxController.Button.kX.value)
-                        .whileTrue(m_elevate.Regrip());
+                        .whileTrue(m_elevate.DriveToCage(m_robotDrive));
 
                 
 
@@ -415,8 +424,8 @@ public class RobotContainer {
                         .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
                 );
 
-                new POVButton(m_actionController, 0).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetPreviousScorePosition()));
-                new POVButton(m_actionController, 180).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetNextScorePosition()));
+                new POVButton(m_actionController, 270).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetPreviousScorePosition()));
+                new POVButton(m_actionController, 90).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetNextScorePosition()));
 
                 new Trigger(() -> {
                         return m_actionController.getRightTriggerAxis() > 0;
@@ -462,12 +471,15 @@ public class RobotContainer {
 
                 new Trigger(()->{
                         return m_actionController.getRightY() < -0.8;
-              }).whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
+              }).whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
 
                   new Trigger(()->{
                         return m_actionController.getRightY() > 0.8;
-                  }).whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
+                  }).whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
                  
+
+                  new JoystickButton(m_actionController, XboxController.Button.kStart.value)
+                  .whileTrue(new DriveToCoordinate(m_robotDrive, 0, 0));
                  
 
 
@@ -494,6 +506,11 @@ public class RobotContainer {
         public void setIsAutonomous(boolean isAuto){
                 m_isAuto = isAuto;
                 m_elevate.setIsAutonomous(m_isAuto);
+
+                if(!isAuto){
+                        m_robotDrive.setIgnore12Oclock(false);
+                }
+               
         }
 
 }

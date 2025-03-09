@@ -12,10 +12,12 @@ import frc.robot.subsystems.drive.DriveSubsystem;
  * @brief This command is used to drive a specific distance
  *        It will drive straight from wherever the robot is currently facing.
  */
-public class DriveDistanceCommand extends Command {
+public class DriveToCoordinate extends Command {
 
-    private final double m_meters;
+    private final double m_x;
+    private final double m_y;
     private final DriveSubsystem m_robotDrive;
+    private int stallCounter = 0;
 
     // Control the motion profile for the auto-commands for driving. This is kind-of
     // like a path following
@@ -30,8 +32,9 @@ public class DriveDistanceCommand extends Command {
             CustomDriveDistanceCommandConstants.kPidValues.d, m_constraints,
             Constants.kDt);
 
-    public DriveDistanceCommand(DriveSubsystem robotDrive, double meters) {
-        m_meters = meters;
+    public DriveToCoordinate(DriveSubsystem robotDrive, double x, double y) {
+        m_x = x;
+        m_y = y;
         m_robotDrive = robotDrive;
         addRequirements(robotDrive); // this effectively locks out the joystick
 
@@ -39,7 +42,12 @@ public class DriveDistanceCommand extends Command {
 
     @Override
     public void initialize() {
-        InitMotionProfile(setpointToX(m_meters), setpointToY(m_meters));
+        if(m_x == 0 || m_y == 0){
+            InitMotionProfile(m_robotDrive.getPose().getX()+.04, m_robotDrive.getPose().getY()+.04);
+        }else{
+            InitMotionProfile(m_x, m_y);
+        }
+        stallCounter = 0;
     }
 
     @Override
@@ -64,26 +72,17 @@ public class DriveDistanceCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return m_controller_x.atGoal() && m_controller_y.atGoal();
+
+        //if we are closer than .05 at either target, increment the stall counter
+        if (Math.abs(m_robotDrive.getPose().getX() - m_x) < .05 || Math.abs(m_robotDrive.getPose().getY() - m_y) < .05) {
+            stallCounter++;
+        } else {
+            stallCounter = 0;
+        }
+
+        return (m_controller_x.atGoal() && m_controller_y.atGoal()) || stallCounter > 15;
     }
 
-    /**
-     * @brief Determines the x value of the setpoint based on the current heading
-     * @param setpoint in meters
-     * @return
-     */
-    private double setpointToX(double setpoint) {
-        return setpoint * m_robotDrive.getPose().getRotation().getCos() + m_robotDrive.getPose().getX();
-    }
-
-    /**
-     * @brief Determines the y value of the setpoint based on the current heading
-     * @param setpoint in meters
-     * @return
-     */
-    private double setpointToY(double setpoint) {
-        return setpoint * m_robotDrive.getPose().getRotation().getSin() + m_robotDrive.getPose().getY();
-    }
 
     /**
      * @brief Initialize the motion profile for the PID controller

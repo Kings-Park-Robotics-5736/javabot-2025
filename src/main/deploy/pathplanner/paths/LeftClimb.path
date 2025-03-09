@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.9980726131779472,
-        "y": 6.577655759748991
+        "x": 7.063451086956522,
+        "y": 7.236141304347825
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7815309390915406,
-        "y": 6.702594558301948
+        "x": 7.439673913043478,
+        "y": 7.236141304347825
       },
       "isLocked": false,
-      "linkedName": "INTAKE_LEFT_START"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.2350291349170774,
-        "y": 7.018175705961451
+        "x": 8.181521739130433,
+        "y": 7.236141304347825
       },
       "prevControl": {
-        "x": 1.451576991409679,
-        "y": 6.893247623256002
+        "x": 7.429076086956521,
+        "y": 7.241440217391304
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "INTAKE_LEFT_END"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
+    "maxVelocity": 0.75,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 36.0
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Intakes",
+  "folder": "AutoPaths",
   "idealStartingState": {
-    "velocity": 0.75,
-    "rotation": 36.0
+    "velocity": 0,
+    "rotation": 180.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

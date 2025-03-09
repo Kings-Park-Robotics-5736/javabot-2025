@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -106,6 +108,10 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_transYLockoutValue;
   private long m_lastPoseUpdate;
   private double startTime = 0;
+  private boolean m_ignore12Oclock = false;
+
+  private int reefTagCounter = 0;
+  private int reefTagNoCounter = 0;
 
   //init field object for elastic dashboard
   private Field2d m_field = new Field2d();
@@ -294,8 +300,52 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
 
+  public void setIgnore12Oclock(boolean ignore){
+    m_ignore12Oclock = ignore;
+    //create an array list of n poses, and convert to array
+    //add call setfiducialidfiltersoverride
+    List <Integer> poses = new ArrayList<Integer>();
+
+    for(int i = 0; i <=22; i++){
+      if(ignore && (i == 10 || i == 21 || i == 3 || i == 16 )){
+        continue;
+      }
+
+      if(i == 15 || i == 14 || i == 4 || i == 5){
+        continue;
+      }
+      poses.add(i);
+    }
+
+    m_limelight.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+    m_limelight_side.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+    m_Limelight3.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+
+    
+    }
+
+    public void setIgnoreAutoExtras(boolean ignore){
+      List <Integer> poses = new ArrayList<Integer>();
+
+      for(int i = 0; i <=22; i++){
+        if(ignore && ( i == 3 || i == 16 )){
+          continue;
+        }
+  
+        if(i == 15 || i == 14 || i == 4 || i == 5){
+          continue;
+        }
+        poses.add(i);
+      }
+  
+      m_limelight.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+      m_limelight_side.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+      m_Limelight3.SetFiducialIDFiltersOverride(poses.stream().mapToInt(Integer::intValue).toArray());
+    }
+    
+
 private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
-  addLimelightVisionMeasurementV1(ll,primary);
+  addLimelightVisionMeasurementV2(ll,primary);
 }
     
 
@@ -376,6 +426,24 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
 
 
+  private void trackReefTag(int tagId){
+    if(( tagId >=17 && tagId <=22 ) || ( tagId >=6 && tagId <=11 )){
+        reefTagCounter = 1;
+        reefTagNoCounter = 0;
+    }else{
+        reefTagNoCounter ++;
+    }
+
+    if (reefTagNoCounter >=25){
+      reefTagCounter = 0;
+    }
+
+  }
+
+  public Boolean seeReef(){
+    return reefTagCounter >0;
+  }
+
   private void addLimelightVisionMeasurementV2(Limelight ll, boolean primary) {
 
     double transStd;
@@ -390,7 +458,8 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
     PoseEstimate robot_blue_pose = ll.GetBotPoseMT1();
 
-    if (!validPose || robot_blue_pose == null) {
+    if (!validPose || robot_blue_pose == null ||robot_blue_pose.rawFiducials.length < 1 ) {
+      trackReefTag(0);
       return;
     }
 
@@ -398,15 +467,18 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
     if(robot_blue_pose.rawFiducials[0].ambiguity > .7)
     {
+      trackReefTag(0);
       return;
     }
-    if(robot_blue_pose.rawFiducials[0].distToCamera > 4)
+    if(robot_blue_pose.rawFiducials[0].distToCamera > 3)
     {
+      trackReefTag(0);
       return;
     }
 
     // observed bad tracking when tag is very close to edge
     double offsetX = ll.getTargetOffsetX();
+    Boolean seeTag = false;
 
     if (Math.abs(offsetX) < 32.5) {
 
@@ -424,7 +496,19 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
             
             SmartDashboard.putNumber("Closest Tag", ll.getTargetID());
 
-          if(MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && distanceToAprilTagSquared > 4 && (ll.getTargetID() == 7 ||  ll.getTargetID() == 18)){
+          if(MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && distanceToAprilTagSquared > 2.5 && (ll.getTargetID() == 7 ||  ll.getTargetID() == 18)){
+            return;
+          }
+
+          if(!MathUtils.IsCloseToIntakeStation(m_poseEstimator.getEstimatedPosition()) && (ll.getTargetID() == 1 ||  ll.getTargetID() == 2 || ll.getTargetID() == 13 || ll.getTargetID() == 12)){
+            return;
+          }
+
+          if((ll.getTargetID() == 16 || ll.getTargetID() == 3)){
+            return;
+          }
+
+          if(m_ignore12Oclock && (ll.getTargetID() == 10 ||  ll.getTargetID() == 21)){
             return;
           }
             
@@ -443,6 +527,12 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
         if (robot_blue_pose.pose.getX() > .5) {
           // Apply vision measurements. pose[6] holds the latency/frame delay
+          seeTag = true;
+          try{
+            trackReefTag((int)ll.getTargetID());
+          } catch(Exception e){
+
+          }
           m_poseEstimator.addVisionMeasurement(
             robot_blue_pose.pose,
             robot_blue_pose.timestampSeconds,
@@ -451,6 +541,10 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
       }else{
         System.out.println("Unable to add limelight measurement");
       }
+    }
+
+    if(!seeTag){
+      trackReefTag(0);
     }
   }
 

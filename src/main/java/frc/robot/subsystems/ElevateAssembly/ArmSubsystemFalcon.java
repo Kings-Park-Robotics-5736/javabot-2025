@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.utils.TalonUtils;
 public class ArmSubsystemFalcon extends SubsystemBase {
 
@@ -272,11 +273,14 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     }
 
     private Boolean isFinished(Boolean finishEarly){
-        if(finishEarly){
+        SmartDashboard.putBoolean("Finish Early", finishEarly);
+        if(!finishEarly){
             return isFinished();
         }
         double delta = Math.abs(getArmAngleRadians() - m_globalSetpoint);
-        return isFinished() || delta < Math.toRadians(5);
+        SmartDashboard.putNumber("Arm Delta", delta);
+
+        return isFinished() || delta < Math.toRadians(10);
     }
 
 
@@ -342,6 +346,10 @@ public class ArmSubsystemFalcon extends SubsystemBase {
      */
 
     public Command RunArmToPositionCommand(double setpoint, Boolean finishEarly) {
+        return RunArmToPositionCommand(setpoint, finishEarly, false);
+    }
+
+    public Command RunArmToPositionCommand(double setpoint, Boolean finishEarly, Boolean async) {
         return new FunctionalCommand(
                 () -> {
                     RunArmToPosition(setpoint);
@@ -351,7 +359,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                     emergencyStop = false;
                 },
                 () -> {
-                    return isFinished(finishEarly);
+                    return async || isFinished(finishEarly);
                 }, this).withName("RunArmToPositionCommand");
     }
 
@@ -391,6 +399,11 @@ public class ArmSubsystemFalcon extends SubsystemBase {
                 () -> {
                     return false;
                 }, this);
+    }
+
+    public Boolean armInSafeSpot(){
+                return getArmAngleRadians() < Math.toRadians(120);
+ 
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {

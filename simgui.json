@@ -1,0 +1,29 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/ArmSubsystemFalcon": "Subsystem",
+      "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/DriveSubsystem": "Subsystem",
+      "/SmartDashboard/ElevatorSubsystemFalcon": "Subsystem",
+      "/SmartDashboard/EndeffectorSubsystem": "Subsystem",
+      "/SmartDashboard/Reset Arm Encoder": "Command",
+      "/SmartDashboard/Reset Odometry": "Command",
+      "/SmartDashboard/Scheduler": "Scheduler"
+    }
+  },
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "transitory": {
+      "SmartDashboard": {
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}

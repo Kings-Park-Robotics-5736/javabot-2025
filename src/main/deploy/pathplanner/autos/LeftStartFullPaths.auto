@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Ignore12Oclock"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -76,7 +82,7 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoral"
+            "name": "WaitForCoralOrChute"
           }
         },
         {
@@ -112,18 +118,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ForceStop"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootOutL4NoIntakeReturn"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -151,7 +145,7 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoral"
+            "name": "WaitForCoralOrChute"
           }
         },
         {
@@ -187,18 +181,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ForceStop"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootOutL4NoIntakeReturn"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -220,7 +202,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

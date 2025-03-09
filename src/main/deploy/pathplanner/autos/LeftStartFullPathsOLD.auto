@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Ignore12Oclock"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -21,7 +15,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "right_start_to_score_f_full"
+                        "pathName": "left_start_to_score_i_full"
                       }
                     },
                     {
@@ -61,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "f_score_to_right_intake"
+                  "pathName": "i_score_to_left_intake"
                 }
               },
               {
@@ -82,7 +76,7 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoralOrChute"
+            "name": "WaitForCoral"
           }
         },
         {
@@ -96,7 +90,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "right_intake_to_score_c_full"
+                        "pathName": "left_intake_to_score_l_full"
                       }
                     },
                     {
@@ -118,13 +112,25 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "c_score_to_right_intake"
+                  "pathName": "l_score_to_left_intake"
                 }
               },
               {
@@ -145,7 +151,7 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoralOrChute"
+            "name": "WaitForCoral"
           }
         },
         {
@@ -159,7 +165,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "right_intake_to_score_d_full"
+                        "pathName": "left_intake_to_score_k_full"
                       }
                     },
                     {
@@ -181,13 +187,25 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ForceStop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootOutL4NoIntakeReturn"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "d_score_to_right_intake"
+                  "pathName": "k_score_to_left_intake"
                 }
               },
               {
@@ -202,7 +220,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

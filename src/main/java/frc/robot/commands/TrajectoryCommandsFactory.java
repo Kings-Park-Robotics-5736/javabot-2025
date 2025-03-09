@@ -213,6 +213,37 @@ public class TrajectoryCommandsFactory {
     public static final Command GoToLeftIntake(DriveSubsystem robotDrive){
         return generatePPPathFindToPathThenAlign(robotDrive, "IntakeLEFT");
     }
+
+    public static final Command GoToLeftCage(DriveSubsystem robotDrive){
+        return Commands.runOnce(()->System.out.println("DRIVING TO LEFT CAGE")).andThen(generatePPPathFindToPathThenAlign(robotDrive, "LeftClimb"));
+    }
+
+    public static final Command GoToRightCage(DriveSubsystem robotDrive){
+        return Commands.runOnce(()->System.out.println("DRIVING TO RIGHT CAGE")).andThen(generatePPPathFindToPathThenAlign(robotDrive, "RightClimb"));
+    }
+
+    public static final Command GoToMiddleCage(DriveSubsystem robotDrive){
+        return Commands.runOnce(()->System.out.println("DRIVING TO MIDLE CAGE")).andThen(generatePPPathFindToPathThenAlign(robotDrive, "MiddleClimb"));
+    }
+
+    public static final Map<String, Command> getAllCageCommands(DriveSubsystem robotDrive) {
+        Map<String, Command> commands = new HashMap<>();
+        commands.put("CAGE1", GoToLeftCage(robotDrive));
+        commands.put("CAGE2", GoToMiddleCage(robotDrive));
+        commands.put("CAGE3", GoToRightCage(robotDrive));
+
+
+        return commands;
+    }
+
+    public static final Command goToSelectedCageCommand(DriveSubsystem robotDrive, Supplier<String> selectedCommandSupplier){
+        Map <String, Command> commands = getAllCageCommands(robotDrive);
+        return new SelectCommand<>(
+            commands,
+            selectedCommandSupplier
+        ).andThen(()->System.out.println("Selected" +  selectedCommandSupplier.get()));
+    }
+
     
 
 

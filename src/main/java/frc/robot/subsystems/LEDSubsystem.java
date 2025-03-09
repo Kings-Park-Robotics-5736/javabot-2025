@@ -113,11 +113,12 @@ public class LEDSubsystem extends SubsystemBase {
         var alliance = DriverStation.getAlliance();
         switch (state){
             case IN_RANGE:
+            case SEE_TAG:
                 setAllLEDColor(LEDConstants.GreenRGB);
                 break;
             case HAVE_NOTE:
                 setLEDOff();
-                 setAllLEDColor(LEDConstants.GreenRGB);
+                 setAllLEDColor(LEDConstants.PurpleRGB);
                  break;
             case NO_NOTE:
             case NONE:

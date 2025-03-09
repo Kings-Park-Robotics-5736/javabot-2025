@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 1.0541012998655312,
-        "y": 1.1734199910354106
+        "x": 1.2346467391304348,
+        "y": 1.00991847826087
       },
       "prevControl": {
-        "x": 1.2912729654654524,
-        "y": 1.252474409232999
+        "x": 1.471818404730356,
+        "y": 1.0889728964584582
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,7 @@
   "reversed": false,
   "folder": "Intakes",
   "idealStartingState": {
-    "velocity": 0.25,
+    "velocity": 0.75,
     "rotation": 144.0
   },
   "useDefaultConstraints": true
