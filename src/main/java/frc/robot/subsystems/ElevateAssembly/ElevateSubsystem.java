@@ -470,7 +470,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
         public Command DriveToCage(DriveSubsystem robotDrive){
-            return Commands.runOnce(()->setIsClimbing(true)).andThen(TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition))) .finallyDo((interrupted)->setIsClimbing(false));
+            return Commands.runOnce(()->setIsClimbing(true)).andThen(TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition)));
         }
     
     

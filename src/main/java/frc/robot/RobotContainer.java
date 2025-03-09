@@ -424,8 +424,8 @@ public class RobotContainer {
                         .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble))
                 );
 
-                new POVButton(m_actionController, 0).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetPreviousScorePosition()));
-                new POVButton(m_actionController, 180).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetNextScorePosition()));
+                new POVButton(m_actionController, 270).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetPreviousScorePosition()));
+                new POVButton(m_actionController, 90).onTrue(new InstantCommand (() -> m_scoringPositionSelector.SetNextScorePosition()));
 
                 new Trigger(() -> {
                         return m_actionController.getRightTriggerAxis() > 0;
