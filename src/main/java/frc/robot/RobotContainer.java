@@ -84,9 +84,9 @@ public class RobotContainer {
         private final PowerDistribution PDH = new PowerDistribution(1, ModuleType.kRev);
         private final SendableChooser<Command> autoChooser;
 
-        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
-        private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
+        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(DriveConstants.kMaxAccelerationMetersPerSecondSquared);
+        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(DriveConstants.kMaxAccelerationMetersPerSecondSquared);
+        private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kMaxAccelerationMetersPerSecondSquared);
 
         private Boolean m_isAuto = false;
 

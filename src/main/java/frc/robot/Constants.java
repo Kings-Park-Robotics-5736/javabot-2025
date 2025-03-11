@@ -10,6 +10,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import frc.robot.utils.Types.FeedForwardConstants;
 import frc.robot.utils.Types.Limits;
 import frc.robot.utils.Types.PidConstants;
@@ -217,8 +218,8 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Units.degreesToRadians(540);
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Units.degreesToRadians(720);
 
     public static final double kPXController = 5;
     public static final double kPYController = 5;
