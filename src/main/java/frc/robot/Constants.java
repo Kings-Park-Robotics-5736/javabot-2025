@@ -89,10 +89,10 @@ public final class Constants {
     public static final double kPDrive = .6418375
     ;
 
-    public static final double kMaxSpeedMetersPerSecond = 4;
+    public static final double kMaxSpeedMetersPerSecond = 5;
     public static final double kMaxRotationSpeedMetersPerSecond = 6;
 
-    public static final double kMaxAccelerationMetersPerSecondSquared = 4;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 5;
   }
 
 
@@ -215,8 +215,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 5;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 5;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 

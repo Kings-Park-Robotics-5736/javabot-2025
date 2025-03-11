@@ -48,6 +48,7 @@ import frc.robot.utils.MathUtils;
 import frc.robot.vision.Limelight;
 import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScorePositions;
+import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.LimelightHelpers.PoseEstimate;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -282,13 +283,19 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     if(visionEnabled){
+      housLimelight();
+
+
+      /* 
       addLimelightVisionMeasurement(m_limelight, true);
       if (m_limelight_side != null) {
         addLimelightVisionMeasurement(m_limelight_side, false);
       }
       if (m_Limelight3 != null){
         addLimelightVisionMeasurement(m_Limelight3, false);
+        
       }
+        */
     }
 
     SmartDashboard.putNumber("Gyro Rotation", m_gyro.getRotation2d().getDegrees());
@@ -551,8 +558,6 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
 
   private void addLimelightVisionMeasurementV3(Limelight ll, boolean primary) {
     
-    
-    
     Boolean doRejectUpdate = false;
 
     ll.SetRobotOrientation( m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
@@ -574,11 +579,37 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
     }
   }
 
+private void housLimelight(){
+  Boolean doRejectUpdate = false;
+
+  LimelightHelpers.SetRobotOrientation("limelight-climb", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-climb");
+      if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if(mt2.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if(!doRejectUpdate)
+      {
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        m_poseEstimator.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
+}
+
 
 
 
   @Override
   public void periodic() {
+    
+    //Print Match time to dashboard
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
     //update the field position on dashboard
     m_field.setRobotPose(getPose());
     // Update the odometry in the periodic block
