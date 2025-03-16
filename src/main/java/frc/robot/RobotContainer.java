@@ -235,7 +235,7 @@ public class RobotContainer {
                 m_elevate.setArmInitialPosition();
 
                 new Trigger(()->
-                {return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->Elastic.selectTab("Example Tab")));
+                {return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->Elastic.selectTab("ClimbCam")));
 
                 
 
