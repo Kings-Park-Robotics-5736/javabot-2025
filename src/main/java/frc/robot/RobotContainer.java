@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -38,6 +37,7 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.Elastic;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.GoalType;
 import frc.robot.utils.Types.LEDState;
@@ -233,6 +233,12 @@ public class RobotContainer {
                 }
 
                 m_elevate.setArmInitialPosition();
+
+                new Trigger(()->
+                {return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->Elastic.selectTab("Example Tab")));
+
+                
+
 
                 
         

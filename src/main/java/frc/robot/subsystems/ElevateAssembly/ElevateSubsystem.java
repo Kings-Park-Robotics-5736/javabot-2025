@@ -1,27 +1,26 @@
 package frc.robot.subsystems.ElevateAssembly;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.field.ScoringPositions.ScoreHeight;
+import frc.robot.field.ScoringPositions.ScorePositions;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.MathUtils;
 import frc.robot.utils.ScoringPositionSelector;
-import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.utils.Types.LEDState;
 
 public class ElevateSubsystem extends SubsystemBase {
@@ -455,22 +454,51 @@ public class ElevateSubsystem extends SubsystemBase {
      }
 
 
-     public Command DriveToClearingPosition(DriveSubsystem robotDrive){
-        return (TrajectoryCommandsFactory.getClearingSelectedCommand(robotDrive, ()-> MathUtils.BuildMapKeyStringClear(m_ScoringPositionSelector.getScorePosition())));
+     
+     public Command DriveToClearingPosition(DriveSubsystem robotDrive, Boolean fastDrive){
+        return (TrajectoryCommandsFactory.getClearingSelectedCommand(robotDrive, fastDrive, ()-> MathUtils.BuildMapKeyStringClear(m_ScoringPositionSelector.getScorePosition())));
+     }
+
+     public Command DriveAwayFromClearingPosition(DriveSubsystem robotDrive){
+        return (TrajectoryCommandsFactory.getClearingSelectedCommand(robotDrive, false, ()-> MathUtils.BuildMapKeyStringClear(m_ScoringPositionSelector.getScorePosition()) + "REV"));
      }
      
 
+
+    /**
+     * Functions to quickly clear algae when already at the score L4 position.
+     */
+     public Command FastClearAlgae(DriveSubsystem robotDrive){
+        return new ConditionalCommand(ClearAlgaeFastHigh(robotDrive), ClearAlgaeFastLow(robotDrive), ()->isClearHigh());
+ 
+     }
+
+     public Command ClearAlgaeFastHigh(DriveSubsystem robotDrive){
+        return ((DriveToClearingPosition(robotDrive, true).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).andThen(ClearAlgaeHighStep2())).andThen(DriveAwayFromClearingPosition(robotDrive));
+     }
+
+    public Command ClearAlgaeFastLow(DriveSubsystem robotDrive){
+        return ((DriveToClearingPosition(robotDrive, true).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).andThen(ClearAlgaeLowStep2())).andThen(DriveAwayFromClearingPosition(robotDrive));
+    }
+
+     public Boolean isClearHigh(){
+        return m_ScoringPositionSelector.getScorePosition() == ScorePositions.TWELVE ||
+        m_ScoringPositionSelector.getScorePosition() == ScorePositions.FOUR ||
+        m_ScoringPositionSelector.getScorePosition() == ScorePositions.EIGHT;
+     }
+
+
      public Command ClearAlgaeHigh(DriveSubsystem robotDrive){
-        return ((DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2()));
+        return ((DriveToClearingPosition(robotDrive, false).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2()));
      }
 
         public Command ClearAlgaeLow(DriveSubsystem robotDrive){
-            return ((DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2()));
+            return ((DriveToClearingPosition(robotDrive, false).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2()));
         }
 
 
         public Command DriveToCage(DriveSubsystem robotDrive){
-            return Commands.runOnce(()->setIsClimbing(true)).andThen(TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition)));
+            return Commands.runOnce(()->setIsClimbing(true)).andThen((TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition))).alongWith(ElevateHome()));
         }
     
     

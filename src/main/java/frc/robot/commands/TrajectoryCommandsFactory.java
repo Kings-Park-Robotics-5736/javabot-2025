@@ -117,6 +117,32 @@ public class TrajectoryCommandsFactory {
         });
     }
 
+
+    public static Command generatePPTrajectoryOnTheFlyFromPath(DriveSubsystem robotDrive, String pathName) {
+
+        PathPlannerPath path = getPathFromFile(pathName);
+      
+
+        if( path != null){
+            Pose2d endPose = new Pose2d(path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().getX(), 
+            path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().getY(),
+            path.getGoalEndState().rotation());
+
+            return (Commands.runOnce(()->System.out.println("Running PP Path Find W/ Align to path " + pathName)) 
+                    .andThen(new PathPlanFromDynamicStartCommand(
+                        () -> robotDrive.getPose(),
+                        robotDrive,
+                        endPose,
+                        new ArrayList<PathPoint>(),
+                        true
+                    ))
+                    .andThen(Commands.runOnce(()->System.out.println("Done Running PP Path Find W/ Align to path " + pathName)))).withName("PP On the fly" + pathName);
+        }
+        return Commands.run(() -> {
+            System.out.println("Error loading path");
+        });
+    }
+
     /**
      * This method is used by PathPlanFromDynamicStartCommand to create a path, should not be used directly
      */
@@ -144,8 +170,16 @@ public class TrajectoryCommandsFactory {
     }
 
 
-    public static Command getPathFollowCommandClearAlgae(DriveSubsystem robotDrive, ScorePositions position) {
-        return generatePPPathFindToPathThenAlign(robotDrive, "CLEAR" + ScoringPositions.ScoreClockPositionToAlphaName(position) + "GEN");
+    public static Command getPathFollowCommandClearAlgae(DriveSubsystem robotDrive, ScorePositions position, Boolean rev, Boolean fastClear) {
+        String suffix = "";
+        if(rev){
+            suffix += "REV";
+        }
+        if(fastClear){
+            return generatePPTrajectoryOnTheFlyFromPath(robotDrive, "CLEAR" + ScoringPositions.ScoreClockPositionToAlphaName(position) + suffix + "GEN");
+        } else {
+            return generatePPPathFindToPathThenAlign(robotDrive, "CLEAR" + ScoringPositions.ScoreClockPositionToAlphaName(position) + suffix + "GEN");
+        }
     }
 
     public static Pose2d getPathFinishingPose(ScorePositions position, ScoreLocation location, ScoreHeight height){
@@ -177,18 +211,19 @@ public class TrajectoryCommandsFactory {
     }
 
 
-    public static final Map<String, Command> getAllClearingCommands(DriveSubsystem robotDrive) {
+    public static final Map<String, Command> getAllClearingCommands(DriveSubsystem robotDrive, Boolean fastClear) {
         Map<String, Command> commands = new HashMap<>();
         for (ScorePositions pos : ScoringPositions.scorePositionsList) {
-                commands.put("CLEAR" + pos.toString(), getPathFollowCommandClearAlgae(robotDrive,pos));
+                commands.put("CLEAR" + pos.toString(), getPathFollowCommandClearAlgae(robotDrive,pos, false, fastClear));
+                commands.put("CLEAR" + pos.toString() +  "REV", getPathFollowCommandClearAlgae(robotDrive,pos, true, fastClear));
         }
 
         return commands;
     }
 
 
-    public static final Command getClearingSelectedCommand(DriveSubsystem robotDrive, Supplier<String> selectedCommandSupplier){
-        Map <String, Command> commands = getAllClearingCommands(robotDrive);
+    public static final Command getClearingSelectedCommand(DriveSubsystem robotDrive, Boolean fastDrive, Supplier<String> selectedCommandSupplier){
+        Map <String, Command> commands = getAllClearingCommands(robotDrive, fastDrive);
         return new SelectCommand<>(
             commands,
             selectedCommandSupplier
