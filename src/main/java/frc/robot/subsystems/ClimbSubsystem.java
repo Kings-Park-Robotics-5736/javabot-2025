@@ -39,7 +39,10 @@ public class ClimbSubsystem extends SubsystemBase{
         return m_motor.getEncoder().getPosition();
     }
 
-    
+    @Override
+    public void periodic(){
+        System.out.println("Climber Position: " + getPosition());
+    }
 
 public Command runClimberToInPosition(){
     return new FunctionalCommand(()->setSpeed(-1), ()->{}, (interrupted) -> m_motor.set(0), ()-> getPosition() <= ClimbConstants.kFullyInPosition, this);
@@ -63,5 +66,19 @@ public Command runClimberReverse(){
          (interrupted) -> m_motor.set(0),
          () -> false, this);
 }
+
+
+public Command runClimberToSetpoint(int setpoint){
+    return new FunctionalCommand(
+        ()->{},
+         ()->{if (getPosition() < setpoint){
+             setSpeed(1);
+         } else if (getPosition() > setpoint){
+             setSpeed(0);
+         }},
+         (interrupted) -> m_motor.set(0),
+         () -> false, this);
+}
+
 
 }
