@@ -475,11 +475,11 @@ public class ElevateSubsystem extends SubsystemBase {
      }
 
      public Command ClearAlgaeFastHigh(DriveSubsystem robotDrive){
-        return ((DriveToClearingPosition(robotDrive, true).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).andThen(ClearAlgaeHighStep2())).andThen(DriveAwayFromClearingPosition(robotDrive));
+        return ((DriveToClearingPosition(robotDrive, true).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).andThen(ClearAlgaeHighStep2())).andThen(DriveAwayFromClearingPosition(robotDrive)).andThen(PrepForIntakePosition());
      }
 
     public Command ClearAlgaeFastLow(DriveSubsystem robotDrive){
-        return ((DriveToClearingPosition(robotDrive, true).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).andThen(ClearAlgaeLowStep2())).andThen(DriveAwayFromClearingPosition(robotDrive));
+        return ((DriveToClearingPosition(robotDrive, true).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).andThen(ClearAlgaeLowStep2())).andThen(DriveAwayFromClearingPosition(robotDrive)).andThen(PrepForIntakePosition());
     }
 
      public Boolean isClearHigh(){
