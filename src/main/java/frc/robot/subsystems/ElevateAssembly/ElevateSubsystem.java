@@ -501,19 +501,8 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
         public Command ClearAlgae(DriveSubsystem robotDrive){
-            return DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(()->{if ( 
-                // Low Positions
-                m_ScoringPositionSelector.getScorePosition() == ScorePositions.TWELVE ||
-                m_ScoringPositionSelector.getScorePosition() == ScorePositions.FOUR ||
-                m_ScoringPositionSelector.getScorePosition() == ScorePositions.EIGHT
-                ){Commands.runOnce(() -> m_robotDrive.forceStop()).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2());} 
-                else if (
-                //High Positions
-                m_ScoringPositionSelector.getScorePosition() == ScorePositions.TWO ||
-                m_ScoringPositionSelector.getScorePosition() == ScorePositions.SIX ||
-                m_ScoringPositionSelector.getScorePosition() == ScorePositions.TEN
-                ){Commands.runOnce(() -> m_robotDrive.forceStop()).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2());}
-                ;}));
+            return new ConditionalCommand(ClearAlgaeHigh(robotDrive), ClearAlgaeLow(robotDrive), ()->isClearHigh());
+
         }
 
 

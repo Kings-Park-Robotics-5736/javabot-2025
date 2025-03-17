@@ -217,8 +217,8 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 5;
     public static final double kMaxAccelerationMetersPerSecondSquared = 5;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxAngularSpeedRadiansPerSecond =Math.toRadians(720);
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.toRadians(1080);
 
     public static final double kPXController = 5;
     public static final double kPYController = 5;
