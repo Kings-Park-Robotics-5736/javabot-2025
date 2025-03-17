@@ -459,13 +459,13 @@ public class RobotContainer {
                         .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
                         
 
-               new Trigger(()->{
-                        return m_actionController.getLeftY() > 0.2;
-               }).whileTrue(m_climb.runClimberForward());    
-               
-                 new Trigger(()->{
-                           return m_actionController.getLeftY() < -0.2;
-                 }).whileTrue(m_climb.runClimberReverse());
+                        new Trigger(()->{
+                                return m_actionController.getLeftY() > 0.2;
+                        }).whileTrue(m_climb.runClimberToSetpoint(290));    
+                        
+                         new Trigger(()->{
+                                   return m_actionController.getLeftY() < -0.2;
+                         }).whileTrue(m_climb.runClimberToSetpoint(150));
 
 
 
