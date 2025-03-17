@@ -1,5 +1,6 @@
 package frc.robot.subsystems.ElevateAssembly;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -423,7 +424,7 @@ public class ElevateSubsystem extends SubsystemBase {
      public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
 
         if(height == ScoreHeight.L4){
-            return ((Commands.runOnce(()->isAutoDrive=true)
+        return ((Commands.runOnce(()->isAutoDrive=true)
                 .andThen(initialCommand.alongWith(GoToIntakeAndIntakeAsDriveWithChecks())
                 .andThen(() -> robotDrive.forceStop())
                 .andThen(ScoreL4CommandEarlyEnd())))
@@ -451,6 +452,11 @@ public class ElevateSubsystem extends SubsystemBase {
 
      public Command DriveToSelectedCommand(DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
         return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringSelectedCommand(robotDrive, false, height == ScoreHeight.L4, ()-> MathUtils.BuildMapKeyString(m_ScoringPositionSelector.getScorePosition(), left, height== ScoreHeight.L4)), robotDrive, left, height);
+        
+     }
+
+     public Command DriveToSelectedCommand(DriveSubsystem robotDrive, Boolean left, ScoreHeight height,BooleanSupplier noFastClear){
+        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringSelectedCommand(robotDrive, false, height == ScoreHeight.L4, ()-> MathUtils.BuildMapKeyString(m_ScoringPositionSelector.getScorePosition(), left, height== ScoreHeight.L4)), robotDrive, left, height).andThen(FastClearAlgae(robotDrive).unless(noFastClear));
         
      }
 
@@ -513,10 +519,10 @@ public class ElevateSubsystem extends SubsystemBase {
 
     
         public Command CagePosRight(){
-            return Commands.runOnce(()->{System.out.println("Cage Positon Changed"); if (m_cagePosition == 3 ) m_cagePosition = 1; else m_cagePosition += 1 ;});
+            return Commands.runOnce(()->{System.out.println("Cage Positon Changed"); if (m_cagePosition == 3 ) m_cagePosition = 1; else m_cagePosition += 1 ;}).andThen(()->SmartDashboard.putNumber("Cage Position", m_cagePosition));
         }
         public Command CagePosLeft(){
-            return Commands.runOnce(()->{System.out.println("Cage Positon Changed"); if (m_cagePosition == 1 ) m_cagePosition = 3; else m_cagePosition -= 1 ;});
+            return Commands.runOnce(()->{System.out.println("Cage Positon Changed"); if (m_cagePosition == 1 ) m_cagePosition = 3; else m_cagePosition -= 1 ;}).andThen(()->SmartDashboard.putNumber("Cage Position", m_cagePosition));
         }
 
     }

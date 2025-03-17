@@ -33,6 +33,7 @@ import frc.robot.commands.drive.DriveDistanceCommand;
 import frc.robot.commands.drive.DriveToCoordinate;
 import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.field.ScoringPositions.ScoreHeight;
+import frc.robot.field.ScoringPositions.ScorePositions;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
@@ -494,6 +495,53 @@ public class RobotContainer {
 
                   new JoystickButton(m_actionController, XboxController.Button.kStart.value)
                   .whileTrue(new DriveToCoordinate(m_robotDrive, 0, 0));
+
+
+                  /** Reef button box */
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k12.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.TWELVE)));
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k10.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.TEN)));
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k8.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.EIGHT)));
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k6.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.SIX)));
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k4.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.FOUR)));
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k2.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.TWO)));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClear.value).onTrue(m_elevate.ClearAlgae(m_robotDrive));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kLL4.value).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L4, ()->!m_buttonbox_controller.getKClearButton()).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kLL3.value).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L3, ()->!m_buttonbox_controller.getKClearButton()).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kLL2.value).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L2, ()->!m_buttonbox_controller.getKClearButton()).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kLeftRumble)));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kRL4.value).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L4, ()->!m_buttonbox_controller.getKClearButton()).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble)));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kRL3.value).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L3, ()->!m_buttonbox_controller.getKClearButton()).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble)));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kRL2.value).whileTrue(
+                        m_elevate.DriveToSelectedCommand(m_robotDrive, false, ScoreHeight.L2, ()->!m_buttonbox_controller.getKClearButton()).raceWith(JoystickCommandsFactory
+                        .RumbleControllerTillCancel(m_driverController, RumbleType.kRightRumble)));
+
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbIn.value).whileTrue(
+                        m_climb.runClimberToSetpoint(305));
+
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbOut.value).whileTrue(
+                        m_climb.runClimberToSetpoint(150));
+
+
+
+
                  
 
 
