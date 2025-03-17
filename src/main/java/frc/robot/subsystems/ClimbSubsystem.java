@@ -73,7 +73,7 @@ public Command runClimberToSetpoint(int setpoint){
     return new FunctionalCommand(
         ()->{},
          ()->{if (getPosition() < setpoint){
-             setSpeed(1);
+             setSpeed(.8);
          } else if (getPosition() > setpoint){
              setSpeed(0);
          }},
