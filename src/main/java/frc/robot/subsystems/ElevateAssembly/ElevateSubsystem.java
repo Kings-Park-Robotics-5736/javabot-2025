@@ -489,9 +489,9 @@ public class ElevateSubsystem extends SubsystemBase {
     }
 
      public Boolean isClearHigh(){
-        return m_ScoringPositionSelector.getScorePosition() == ScorePositions.TWELVE ||
-        m_ScoringPositionSelector.getScorePosition() == ScorePositions.FOUR ||
-        m_ScoringPositionSelector.getScorePosition() == ScorePositions.EIGHT;
+        return m_ScoringPositionSelector.getScorePosition() == ScorePositions.TWO ||
+        m_ScoringPositionSelector.getScorePosition() == ScorePositions.SIX ||
+        m_ScoringPositionSelector.getScorePosition() == ScorePositions.TEN;
      }
 
 

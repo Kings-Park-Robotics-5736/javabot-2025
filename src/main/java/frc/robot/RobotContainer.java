@@ -535,10 +535,13 @@ public class RobotContainer {
 
 
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbIn.value).whileTrue(
-                        m_climb.runClimberToSetpoint(305));
+                        m_climb.runClimberToSetpoint(315));
 
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbOut.value).whileTrue(
                         m_climb.runClimberToSetpoint(150));
+
+                  new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kElevatorDown.value).whileTrue(
+                        m_elevate.ElevateHome());
 
 
 
