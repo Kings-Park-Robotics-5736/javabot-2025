@@ -507,7 +507,9 @@ public class RobotContainer {
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k4.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.FOUR)));
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.k2.value).onTrue(new InstantCommand(()->m_scoringPositionSelector.setScorePosition(ScorePositions.TWO)));
 
-                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClear.value).onTrue(m_elevate.ClearAlgae(m_robotDrive));
+                new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClear.value).and(new Trigger(()->{
+                        return !m_buttonbox_controller.getKLL4Button() && !m_buttonbox_controller.getKRL4Button() ;
+              })).onTrue(m_elevate.ClearAlgae(m_robotDrive));
 
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kLL4.value).whileTrue(
                         m_elevate.DriveToSelectedCommand(m_robotDrive, true, ScoreHeight.L4, ()->!m_buttonbox_controller.getKClearButton()).raceWith(JoystickCommandsFactory
