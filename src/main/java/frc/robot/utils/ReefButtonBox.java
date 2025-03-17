@@ -28,21 +28,23 @@ public class ReefButtonBox extends GenericHID implements Sendable {
   /** Represents a digital button on a XboxController. */
   public enum Button {
     /** Reef BUttons A - L */
-    k12(5),
+    
     k2(0),
     k4(1),
     k6(2),
     k8(3),
     k10(4),
+    k12(5),
     kClear(6),
-    kLL4(10),
-    kLL3(11),
-    kLL2(12),
     kRL4(7),
     kRL3(8),
     kRL2(9),
-    kClimbIn(14),
+    kLL4(10),
+    kLL3(11),
+    kLL2(12),
     kClimbOut(13),
+    kClimbIn(14),
+    
 
     kElevatorDown(15);
   
