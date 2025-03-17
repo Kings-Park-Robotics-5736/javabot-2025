@@ -148,7 +148,7 @@ public class TrajectoryCommandsFactory {
      */
     public static Command generatePPPathToPose( List<Waypoint> waypoints, Rotation2d endRotation ) {
 
-        PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+        PathConstraints constraints = new PathConstraints(4.0, 4.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
       
         // Create the path using the waypoints created above
         PathPlannerPath path = new PathPlannerPath(

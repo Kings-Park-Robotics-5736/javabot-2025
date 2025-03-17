@@ -310,7 +310,15 @@ public class ElevateSubsystem extends SubsystemBase {
     }
 
     public Command ScoreL4CommandEarlyEnd(){
-        return ScoreL4NoPre(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true);
+        return ScoreL4CommandEarlyEnd(()->true);
+
+    }
+
+    public Command ScoreL4CommandEarlyEnd(BooleanSupplier noFastClear){
+
+        return new ConditionalCommand(ScoreL4NoPre(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true), ScoreL4NoPreNoReturn(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true), noFastClear);
+
+
     }
 
     public Command ScoreL4CommandEarlyEndNoReturn(){
@@ -421,13 +429,18 @@ public class ElevateSubsystem extends SubsystemBase {
 
      
 
+
      public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){
+        return DriveAndScoreCommand(initialCommand, robotDrive, left, height, ()->true);
+     }
+     
+     public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height, BooleanSupplier noFastClear){
 
         if(height == ScoreHeight.L4){
         return ((Commands.runOnce(()->isAutoDrive=true)
                 .andThen(initialCommand.alongWith(GoToIntakeAndIntakeAsDriveWithChecks())
                 .andThen(() -> robotDrive.forceStop())
-                .andThen(ScoreL4CommandEarlyEnd())))
+                .andThen(ScoreL4CommandEarlyEnd(noFastClear))))
                 .finallyDo((interrupted)->{isAutoDrive = false;}))
                 .withName("DriveAndScoreCommandL4");
         }else{
@@ -456,7 +469,7 @@ public class ElevateSubsystem extends SubsystemBase {
      }
 
      public Command DriveToSelectedCommand(DriveSubsystem robotDrive, Boolean left, ScoreHeight height,BooleanSupplier noFastClear){
-        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringSelectedCommand(robotDrive, false, height == ScoreHeight.L4, ()-> MathUtils.BuildMapKeyString(m_ScoringPositionSelector.getScorePosition(), left, height== ScoreHeight.L4)), robotDrive, left, height).andThen(FastClearAlgae(robotDrive).unless(noFastClear));
+        return DriveAndScoreCommand(TrajectoryCommandsFactory.getScoringSelectedCommand(robotDrive, false, height == ScoreHeight.L4, ()-> MathUtils.BuildMapKeyString(m_ScoringPositionSelector.getScorePosition(), left, height== ScoreHeight.L4)), robotDrive, left, height, noFastClear).andThen(FastClearAlgae(robotDrive).unless(noFastClear));
         
      }
 
