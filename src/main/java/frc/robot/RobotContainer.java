@@ -56,8 +56,7 @@ import frc.robot.vision.PiCamera;
  */
 public class RobotContainer {
 
-        // The robot's subsystems
-
+        // The robot's subsystems 
         private final SysidMechanism enabledSysid = SysidMechanism.NONE;
 
         private final PiCamera m_picam = new PiCamera();
@@ -185,6 +184,8 @@ public class RobotContainer {
         public RobotContainer() {
 
                 InitializeNamedCommands(); // must do this first
+
+                
 
                 // Configure the button bindings
                 switch (enabledSysid) {
@@ -349,6 +350,9 @@ public class RobotContainer {
                 //POV Up -> Run Climber Forward
                 //POV Down -> Run Climber Reverse
 
+                //POV Right -> Next Cage Pos
+                //POV Left -> Previous Cage Pos
+
                  new JoystickButton(m_driverController, XboxController.Button.kA.value)
                  .whileTrue(m_elevate.GotoScoreL2PositionCommand());
 
@@ -378,6 +382,8 @@ public class RobotContainer {
                  new POVButton(m_driverController, 0).whileTrue(m_elevate.PrepForIntakePosition());
                  new POVButton(m_driverController, 180).whileTrue(m_elevate.GoToIntakeAndIntake());
 
+                 new POVButton(m_driverController, 90).whileTrue(m_elevate.CagePosRight());
+                 new POVButton(m_driverController, 270).whileTrue(m_elevate.CagePosLeft());
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
                 }).whileTrue(m_elevate.OnlyScore());
@@ -471,11 +477,11 @@ public class RobotContainer {
 
                 new Trigger(()->{
                         return m_actionController.getRightY() < -0.8;
-              }).whileTrue(m_elevate.ClearAlgaeHigh(m_robotDrive));
+              }).whileTrue(m_elevate.ClearAlgae(m_robotDrive));
 
                   new Trigger(()->{
                         return m_actionController.getRightY() > 0.8;
-                  }).whileTrue(m_elevate.ClearAlgaeLow(m_robotDrive));
+                  }).whileTrue(m_elevate.ClearAlgae(m_robotDrive));
                  
 
                   new JoystickButton(m_actionController, XboxController.Button.kStart.value)

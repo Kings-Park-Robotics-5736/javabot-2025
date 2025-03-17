@@ -18,6 +18,7 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.TrajectoryCommandsFactory;
 import frc.robot.field.ScoringPositions.ScoreHeight;
+import frc.robot.field.ScoringPositions.ScorePositions;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.MathUtils;
 import frc.robot.utils.ScoringPositionSelector;
@@ -464,14 +465,41 @@ public class ElevateSubsystem extends SubsystemBase {
         return ((DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2()));
      }
 
+        
         public Command ClearAlgaeLow(DriveSubsystem robotDrive){
             return ((DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(() -> m_robotDrive.forceStop()))).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2()));
         }
 
 
+
+        public Command ClearAlgae(DriveSubsystem robotDrive){
+            return DriveToClearingPosition(robotDrive).andThen(Commands.runOnce(()->{if ( 
+                // Low Positions
+                m_ScoringPositionSelector.getScorePosition() == ScorePositions.TWELVE ||
+                m_ScoringPositionSelector.getScorePosition() == ScorePositions.FOUR ||
+                m_ScoringPositionSelector.getScorePosition() == ScorePositions.EIGHT
+                ){Commands.runOnce(() -> m_robotDrive.forceStop()).alongWith(ClearAlgaeLowStep1()).andThen(ClearAlgaeLowStep2());} 
+                else if (
+                //High Positions
+                m_ScoringPositionSelector.getScorePosition() == ScorePositions.TWO ||
+                m_ScoringPositionSelector.getScorePosition() == ScorePositions.SIX ||
+                m_ScoringPositionSelector.getScorePosition() == ScorePositions.TEN
+                ){Commands.runOnce(() -> m_robotDrive.forceStop()).alongWith(ClearAlgaeHighStep1()).andThen(ClearAlgaeHighStep2());}
+                ;}));
+        }
+
+
+
         public Command DriveToCage(DriveSubsystem robotDrive){
             return Commands.runOnce(()->setIsClimbing(true)).andThen(TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition)));
         }
+
     
-    
-}
+        public Command CagePosRight(){
+            return Commands.runOnce(()->{System.out.println("Cage Positon Changed"); if (m_cagePosition == 3 ) m_cagePosition = 1; else m_cagePosition += 1 ;});
+        }
+        public Command CagePosLeft(){
+            return Commands.runOnce(()->{System.out.println("Cage Positon Changed"); if (m_cagePosition == 1 ) m_cagePosition = 3; else m_cagePosition -= 1 ;});
+        }
+
+    }
