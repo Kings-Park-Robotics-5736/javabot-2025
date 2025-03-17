@@ -283,10 +283,7 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     if(visionEnabled){
-      housLimelight();
-
-
-      /* 
+      
       addLimelightVisionMeasurement(m_limelight, true);
       if (m_limelight_side != null) {
         addLimelightVisionMeasurement(m_limelight_side, false);
@@ -295,7 +292,7 @@ public class DriveSubsystem extends SubsystemBase {
         addLimelightVisionMeasurement(m_Limelight3, false);
         
       }
-        */
+        
     }
 
     SmartDashboard.putNumber("Gyro Rotation", m_gyro.getRotation2d().getDegrees());

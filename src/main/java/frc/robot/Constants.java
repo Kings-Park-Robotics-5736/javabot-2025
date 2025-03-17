@@ -211,6 +211,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kActionControllerPort = 1;
     public static final int kArduinoOutputPort = 2;
+    public static final int kButtonBoxPort = 3;
 
   }
 

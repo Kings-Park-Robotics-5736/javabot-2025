@@ -38,6 +38,7 @@ import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.Elastic;
+import frc.robot.utils.ReefButtonBox;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.GoalType;
 import frc.robot.utils.Types.LEDState;
@@ -67,6 +68,7 @@ public class RobotContainer {
         XboxController m_driverController = new XboxController(IOConstants.kDriverControllerPort);
         XboxController m_actionController = new XboxController(IOConstants.kActionControllerPort);
         XboxController m_output_controller = new XboxController(IOConstants.kArduinoOutputPort);
+        ReefButtonBox m_buttonbox_controller = new ReefButtonBox(IOConstants.kButtonBoxPort);
         public ScoringPositionSelector m_scoringPositionSelector = new ScoringPositionSelector(m_output_controller);
 
         public ClimbSubsystem m_climb = new ClimbSubsystem();
