@@ -211,3 +211,28 @@ for tag in path_data:
         json.dump(samplePath, f, indent=4)
 
 
+
+    samplePath['waypoints'][0]['anchor']['x'] = robotPositionX
+    samplePath['waypoints'][0]['anchor']['y'] = robotPositionY
+    samplePath['waypoints'][0]['nextControl']['x'] = controlX
+    samplePath['waypoints'][0]['nextControl']['y'] = controlY
+    samplePath['waypoints'][0]['linkedName'] = "CLEAR" + tag['name'] + "REVSTART"
+
+    #in samplePath, replace the second waypoint with the new waypoint robotPositionX, robotPositionY, robotRotationL4
+    samplePath['waypoints'][1]['anchor']['x'] = startX
+    samplePath['waypoints'][1]['anchor']['y'] = startY
+    samplePath['waypoints'][1]['prevControl']['x'] = controlX
+    samplePath['waypoints'][1]['prevControl']['y'] = controlY
+    samplePath['waypoints'][1]['linkedName'] = "CLEAR" + tag['name'] + "REVEND"
+
+
+    #put the rotation L4 in the goalEndState and idealStartingState
+    samplePath['goalEndState']['rotation'] = robotRotationL4
+    samplePath['idealStartingState']['rotation'] = robotRotationL4
+    
+
+    #write the json object with the format tag[name] + "L4" + names[i] + ".json"
+    with open("CLEAR" +tag['name']  + "REVGEN.path", "w") as f:
+        json.dump(samplePath, f, indent=4)
+
+

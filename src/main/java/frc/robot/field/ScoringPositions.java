@@ -39,6 +39,8 @@ public final class ScoringPositions {
     public static final Pose2d REDATTWO = new Pose2d(new Translation2d(12.64, 4.75), Rotation2d.fromDegrees(120));
     public static final Pose2d REDATFOUR = new Pose2d(new Translation2d(13.47, 4.75), Rotation2d.fromDegrees(60));
 
+
+    
     public static final Pose2d RedScoringLocations[] = {
         REDATTWELVE, REDATTWO, REDATFOUR, REDATSIX, REDATEIGHT, REDATTEN
     };
