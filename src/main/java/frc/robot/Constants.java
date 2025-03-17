@@ -101,8 +101,8 @@ public final class Constants {
     public static final boolean kMotorInverted = true;
     public static final byte kMotorID = 5;
 
-    public static final double kFullyOutPosition = 15;
-    public static final double kFullyInPosition = 0;
+    public static final int kFullyOutPosition = 150;
+    public static final int kFullyInPosition = 305;
   }
 
 

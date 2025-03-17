@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IOConstants;
 import frc.robot.commands.JoystickCommandsFactory;
@@ -476,11 +477,11 @@ public class RobotContainer {
 
                         new Trigger(()->{
                                 return m_actionController.getLeftY() > 0.2;
-                        }).whileTrue(m_climb.runClimberToSetpoint(290));    
+                        }).whileTrue(m_climb.runClimberToSetpoint(ClimbConstants.kFullyInPosition));    
                         
                          new Trigger(()->{
                                    return m_actionController.getLeftY() < -0.2;
-                         }).whileTrue(m_climb.runClimberToSetpoint(150));
+                         }).whileTrue(m_climb.runClimberToSetpoint(ClimbConstants.kFullyOutPosition));
 
 
 
