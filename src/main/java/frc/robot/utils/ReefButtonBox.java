@@ -29,24 +29,24 @@ public class ReefButtonBox extends GenericHID implements Sendable {
   public enum Button {
     /** Reef BUttons A - L */
     
-    k2(0),
-    k4(1),
-    k6(2),
-    k8(3),
-    k10(4),
-    k12(5),
-    kClear(6),
-    kRL4(7),
-    kRL3(8),
-    kRL2(9),
-    kLL4(10),
-    kLL3(11),
-    kLL2(12),
-    kClimbOut(13),
-    kClimbIn(14),
+    k2(1),
+    k4(2),
+    k6(3),
+    k8(4),
+    k10(5),
+    k12(6),
+    kClear(7),
+    kRL4(8),
+    kRL3(9),
+    kRL2(10),
+    kLL4(11),
+    kLL3(12),
+    kLL2(13),
+    kClimbOut(14),
+    kClimbIn(15),
     
 
-    kElevatorDown(15);
+    kElevatorDown(16);
   
 
 
