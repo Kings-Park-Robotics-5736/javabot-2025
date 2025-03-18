@@ -40,6 +40,7 @@ import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ElevateAssembly.ElevateSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.Elastic;
+import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.ReefButtonBox;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.GoalType;
@@ -240,11 +241,9 @@ public class RobotContainer {
 
                 m_elevate.setArmInitialPosition();
                 // No i dont like it hous i am
-                //new Trigger(()->
-                //{return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->Elastic.selectTab("ClimbCam")));
-               // i like, make it work!!
-                // new Trigger(()->
-               // {return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->m_limelight.setStreamMode_PiPSecondary("")));
+               
+                new Trigger(()->
+              {return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->LimelightHelpers.setStreamMode_PiPSecondary("limelight-elevate")));
                 
         }
 
