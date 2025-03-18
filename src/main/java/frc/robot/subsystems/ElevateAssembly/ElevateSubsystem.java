@@ -328,8 +328,9 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
     //Command to shoot out for L1-L3
+    // Try removing WaitCommand
     public Command OnlyScore(){
-        return (m_endeffector.Score(false).andThen(new WaitCommand(.25)).andThen(PrepForIntakePosition(true))).withName("OnlyScore");
+        return (m_endeffector.Score(false).andThen(new WaitCommand(.05)).andThen(PrepForIntakePosition(true))).withName("OnlyScore");
     }
 
     //command to shoot out for L4
@@ -451,7 +452,7 @@ public class ElevateSubsystem extends SubsystemBase {
                         new WaitUntilCommand(()->MathUtils.IsWithinRange(robotDrive.getPose())))
                         .andThen(GetPositionCommandFromHeight(height)))
                     .andThen(() -> robotDrive.forceStop())
-                    .andThen(new WaitCommand(.20))
+                    .andThen(new WaitCommand(.05))
                     .andThen(height == ScoreHeight.L4 ? OnlyScoreL4() : OnlyScore())))
             .finallyDo((interrupted)->{isAutoDrive = false;})
             .withName("DriveAndScoreCommand");
