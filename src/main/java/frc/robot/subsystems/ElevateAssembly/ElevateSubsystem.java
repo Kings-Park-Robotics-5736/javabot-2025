@@ -21,6 +21,7 @@ import frc.robot.field.ScoringPositions.ScorePositions;
 import frc.robot.subsystems.LEDSubsystem;
 
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.utils.Elastic;
 import frc.robot.utils.MathUtils;
 import frc.robot.utils.ScoringPositionSelector;
 import frc.robot.utils.Types.LEDState;
@@ -528,6 +529,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
         public Command DriveToCage(DriveSubsystem robotDrive){
             return Commands.runOnce(()->setIsClimbing(true)).andThen((TrajectoryCommandsFactory.goToSelectedCageCommand(robotDrive, ()->"CAGE"+String.valueOf(m_cagePosition))).alongWith(ElevateHome()));
+            // removed bec random pause: .alongWith(Commands.runOnce(()->Elastic.selectTab("ClimbCam")))
         }
 
     

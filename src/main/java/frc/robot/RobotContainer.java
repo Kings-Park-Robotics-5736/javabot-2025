@@ -229,6 +229,7 @@ public class RobotContainer {
 
                 // Set limelight LED to follow pipeline on startup
                 m_limelight.setLEDMode(LEDMode.PIPELINE);
+                
 
                 if(m_robotDrive.getPathPlannerInitSuccess()){
                         autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be `Commands.none()`
@@ -238,15 +239,13 @@ public class RobotContainer {
                 }
 
                 m_elevate.setArmInitialPosition();
-
-                new Trigger(()->
-                {return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->Elastic.selectTab("ClimbCam")));
-
+                // No i dont like it hous i am
+                //new Trigger(()->
+                //{return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->Elastic.selectTab("ClimbCam")));
+               // i like, make it work!!
+                // new Trigger(()->
+               // {return DriverStation.getMatchTime()  < 25 && !m_isAuto;}).onTrue(Commands.runOnce(()->m_limelight.setStreamMode_PiPSecondary("")));
                 
-
-
-                
-        
         }
 
         public void resetArmElevator(){
@@ -537,10 +536,10 @@ public class RobotContainer {
 
 
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbIn.value).whileTrue(
-                        m_climb.runClimberToSetpoint(315));
+                        m_climb.runClimberToSetpoint(ClimbConstants.kFullyInPosition));
 
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbOut.value).whileTrue(
-                        m_climb.runClimberToSetpoint(150));
+                        m_climb.runClimberToSetpoint(ClimbConstants.kFullyOutPosition));
 
                   new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kElevatorDown.value).whileTrue(
                         m_elevate.ElevateHome());
