@@ -1,0 +1,168 @@
+#include <ezButton.h>
+#include <Joystick.h>
+#include <pcf8574.h>
+Joystick_ Joystick;
+PCF8574 ex1(0x20);
+// the learno is stupid and i hate it
+
+/* 
+
+
+#define PIN_A0   (18)
+#define PIN_A1   (19)
+#define PIN_A2   (20)
+#define PIN_A3   (21)
+#define PIN_A4   (22)
+#define PIN_A5   (23)
+#define PIN_A6   (24)
+#define PIN_A7   (25)
+#define PIN_A8   (26)
+#define PIN_A9   (27)
+#define PIN_A10  (28)
+#define PIN_A11  (29)
+
+leds for reef2-12
+are in pch1 slots 0-5
+
+
+
+
+nano  a4=sda a5=scl
+leonardo dio 2=sda dio 3 scl
+
+nano led wireing 
+
+a0=g2
+d3-d12
+g 2--> g 12
+b2 ---'> b12
+dio pins 2 and 3 were orginally for reef 6 and reef 8 but they need to be used for i2c so they will be moved to a4 and a5
+
+
+
+
+
+
+because im only using chars reef leds are as follows
+g2 =1
+g4 =2
+g6 =3
+g8 =4
+g10 =5
+g12 = 6
+
+b2 = 7
+b4 = 8
+b6 = 9
+b8 = 10
+b10 = 11
+b12 = 12
+*/
+
+
+
+
+
+
+const int BUTTON_NUM = 16;
+
+const int BUTTON_1_PIN_r2 = 0;
+const int BUTTON_2_PIN_r4 = 1;
+const int BUTTON_3_PIN_r6 = 22;
+const int BUTTON_4_PIN_r8 = 23;
+const int BUTTON_5_PIN_r10 = 4;
+const int BUTTON_6_PIN_r12 = 5;
+const int BUTTON_7_PIN_algae = 6;
+
+const int BUTTON_8_PIN_l4r = 7;
+const int BUTTON_9_PIN_l3r = 8;
+const int BUTTON_10_PIN_l2r = 9;
+
+const int BUTTON_11_PIN_l4l = 10;
+const int BUTTON_12_PIN_l3l = 11;
+const int BUTTON_13_PIN_l2l = 12;
+
+const int BUTTON_14_PIN_cup = 13;
+const int BUTTON_15_PIN_cd = 18;
+int LastReefPos = 2;
+const int BUTTON_16_PIN_evd = 19;
+
+const int a3ledtest = 21;
+
+ezButton buttonArray[] = {
+ezButton(BUTTON_1_PIN_r2),
+ezButton(BUTTON_2_PIN_r4),
+ezButton(BUTTON_3_PIN_r6),
+ezButton(BUTTON_4_PIN_r8),
+ezButton(BUTTON_5_PIN_r10),
+ezButton(BUTTON_6_PIN_r12),
+ezButton(BUTTON_7_PIN_algae),
+
+ezButton(BUTTON_8_PIN_l4r),
+ezButton(BUTTON_9_PIN_l3r),
+ezButton(BUTTON_10_PIN_l2r),
+
+ezButton(BUTTON_11_PIN_l4l),
+ezButton(BUTTON_12_PIN_l3l),
+ezButton(BUTTON_13_PIN_l2l),
+
+ezButton(BUTTON_14_PIN_cup),
+ezButton(BUTTON_15_PIN_cd),
+
+ezButton(BUTTON_16_PIN_evd),
+
+
+};
+
+void setup() {
+
+
+
+
+
+  Serial.begin(9600);
+  Wire.begin();
+  Joystick.begin();
+  
+
+  for(byte i = 0; i < BUTTON_NUM; i++){
+    buttonArray[i].setDebounceTime(50); // set debounce time to 50 milliseconds
+  }
+}
+
+void loop() {
+
+
+
+
+
+
+
+  for(byte i = 0; i < BUTTON_NUM; i++)
+    buttonArray[i].loop(); // MUST call the loop() function first
+
+  for(byte i = 0; i < BUTTON_NUM; i++) {
+    if(buttonArray[i].isPressed()) {
+      Serial.print("The button ");
+      Serial.print(i + 1);
+      Serial.println(i);
+      Joystick.setButton(i, 0);
+      Serial.println(" is pressed");
+      if (i==0 || i== 1 ||i==2|| i == 3 ||  i==4 || i==5 || i==6){
+          Wire.beginTransmission(8); // transmit to device #8
+          Wire.write(i);        // sends the given value
+          Wire.endTransmission();
+
+
+          Serial.println("Sent to nano");
+      }
+    }
+
+    if(buttonArray[i].isReleased()) {
+      Serial.print("The button ");
+      Serial.print(i + 1);
+      Joystick.setButton(i, 1);
+      Serial.println(" is released");
+    }
+  }
+}
