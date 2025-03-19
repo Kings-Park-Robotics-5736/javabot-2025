@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.934103260869565,
-        "y": 6.679755434782607
+        "x": 2.500020292207792,
+        "y": 6.168892045454545
       },
       "isLocked": false,
       "linkedName": "INTAKE_LEFT_END"
@@ -20,8 +20,8 @@
         "y": 5.110758475924277
       },
       "prevControl": {
-        "x": 3.4321961134403414,
-        "y": 5.651838
+        "x": 1.851866883116883,
+        "y": 5.506493506493506
       },
       "nextControl": null,
       "isLocked": false,

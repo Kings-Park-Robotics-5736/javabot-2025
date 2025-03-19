@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.145244565217391,
-        "y": 6.128668478263519
+        "x": 3.8036146002130344,
+        "y": 6.896616507523428
       },
       "isLocked": false,
       "linkedName": "SCOREJIL4LeftEND"
@@ -20,20 +20,15 @@
         "y": 7.018175705961451
       },
       "prevControl": {
-        "x": 1.4625,
-        "y": 6.716847826089606
+        "x": 2.0862021962994106,
+        "y": 6.751401607561649
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "INTAKE_LEFT_END"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 36.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
