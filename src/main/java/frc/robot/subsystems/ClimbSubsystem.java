@@ -42,7 +42,7 @@ public class ClimbSubsystem extends SubsystemBase{
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Climb Pos", getPosition());
+        //SmartDashboard.putNumber("Climb Pos", getPosition());
     }
 
 public Command runClimberToInPosition(){

@@ -121,7 +121,7 @@ public double getArmEncoder(){
   }
 
   public Command ReGripL2L3(){
-    return ((new FunctionalCommand(
+    return (((new FunctionalCommand(
         ()->{},
          ()->setSpeed(.4),
          (interrupted) -> m_motor.set(0),
@@ -132,9 +132,9 @@ public double getArmEncoder(){
                      (interrupted) -> m_motor.set(0),
                         () -> !ReverseLimitReached(), this)
                         .andThen(new InstantCommand(()->setSpeed(.2)))
-                        .andThen(new WaitCommand(.1))
-                        .andThen(new InstantCommand(()->m_motor.set(0)))
-            )).raceWith(new WaitCommand(.75))).withName("ReGripL2L3");
+                        .andThen(new WaitCommand(.25)).finallyDo(()->m_motor.set(0))
+                        .andThen(new InstantCommand(()->m_motor.set(0))
+            ))).finallyDo(()->m_motor.set(0)).raceWith(new WaitCommand(.75))).withName("ReGripL2L3"));
   }
 
   //positive speed brings up, revese limit switch is the top limit

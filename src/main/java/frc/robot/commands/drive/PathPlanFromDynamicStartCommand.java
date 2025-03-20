@@ -34,7 +34,8 @@ public class PathPlanFromDynamicStartCommand extends Command {
     private Pose2d m_endPose;
     private ArrayList<PathPoint> m_mid_poses;
     private int m_pathPlannerDoneCounter;
-    PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+    PathConstraints constraints = new PathConstraints(4.0, 4.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+
     // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use unlimited constraints, only limited by motor torque and nominal battery voltage
     /**
      * @param initialPoseSupplier method to obtain the current robot pose to
@@ -96,6 +97,21 @@ public class PathPlanFromDynamicStartCommand extends Command {
         // movement
     }
 
+    public PathPlanFromDynamicStartCommand(Supplier<Pose2d> initialPoseSupplier, DriveSubsystem robotDrive,
+        Pose2d endPose, ArrayList<PathPoint> midPoses,  boolean continueTillAtPos, PathConstraints constraints) {
+    m_initialPoseSupplier = initialPoseSupplier;
+    m_robotDrive = robotDrive;
+    m_endPose = endPose;
+    m_continueTillAtPos = continueTillAtPos;
+    m_mid_poses = midPoses;
+    this.constraints = constraints;
+    addRequirements(robotDrive); // this effectively locks out the joystick controlls.
+    // without this, the 0,0 from the joystick still happens, causing jittery
+    // movement
+    }
+
+    
+
     /**
      * @brief allows you to set the end pose after the command has been created
      * @note Must be set before initialize() is called (command is started) for it to take effect
@@ -124,7 +140,7 @@ public class PathPlanFromDynamicStartCommand extends Command {
 
         if(distance > 0.04){
             // delay trajectory creation until this initialize.
-            m_pathFollowCommand = TrajectoryCommandsFactory.generatePPPathToPose(waypoints, m_endPose.getRotation());
+            m_pathFollowCommand = TrajectoryCommandsFactory.generatePPPathToPose(waypoints, m_endPose.getRotation(),constraints);
             try{
                 m_pathFollowCommand.initialize();
             }catch(Exception e){

@@ -257,7 +257,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
     // Bring the arm and the elevator up to the scoring position for l1-l3
     private Command GoToScorePosition(double elevatorPosition, double armFinalPosition){
-        return (GoOutOfTheWay().andThen(RunElevatorToPositionCommand(elevatorPosition).alongWith(m_arm.RunArmToPositionCommand(armFinalPosition).alongWith(ReGripL2L3())))).withName("GoToScorePosition");
+        return ((GoOutOfTheWay().alongWith(ReGripL2L3())).andThen(RunElevatorToPositionCommand(elevatorPosition).alongWith(m_arm.RunArmToPositionCommand(armFinalPosition)))).handleInterrupt(()->m_endeffector.setSpeed(0)).withName("GoToScorePosition");
     }
 
     //bring the arm and the elevator up the scoring position and score for l1-l3
