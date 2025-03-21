@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.drive.DriveToCoordinate;
 import frc.robot.commands.drive.PathPlanFromDynamicStartCommand;
 import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScoreHeight;
@@ -102,7 +103,8 @@ public class TrajectoryCommandsFactory {
             path.getGoalEndState().rotation());
 
             return (Commands.runOnce(()->System.out.println("Running PP Path Find W/ Align to path " + pathName)) 
-                    .andThen(AutoBuilder.pathfindThenFollowPath(path, constraints))
+                    .andThen(
+                        AutoBuilder.pathfindThenFollowPath(path, constraints))
                     .andThen(new PathPlanFromDynamicStartCommand(
                         () -> robotDrive.getPose(),
                         robotDrive,
@@ -129,14 +131,9 @@ public class TrajectoryCommandsFactory {
             path.getGoalEndState().rotation());
 
             return (Commands.runOnce(()->System.out.println("Running PP Path FLY Find W/ Align to path " + pathName)) 
-                    .andThen(new PathPlanFromDynamicStartCommand(
-                        () -> robotDrive.getPose(),
-                        robotDrive,
-                        endPose,
-                        new ArrayList<PathPoint>(),
-                        true,
-                        new PathConstraints(6.0, 6.0, 2 * Math.PI, 4 * Math.PI)
-                    ))
+                .andThen(new DriveToCoordinate(robotDrive, endPose.getX(), endPose.getY(), endPose.getRotation()))        
+            
+           
                     .andThen(Commands.runOnce(()->System.out.println("Done Running PP Path FLY Find W/ Align to path " + pathName)))).withName("PP On the fly" + pathName);
         }
         return Commands.run(() -> {

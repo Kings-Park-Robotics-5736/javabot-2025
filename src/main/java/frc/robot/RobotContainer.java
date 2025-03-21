@@ -230,8 +230,8 @@ public class RobotContainer {
 
                 // Set limelight LED to follow pipeline on startup
                 m_limelight.setLEDMode(LEDMode.PIPELINE);
-                
-                LimelightHelpers.setStreamMode_PiPSecondary("limelight-chute");
+
+               // LimelightHelpers.setStreamMode_PiPSecondary("limelight-chute");
                 
 
                 if(m_robotDrive.getPathPlannerInitSuccess()){

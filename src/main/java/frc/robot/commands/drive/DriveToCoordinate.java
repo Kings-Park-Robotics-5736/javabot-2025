@@ -1,7 +1,16 @@
 package frc.robot.commands.drive;
 
+import java.util.List;
+
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.util.FlippingUtil;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.CustomDriveDistanceCommandConstants;
@@ -14,15 +23,16 @@ import frc.robot.subsystems.drive.DriveSubsystem;
  */
 public class DriveToCoordinate extends Command {
 
-    private final double m_x;
-    private final double m_y;
+    private double m_x;
+    private double m_y;
+    private Rotation2d m_rot;
     private final DriveSubsystem m_robotDrive;
     private int stallCounter = 0;
 
     // Control the motion profile for the auto-commands for driving. This is kind-of
     // like a path following
     private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
-            DriveConstants.kMaxSpeedMetersPerSecond, DriveConstants.kMaxAccelerationMetersPerSecondSquared);
+            DriveConstants.kMaxSpeedMetersPerSecond/2, DriveConstants.kMaxAccelerationMetersPerSecondSquared/2);
     private final ProfiledPIDController m_controller_x = new ProfiledPIDController(
             CustomDriveDistanceCommandConstants.kPidValues.p, CustomDriveDistanceCommandConstants.kPidValues.i,
             CustomDriveDistanceCommandConstants.kPidValues.d, m_constraints,
@@ -31,22 +41,37 @@ public class DriveToCoordinate extends Command {
             CustomDriveDistanceCommandConstants.kPidValues.p, CustomDriveDistanceCommandConstants.kPidValues.i,
             CustomDriveDistanceCommandConstants.kPidValues.d, m_constraints,
             Constants.kDt);
+     private Pose2d m_endPose;
 
-    public DriveToCoordinate(DriveSubsystem robotDrive, double x, double y) {
+    public DriveToCoordinate(DriveSubsystem robotDrive, double x, double y, Rotation2d rot) {
         m_x = x;
         m_y = y;
+        m_rot = rot;
+        
         m_robotDrive = robotDrive;
         addRequirements(robotDrive); // this effectively locks out the joystick
 
     }
 
+    public void SetEndPose(Pose2d endPose){
+        m_endPose = endPose;
+        m_x = m_endPose.getX();
+        m_y = m_endPose.getY();
+        m_rot = m_endPose.getRotation();
+    }
+
     @Override
     public void initialize() {
-        if(m_x == 0 || m_y == 0){
-            InitMotionProfile(m_robotDrive.getPose().getX()+.04, m_robotDrive.getPose().getY()+.04);
-        }else{
-            InitMotionProfile(m_x, m_y);
+
+        m_endPose = new Pose2d(m_x,m_y, m_rot);
+         var alliance = DriverStation.getAlliance();
+        //guard against double flipping - if pos < 8.5, we are on blue, otherwise already on red
+        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red && m_endPose.getX() < 8.5) {
+            m_endPose = FlippingUtil.flipFieldPose(m_endPose);
         }
+        
+        InitMotionProfile(m_endPose.getX(), m_endPose.getY());
+        
         stallCounter = 0;
     }
 
