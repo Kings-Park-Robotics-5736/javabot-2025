@@ -1,0 +1,96 @@
+// requrires wire lib :)
+#include <Wire.h>
+
+
+
+
+
+
+
+const int b2 = 7;
+const int b4 = 8;
+const int b6 = 9;
+const int b8 = 10;
+const int b10 = 11;
+const int b12 = 12;
+
+
+
+
+
+void allOff(){
+
+digitalWrite(b2, LOW);
+digitalWrite(b4, LOW);
+digitalWrite(b6, LOW);
+digitalWrite(b8, LOW);
+digitalWrite(b10, LOW);
+digitalWrite(b12, LOW);
+
+}
+
+#define BUFFER_SIZE 32  // Maximum I2C buffer size
+char message[BUFFER_SIZE];  
+byte index = 0;
+
+void receiveEvent(int bytes) {
+    index = 0;
+    while (Wire.available() && index < BUFFER_SIZE - 1) {
+        message[index++] = Wire.read();  // Store characters
+    }
+    message[index] = '\0';  // Null-terminate the string
+    
+    Serial.println(message[0] + 48); // Print the received message
+    if(message[0]==0){
+      allOff();
+      digitalWrite(b2, HIGH);
+      
+      }
+      else if(message[0]==1){
+        allOff();
+      digitalWrite(b4, HIGH);
+      
+      }
+            else if(message[0]==2){
+              allOff();
+      digitalWrite(b6, HIGH);
+      
+      }
+            else if(message[0]==3){
+              allOff();
+      digitalWrite(b8, HIGH);
+      
+      }
+            else if(message[0]==4){
+              allOff();
+      digitalWrite(b10, HIGH);
+      
+      }
+                  else if(message[0]==5){
+                    allOff();
+      digitalWrite(b12, HIGH);
+      
+      }
+}
+
+void setup() {
+  pinMode(b2, OUTPUT);
+  pinMode(b4, OUTPUT);
+  pinMode(b6, OUTPUT);
+  pinMode(b8, OUTPUT);
+  pinMode(b10, OUTPUT);
+  pinMode(b12, OUTPUT);
+
+    Wire.begin(8);  // Set Nano as I2C slave at address 8
+    Wire.onReceive(receiveEvent);
+    Serial.begin(9600);
+}
+
+void loop() {
+
+
+
+
+
+    // Nothing here, everything happens in the interrupt
+}
