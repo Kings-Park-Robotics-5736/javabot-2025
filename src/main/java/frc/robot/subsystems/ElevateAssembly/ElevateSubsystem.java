@@ -251,12 +251,12 @@ public class ElevateSubsystem extends SubsystemBase {
     }
 
     public Command WaitForCoralOrChuteWithTimeoutRight(){
-        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(.5)).andThen(CrawlToIntakeRight().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutRight");
+        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(1)).andThen(CrawlToIntakeRight().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutRight");
     }
 
 
     public Command WaitForCoralOrChuteWithTimeoutLeft(){
-        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(.5)).andThen(CrawlToIntakeLeft().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutLeft");
+        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(.1)).andThen(CrawlToIntakeLeft().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutLeft");
     }
 
     public Command PrepForIntakePosition(){
