@@ -175,6 +175,7 @@ public final class Constants {
     public static final double intakeAngle = Math.toRadians(217);
     public static final double vertical = Math.toRadians(90);
     public static final double AllHoldingAngle = Math.toRadians(110);
+    public static final double L23HoldingAngle = Math.toRadians(157);
 
     public static final double ClearAlgaeAngle = Math.toRadians(15);
 

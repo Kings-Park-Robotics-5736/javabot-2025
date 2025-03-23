@@ -169,16 +169,12 @@ public class RobotContainer {
                 NamedCommands.registerCommand("ElevateToScorePrep", m_elevate.PrepScore());
                 NamedCommands.registerCommand("ElevateToIntake", m_elevate.PrepForIntakePosition());
                 NamedCommands.registerCommand("ElevateToIntakeAndIntake", m_elevate.GoToIntakeAndIntake());
-                NamedCommands.registerCommand("ShootOutL1L3", m_elevate.OnlyScore());
+                NamedCommands.registerCommand("ShootOutL1L3", m_elevate.OnlyScoreL23());
                 NamedCommands.registerCommand("ShootOutL4", m_elevate.OnlyScoreL4());
                 NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", (m_elevate.OnlyScoreL4NoIntakeReturn()));
                 NamedCommands.registerCommand("WaitForCoral", m_elevate.WaitForCoral());
                 NamedCommands.registerCommand("WaitForCoralOrChute",m_elevate.WaitForCoralOrChute());
                 NamedCommands.registerCommand("MoveToL4WhileDrive", m_elevate.AutoIntakeAndL4PositionWhileDriving());
-                NamedCommands.registerCommand("IntakeWhileDrive", m_elevate.AutoIntakePositionWhileDriving());
-
-                NamedCommands.registerCommand("ScoreL4EarlyEndNoReturn", m_elevate.ScoreL4CommandEarlyEndNoReturn());
-
                 NamedCommands.registerCommand("Ignore12Oclock", Commands.runOnce(()->m_robotDrive.setIgnore12Oclock(true)));
                 NamedCommands.registerCommand("IgnoreMiddleScoring",  Commands.runOnce(()->m_robotDrive.setIgnoreAutoExtras(true)));
           }
@@ -486,7 +482,7 @@ public class RobotContainer {
                  new POVButton(m_driverController, 270).whileTrue(m_elevate.CagePosLeft());
                  new Trigger(() -> {
                         return m_driverController.getRightTriggerAxis() > 0;
-                }).whileTrue(m_elevate.OnlyScore());
+                }).whileTrue(m_elevate.OnlyScoreL23());
 
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));

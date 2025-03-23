@@ -137,6 +137,14 @@ public double getArmEncoder(){
             ))).finallyDo(()->m_motor.set(0)).raceWith(new WaitCommand(.75))).withName("ReGripL2L3"));
   }
 
+  public Command PullTillReverseSeen(){
+    return ((new FunctionalCommand(
+            ()->{},
+            ()->setSpeed(.4),
+            (interrupted) -> m_motor.set(0),
+            () -> ReverseLimitReached(), this))).finallyDo(()->m_motor.set(0)).raceWith(new WaitCommand(.75)).withName("ReGripL2L3Lite");
+  }
+
   //positive speed brings up, revese limit switch is the top limit
 
   public Command Intake(){
