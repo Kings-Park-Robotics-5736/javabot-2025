@@ -1,8 +1,10 @@
 package frc.robot.subsystems.ElevateAssembly;
 
+import java.text.FieldPosition;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,8 +16,11 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.TrajectoryCommandsFactory;
+import frc.robot.commands.drive.DriveToCoordinate;
+import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScoreHeight;
 import frc.robot.field.ScoringPositions.ScorePositions;
 import frc.robot.subsystems.LEDSubsystem;
@@ -235,6 +240,25 @@ public class ElevateSubsystem extends SubsystemBase {
         return new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withName("WaitForCoralOrChute");
     }
 
+    public Command CrawlToIntakeLeft(){
+        return new DriveToCoordinate(m_robotDrive, ScoringPositions.INTAKE_LEFT_BLUE, new TrapezoidProfile.Constraints(
+           1, 2));
+    }
+
+    public Command CrawlToIntakeRight(){
+        return new DriveToCoordinate(m_robotDrive, ScoringPositions.INTAKE_RIGHT_BLUE, new TrapezoidProfile.Constraints(
+            1, 2));
+    }
+
+    public Command WaitForCoralOrChuteWithTimeoutRight(){
+        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(.5)).andThen(CrawlToIntakeRight().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutRight");
+    }
+
+
+    public Command WaitForCoralOrChuteWithTimeoutLeft(){
+        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(.5)).andThen(CrawlToIntakeLeft().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutLeft");
+    }
+
     public Command PrepForIntakePosition(){
         return PrepForIntakePosition(false);
     }
@@ -383,13 +407,16 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
 
-     public Command AutoIntakeAndL4PositionWhileDriving(){
+     public Command AutoIntakeAndL4PositionWhileDriving(Boolean moveArmToPre){
         return 
-        new WaitUntilCommand(()->coralOnCone()).andThen(
-         m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle))
+        (new WaitUntilCommand(()->coralOnCone()).withTimeout(3.5)).andThen(
+         (m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle))
         .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake()))
-        .andThen(GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true)).andThen(m_endeffector.Score(true));
+        .andThen(moveArmToPre ? GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true) : GoToL4PositionNoPre(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true)).andThen(m_endeffector.Score(true))).unless(()->!coralOnCone());
      } 
+
+
+     
 
 
      public Command DriveAndScoreCommand(Command initialCommand, DriveSubsystem robotDrive, Boolean left, ScoreHeight height){

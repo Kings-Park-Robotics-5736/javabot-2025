@@ -82,7 +82,7 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoralOrChute"
+            "name": "WaitForCoralOrChuteTimeoutRight"
           }
         },
         {
@@ -145,7 +145,7 @@
         {
           "type": "named",
           "data": {
-            "name": "WaitForCoralOrChute"
+            "name": "WaitForCoralOrChuteTimeoutRight"
           }
         },
         {
