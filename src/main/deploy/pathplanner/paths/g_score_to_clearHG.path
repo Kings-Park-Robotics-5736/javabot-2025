@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.801411922904527,
-        "y": 1.3700806813088298
+        "x": 5.784596,
+        "y": 4.09448
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5366847826086956,
-        "y": 1.1688858695652176
+        "x": 5.784596,
+        "y": 4.34448
       },
       "isLocked": false,
-      "linkedName": "INTAKE_RIGHT_START"
+      "linkedName": "SCOREHGL4LeftEND"
     },
     {
       "anchor": {
-        "x": 1.2346467391304348,
-        "y": 1.00991847826087
+        "x": 5.784596,
+        "y": 4.3053
       },
       "prevControl": {
-        "x": 1.520788043478261,
-        "y": 1.1476902173913037
+        "x": 5.784596,
+        "y": 4.0553
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "INTAKE_RIGHT_END"
+      "linkedName": "CLEARHGEND"
     }
   ],
   "rotationTargets": [],
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": 144.0
+    "velocity": 0,
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Intakes",
+  "folder": "AutoPaths",
   "idealStartingState": {
-    "velocity": 0.75,
-    "rotation": 144.0
+    "velocity": 0,
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

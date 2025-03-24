@@ -402,7 +402,7 @@ public class ArmSubsystemFalcon extends SubsystemBase {
     }
 
     public Boolean armInSafeSpot(){
-                return getArmAngleRadians() < Math.toRadians(120);
+                return getArmAngleRadians() < Math.toRadians(170);
  
     }
 

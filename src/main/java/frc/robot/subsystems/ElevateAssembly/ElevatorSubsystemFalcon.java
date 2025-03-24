@@ -164,7 +164,7 @@ public class ElevatorSubsystemFalcon extends SubsystemBase {
     }
 
     public Boolean elevatorInSafeSpot(){
-        return getElevatorPosition() > ElevatorConstants.kOutofthewayPosition;
+        return getElevatorPosition() > (ElevatorConstants.kOutofthewayPosition - .5);
     }
 
 
