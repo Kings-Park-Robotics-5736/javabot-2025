@@ -507,6 +507,8 @@ public class ElevateSubsystem extends SubsystemBase {
         return new ConditionalCommand(ClearAlgaeHigh(robotDrive), ClearAlgaeLow(robotDrive), ()->isClearHigh());
     }
 
+
+
     /************************
      * Cage Drive commands
      */
