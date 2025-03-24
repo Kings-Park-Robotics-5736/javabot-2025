@@ -181,6 +181,9 @@ public class RobotContainer {
                 NamedCommands.registerCommand("MoveToL4WhileDriveNoPre", m_elevate.AutoIntakeAndL4PositionWhileDriving(false));
                 NamedCommands.registerCommand("Ignore12Oclock", Commands.runOnce(()->m_robotDrive.setIgnore12Oclock(true)));
                 NamedCommands.registerCommand("IgnoreMiddleScoring",  Commands.runOnce(()->m_robotDrive.setIgnoreAutoExtras(true)));
+
+                NamedCommands.registerCommand("ClearAlgaeLow", m_elevate.ClearAlgaeLowStep2());
+                NamedCommands.registerCommand("ClearAlgaeHigh", m_elevate.ClearAlgaeHighStep2());
           }
 
         /**
