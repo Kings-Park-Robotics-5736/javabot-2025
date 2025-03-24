@@ -174,7 +174,11 @@ public class RobotContainer {
                 NamedCommands.registerCommand("ShootOutL4NoIntakeReturn", (m_elevate.OnlyScoreL4NoIntakeReturn()));
                 NamedCommands.registerCommand("WaitForCoral", m_elevate.WaitForCoral());
                 NamedCommands.registerCommand("WaitForCoralOrChute",m_elevate.WaitForCoralOrChute());
-                NamedCommands.registerCommand("MoveToL4WhileDrive", m_elevate.AutoIntakeAndL4PositionWhileDriving());
+                NamedCommands.registerCommand("WaitForCoralOrChuteTimeoutLeft",m_elevate.WaitForCoralOrChuteWithTimeoutLeft());
+                NamedCommands.registerCommand("WaitForCoralOrChuteTimeoutRight",m_elevate.WaitForCoralOrChuteWithTimeoutRight());
+
+                NamedCommands.registerCommand("MoveToL4WhileDrive", m_elevate.AutoIntakeAndL4PositionWhileDriving(true));
+                NamedCommands.registerCommand("MoveToL4WhileDriveNoPre", m_elevate.AutoIntakeAndL4PositionWhileDriving(false));
                 NamedCommands.registerCommand("Ignore12Oclock", Commands.runOnce(()->m_robotDrive.setIgnore12Oclock(true)));
                 NamedCommands.registerCommand("IgnoreMiddleScoring",  Commands.runOnce(()->m_robotDrive.setIgnoreAutoExtras(true)));
           }

@@ -31,7 +31,7 @@ public class DriveToCoordinate extends Command {
 
     // Control the motion profile for the auto-commands for driving. This is kind-of
     // like a path following
-    private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
+    private  TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
             DriveConstants.kMaxSpeedMetersPerSecond/2, DriveConstants.kMaxAccelerationMetersPerSecondSquared/2);
     private final ProfiledPIDController m_controller_x = new ProfiledPIDController(
             CustomDriveDistanceCommandConstants.kPidValues.p, CustomDriveDistanceCommandConstants.kPidValues.i,
@@ -53,11 +53,26 @@ public class DriveToCoordinate extends Command {
 
     }
 
-    public void SetEndPose(Pose2d endPose){
-        m_endPose = endPose;
-        m_x = m_endPose.getX();
-        m_y = m_endPose.getY();
-        m_rot = m_endPose.getRotation();
+    public DriveToCoordinate(DriveSubsystem robotDrive, double x, double y, Rotation2d rot,  TrapezoidProfile.Constraints constraints) {
+        m_x = x;
+        m_y = y;
+        m_rot = rot;
+        m_constraints = constraints;
+        
+        m_robotDrive = robotDrive;
+        addRequirements(robotDrive); // this effectively locks out the joystick
+
+    }
+
+    public DriveToCoordinate(DriveSubsystem robotDrive, Pose2d pose, TrapezoidProfile.Constraints constraints) {
+        m_x = pose.getX();
+        m_y = pose.getY();
+        m_rot = pose.getRotation();
+        m_constraints = constraints;
+        
+        m_robotDrive = robotDrive;
+        addRequirements(robotDrive); // this effectively locks out the joystick
+
     }
 
     @Override
