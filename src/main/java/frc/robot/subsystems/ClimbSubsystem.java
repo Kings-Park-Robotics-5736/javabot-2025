@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -15,9 +16,10 @@ import frc.robot.utils.SparkMaxUtils;
 public class ClimbSubsystem extends SubsystemBase{
     private SparkMax m_motor;
     private SparkMaxConfig m_motorConfig;
-    
+    private DutyCycleEncoder m_climbEncoder = new DutyCycleEncoder(3);
     
     public ClimbSubsystem(){
+        
         m_motor = new SparkMax(ClimbConstants.kMotorID, MotorType.kBrushless);
         m_motorConfig = new SparkMaxConfig();
         m_motorConfig.idleMode(IdleMode.kBrake);
@@ -43,6 +45,7 @@ public class ClimbSubsystem extends SubsystemBase{
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Climb Pos", getPosition());
+        SmartDashboard.putNumber("ClimbEncoder", m_climbEncoder.get());
     }
 
 public Command runClimberToInPosition(){
