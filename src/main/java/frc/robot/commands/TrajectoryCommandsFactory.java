@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.drive.DriveToCoordinate;
 import frc.robot.commands.drive.PathPlanFromDynamicStartCommand;
 import frc.robot.field.ScoringPositions;
 import frc.robot.field.ScoringPositions.ScoreHeight;
@@ -102,7 +103,8 @@ public class TrajectoryCommandsFactory {
             path.getGoalEndState().rotation());
 
             return (Commands.runOnce(()->System.out.println("Running PP Path Find W/ Align to path " + pathName)) 
-                    .andThen(AutoBuilder.pathfindThenFollowPath(path, constraints))
+                    .andThen(
+                        AutoBuilder.pathfindThenFollowPath(path, constraints))
                     .andThen(new PathPlanFromDynamicStartCommand(
                         () -> robotDrive.getPose(),
                         robotDrive,
@@ -128,15 +130,11 @@ public class TrajectoryCommandsFactory {
             path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().getY(),
             path.getGoalEndState().rotation());
 
-            return (Commands.runOnce(()->System.out.println("Running PP Path Find W/ Align to path " + pathName)) 
-                    .andThen(new PathPlanFromDynamicStartCommand(
-                        () -> robotDrive.getPose(),
-                        robotDrive,
-                        endPose,
-                        new ArrayList<PathPoint>(),
-                        true
-                    ))
-                    .andThen(Commands.runOnce(()->System.out.println("Done Running PP Path Find W/ Align to path " + pathName)))).withName("PP On the fly" + pathName);
+            return (Commands.runOnce(()->System.out.println("Running PP Path FLY Find W/ Align to path " + pathName)) 
+                .andThen(new DriveToCoordinate(robotDrive, endPose.getX(), endPose.getY(), endPose.getRotation()))        
+            
+           
+                    .andThen(Commands.runOnce(()->System.out.println("Done Running PP Path FLY Find W/ Align to path " + pathName)))).withName("PP On the fly" + pathName);
         }
         return Commands.run(() -> {
             System.out.println("Error loading path");
@@ -149,6 +147,14 @@ public class TrajectoryCommandsFactory {
     public static Command generatePPPathToPose( List<Waypoint> waypoints, Rotation2d endRotation ) {
 
         PathConstraints constraints = new PathConstraints(4.0, 4.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+      
+        // Create the path using the waypoints created above
+       
+        return generatePPPathToPose(waypoints, endRotation, constraints);
+    }
+
+    public static Command generatePPPathToPose( List<Waypoint> waypoints, Rotation2d endRotation, PathConstraints constraints ) {
+
       
         // Create the path using the waypoints created above
         PathPlannerPath path = new PathPlannerPath(

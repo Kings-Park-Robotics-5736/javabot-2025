@@ -101,8 +101,8 @@ public final class Constants {
     public static final boolean kMotorInverted = true;
     public static final byte kMotorID = 5;
 
-    public static final int kFullyOutPosition = 176;
-    public static final int kFullyInPosition = 315;
+    public static final double kFullyOutPosition = 0.770;
+    public static final double kFullyInPosition = 0.574;
   }
 
 
@@ -175,7 +175,9 @@ public final class Constants {
     public static final double intakeAngle = Math.toRadians(217);
     public static final double vertical = Math.toRadians(90);
     public static final double AllHoldingAngle = Math.toRadians(110);
+    public static final double L23HoldingAngle = Math.toRadians(157);
 
+    public static final double ClimbAngle = Math.toRadians(60);
     public static final double ClearAlgaeAngle = Math.toRadians(15);
 
 

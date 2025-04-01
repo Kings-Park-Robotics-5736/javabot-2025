@@ -42,19 +42,17 @@ public class ClimbSubsystem extends SubsystemBase{
         return m_motor.getEncoder().getPosition();
     }
 
+    public double getEncoderPosition(){
+        return m_climbEncoder.get();
+    }
+
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Climb Pos", getPosition());
         SmartDashboard.putNumber("ClimbEncoder", m_climbEncoder.get());
     }
 
-public Command runClimberToInPosition(){
-    return new FunctionalCommand(()->setSpeed(-1), ()->{}, (interrupted) -> m_motor.set(0), ()-> getPosition() <= ClimbConstants.kFullyInPosition, this);
-}    
 
-public Command runClimberToOutPosition(){
-    return new FunctionalCommand(()->setSpeed(1), ()->{}, (interrupted) -> m_motor.set(0), ()-> getPosition() >= ClimbConstants.kFullyOutPosition, this);
-}
 
 public Command runClimberForward(){
     return new FunctionalCommand(
@@ -72,12 +70,24 @@ public Command runClimberReverse(){
 }
 
 
-public Command runClimberToSetpoint(int setpoint){
+public Command runClimberToSetpointIn(double setpoint){
     return new FunctionalCommand(
         ()->{},
-         ()->{if (getPosition() < setpoint){
-             setSpeed(.8);
-         } else if (getPosition() > setpoint){
+         ()->{if (getEncoderPosition() > setpoint){
+             setSpeed(.75);
+         } else if (getEncoderPosition() < setpoint){
+             setSpeed(0);
+         }},
+         (interrupted) -> m_motor.set(0),
+         () -> false, this);
+}
+
+public Command runClimberToSetpointOut(double setpoint){
+    return new FunctionalCommand(
+        ()->{},
+         ()->{if (getEncoderPosition() < setpoint){
+             setSpeed(.9);
+         } else if (getEncoderPosition() > setpoint){
              setSpeed(0);
          }},
          (interrupted) -> m_motor.set(0),
