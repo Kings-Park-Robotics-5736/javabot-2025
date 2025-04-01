@@ -411,11 +411,11 @@ public class RobotContainer {
  
                          new Trigger(()->{
                                  return m_actionController.getLeftY() > 0.2;
-                         }).whileTrue(m_climb.runClimberToSetpoint(ClimbConstants.kFullyInPosition));    
+                         }).whileTrue(m_climb.runClimberToSetpointIn(ClimbConstants.kFullyInPosition));    
                          
                           new Trigger(()->{
                                     return m_actionController.getLeftY() < -0.2;
-                          }).whileTrue(m_climb.runClimberToSetpoint(ClimbConstants.kFullyOutPosition));
+                          }).whileTrue(m_climb.runClimberToSetpointOut(ClimbConstants.kFullyOutPosition));
  
  
  
@@ -539,10 +539,10 @@ public class RobotContainer {
 
 
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbIn.value).whileTrue(
-                        m_climb.runClimberToSetpoint(ClimbConstants.kFullyInPosition));
+                        m_climb.runClimberToSetpointIn(ClimbConstants.kFullyInPosition));
 
                 new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kClimbOut.value).whileTrue(
-                        m_climb.runClimberToSetpoint(ClimbConstants.kFullyOutPosition));
+                        m_climb.runClimberToSetpointOut(ClimbConstants.kFullyOutPosition));
 
                   new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kElevatorDown.value).whileTrue(
                         m_elevate.ElevateHome());

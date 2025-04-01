@@ -303,7 +303,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
     public Command ElevateHome(){
-        return GoOutOfTheWay().andThen(m_arm.RunArmToPositionCommand(ArmConstants.vertical).andThen(m_elevator.RunElevatorToPositionCommand(1)));
+        return GoOutOfTheWayWithArmCheck().andThen(m_arm.RunArmToPositionCommand(ArmConstants.ClimbAngle).andThen(m_elevator.RunElevatorToPositionCommand(1)));
     }
 
     /**********************************
