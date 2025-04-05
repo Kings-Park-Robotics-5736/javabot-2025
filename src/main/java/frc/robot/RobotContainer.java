@@ -140,11 +140,11 @@ public class RobotContainer {
                 if (rot != 0){
                         SmartDashboard.putBoolean("Square to Target?", false);
                 }
-                if(m_driverController.getLeftTriggerAxis()>0){
+               /* if(m_driverController.getLeftTriggerAxis()>0){
                         fieldRelative = false;
                           xSpeed = -xSpeed;
                         ySpeed = -ySpeed;
-                }
+                }*/
                 m_robotDrive.drive(xSpeed, ySpeed, rot, fieldRelative, true);
         }
 
@@ -488,8 +488,17 @@ public class RobotContainer {
                  new POVButton(m_driverController, 90).whileTrue(m_elevate.CagePosRight());
                  new POVButton(m_driverController, 270).whileTrue(m_elevate.CagePosLeft());
                  new Trigger(() -> {
-                        return m_driverController.getRightTriggerAxis() > 0;
+                        return m_driverController.getRightTriggerAxis() > 0 && m_driverController.getLeftTriggerAxis() < 0.2;
                 }).whileTrue(m_elevate.OnlyScoreL23());
+
+                new Trigger(() -> {
+                        return m_driverController.getLeftTriggerAxis() > 0.2 && m_driverController.getRightTriggerAxis() < 0.2;
+                }).whileTrue(m_elevate.GotoScoreL1PositionCommand());
+
+                new Trigger(()->{
+                        return m_driverController.getLeftTriggerAxis() > 0.2 && m_driverController.getRightTriggerAxis() > 0.2;
+
+                }).whileTrue(m_elevate.OnlyScoreL1());
 
 
                 SmartDashboard.putData("Reset Odometry", (Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive)));
@@ -545,7 +554,7 @@ public class RobotContainer {
                         m_climb.runClimberToSetpointOut(ClimbConstants.kFullyOutPosition));
 
                   new JoystickButton(m_buttonbox_controller, ReefButtonBox.Button.kElevatorDown.value).whileTrue(
-                        m_elevate.ElevateHome());
+                        m_climb.runClimberForward());
 
 
 

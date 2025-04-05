@@ -102,7 +102,8 @@ public final class Constants {
     public static final byte kMotorID = 5;
 
     public static final double kFullyOutPosition = 0.770;
-    public static final double kFullyInPosition = 0.574;
+    public static final double kFullyInPosition = 0.59
+    ;
   }
 
 
@@ -127,9 +128,9 @@ public final class Constants {
 
     //.45 rotations per inch
 
-    public static final double kL1Position = 1;
-    public static final double kL2Position = 8.8;
-    public static final double kL3Position = 15.5;
+    public static final double kL1Position = 11.6;
+    public static final double kL2Position = 8.30;
+    public static final double kL3Position = 15.0;
     public static final double kL4Position = 23.9;
     public static final double kIntakePosition = 7.75;
     public static final double kOutofthewayPosition = 10.5;
@@ -163,9 +164,9 @@ public final class Constants {
     public static final int kStaleThreshold = 20;
 
 
-    public static final Limits kLimits = new Limits(Math.toRadians(0),Math.toRadians(230));
+    public static final Limits kLimits = new Limits(Math.toRadians(-60),Math.toRadians(230));
 
-    public static final double L1Angle = Math.toRadians(120);
+    public static final double L1Angle = Math.toRadians(-35);
 
     public static final double L2Angle = Math.toRadians(158.5);
     public static final double L3Angle = Math.toRadians(156);
@@ -177,7 +178,7 @@ public final class Constants {
     public static final double AllHoldingAngle = Math.toRadians(110);
     public static final double L23HoldingAngle = Math.toRadians(157);
 
-    public static final double ClimbAngle = Math.toRadians(60);
+    public static final double ClimbAngle = Math.toRadians(80);
     public static final double ClearAlgaeAngle = Math.toRadians(15);
 
 

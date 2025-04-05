@@ -163,6 +163,14 @@ public double getArmEncoder(){
             () -> !ReverseLimitReached() && !ForwardLimitReached(), this)).withName("Score");
   }
 
+  public Command ScoreSlow(){
+    return (new FunctionalCommand(
+        ()->{},
+         ()->setSpeed(-.5),
+         (interrupted) -> m_motor.set(0),
+            () -> !ReverseLimitReached() && !ForwardLimitReached(), this)).withName("Score");
+  }
+
    public Command RunEndeffectorManualSpeedCommand(DoubleSupplier getSpeed) {
         return new FunctionalCommand(
                 () -> System.out.println("Endeffector Manual Run"),

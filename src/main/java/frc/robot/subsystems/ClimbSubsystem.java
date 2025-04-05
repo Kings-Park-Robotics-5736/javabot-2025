@@ -57,7 +57,7 @@ public class ClimbSubsystem extends SubsystemBase{
 public Command runClimberForward(){
     return new FunctionalCommand(
         ()->{},
-         ()->setSpeed(1),
+         ()->setSpeed(.8),
          (interrupted) -> m_motor.set(0),
          () -> false, this);
 }
@@ -86,7 +86,7 @@ public Command runClimberToSetpointOut(double setpoint){
     return new FunctionalCommand(
         ()->{},
          ()->{if (getEncoderPosition() < setpoint){
-             setSpeed(.9);
+             setSpeed(1);
          } else if (getEncoderPosition() > setpoint){
              setSpeed(0);
          }},

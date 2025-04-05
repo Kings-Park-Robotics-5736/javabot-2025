@@ -338,8 +338,16 @@ public class ElevateSubsystem extends SubsystemBase {
         return m_endeffector.Score(true);
     }
 
+    public Command OnlyScoreL1(){
+        return m_endeffector.ScoreSlow();
+    }
+
 
     //commands to go to the scoring commands, but NOT shoot
+    public Command GotoScoreL1PositionCommand(){
+        return GoToScorePositionL23(ElevatorConstants.kL1Position, ArmConstants.L1Angle);
+    }
+
     public Command GotoScoreL2PositionCommand(){
         return GoToScorePositionL23(ElevatorConstants.kL2Position, ArmConstants.L2Angle);
     }
@@ -394,6 +402,8 @@ public class ElevateSubsystem extends SubsystemBase {
 
      public Command GetPositionCommandFromHeight(ScoreHeight height){
         switch(height){
+            case L1: 
+                return GotoScoreL1PositionCommand();
             case L2:
                 return GotoScoreL2PositionCommand();
             case L3:
