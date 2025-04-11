@@ -368,7 +368,7 @@ public class ElevateSubsystem extends SubsystemBase {
     }
 
     public Command PrepScoreL23(){
-        return ((GoOutOfTheWayWithArmCheck().andThen( m_arm.RunArmToPositionCommand(ArmConstants.L23HoldingAngle))).alongWith(m_endeffector.PullTillReverseSeen())).withName("PrepScoreL23");
+        return ((GoOutOfTheWayWithArmCheck().andThen( m_arm.RunArmToPositionCommand(ArmConstants.L23HoldingAngle, false, true))).alongWith(m_endeffector.PullTillReverseSeen())).withName("PrepScoreL23");
     }
 
     public Command Regrip(){
