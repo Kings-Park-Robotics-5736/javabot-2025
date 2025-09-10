@@ -234,7 +234,7 @@ public final class Constants {
 
     public static final PPHolonomicDriveController pathFollowerConfig = new PPHolonomicDriveController(
         new PIDConstants(5.0, 0, 0), // Translation constants
-        new PIDConstants(5.0, 0, 0) // Rotation constants
+        new PIDConstants(5.5, 0, 0) // Rotation constants
     );
   }
 

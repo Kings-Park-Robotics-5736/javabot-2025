@@ -515,8 +515,13 @@ private void addLimelightVisionMeasurement(Limelight ll, boolean primary) {
           if(m_ignore12Oclock && (ll.getTargetID() == 10 ||  ll.getTargetID() == 21)){
             return;
           }
+
+        if (distanceToAprilTagSquared < 1 && poseDelta < .35 && primary) {
+          transStd = 0.125;
+          rotStd = 10;
+        }
             
-        if (distanceToAprilTagSquared < 6 && poseDelta < .35) {
+        else if (distanceToAprilTagSquared < 6 && poseDelta < .35 ) {
           transStd = 0.20;
           rotStd = 10;
         } else if (distanceToAprilTagSquared < 9 && poseDelta < .5) {

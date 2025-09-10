@@ -46,6 +46,7 @@ public class ElevateSubsystem extends SubsystemBase {
     private Boolean isAutoDrive = false;
     private Boolean isChuteSeen = false;
     private Boolean isClimbing = false;
+    private Boolean coralLandedOnCone = false;
 
 
     public ElevateSubsystem(ScoringPositionSelector scoringPositionSelector, DriveSubsystem robotDrive, LEDSubsystem ledSubsystem) {
@@ -256,7 +257,7 @@ public class ElevateSubsystem extends SubsystemBase {
 
 
     public Command WaitForCoralOrChuteWithTimeoutLeft(){
-        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(.1)).andThen(CrawlToIntakeLeft().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutLeft");
+        return (new WaitUntilCommand(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;}).withTimeout(1)).andThen(CrawlToIntakeLeft().until(()->{ return coralOnCone() || chuteSensorSeen() || isChuteSeen;})).withName("WaitForCoralOrChuteTimeoutLeft");
     }
 
     public Command PrepForIntakePosition(){
@@ -419,10 +420,10 @@ public class ElevateSubsystem extends SubsystemBase {
 
      public Command AutoIntakeAndL4PositionWhileDriving(Boolean moveArmToPre){
         return 
-        (new WaitUntilCommand(()->coralOnCone()).withTimeout(3.5)).andThen(
+        (((new WaitUntilCommand(()->coralOnCone()).andThen(()->coralLandedOnCone=true))).andThen(
          (m_arm.RunArmToPositionCommand(ArmConstants.intakeAngle))
         .andThen(RunElevatorToPositionCommand(ElevatorConstants.kIntakePosition).alongWith(m_endeffector.Intake()))
-        .andThen(moveArmToPre ? GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true) : GoToL4PositionNoPre(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true)).andThen(m_endeffector.Score(true))).unless(()->!coralOnCone());
+        .andThen(moveArmToPre ? GoToL4Position(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true) : GoToL4PositionNoPre(ElevatorConstants.kL4Position, ArmConstants.L4PrepAngle, ArmConstants.L4Angle, true)).andThen(m_endeffector.Score(true)))).finallyDo(()->coralLandedOnCone=false);
      } 
 
 
